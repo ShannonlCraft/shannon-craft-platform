@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#000000">
+<title>Email Studio · Shannon Craft</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#080808;--g1:#111;--g2:#1a1a1a;--g3:#242424;--g4:#2e2e2e;
+  --sep:rgba(255,255,255,.06);--sep2:rgba(255,255,255,.10);
+  --accent:#E8571A;--as:rgba(232,87,26,.12);--ab:rgba(232,87,26,.25);
+  --white:#fff;--l1:rgba(255,255,255,.9);--l2:rgba(255,255,255,.55);
+  --l3:rgba(255,255,255,.3);--l4:rgba(255,255,255,.12);
+  --green:#16A34A;--gs:rgba(22,163,74,.12);--gb:rgba(22,163,74,.25);
+  --sidebar-w:300px;--toolbar-h:56px;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);font-family:'Manrope',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideRight{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
+@keyframes popIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+@keyframes shimmer{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--g2);border:1px solid var(--sep2);color:var(--white);border-radius:12px;padding:11px 18px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;box-shadow:0 8px 40px rgba(0,0,0,.8);transform:translateY(20px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:center;gap:8px;}
+.toast-dot{width:5px;height:5px;background:var(--accent);border-radius:50%;}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* ── LAYOUT ── */
+.app{display:grid;grid-template-columns:var(--sidebar-w) 1fr;grid-template-rows:var(--toolbar-h) 1fr;height:100vh;}
+
+/* ── TOOLBAR ── */
+.toolbar{grid-column:1/-1;background:var(--g1);border-bottom:1px solid var(--sep);display:flex;align-items:center;padding:0 20px;gap:12px;z-index:30;}
+.toolbar-brand{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--white);white-space:nowrap;margin-right:4px;}
+.toolbar-brand em{color:var(--accent);font-style:normal;}
+.toolbar-sep{width:1px;height:20px;background:var(--sep2);flex-shrink:0;}
+.toolbar-tabs{display:flex;gap:2px;}
+.ttab{height:32px;padding:0 14px;border-radius:8px;background:transparent;border:none;font-family:'Manrope',sans-serif;font-size:12px;font-weight:700;color:var(--l3);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.ttab:hover{color:var(--l2);background:var(--g2);}
+.ttab.on{background:var(--as);color:var(--accent);}
+.toolbar-right{margin-left:auto;display:flex;gap:8px;align-items:center;}
+.tbtn{display:flex;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:8px;font-family:'Manrope',sans-serif;font-size:12px;font-weight:800;cursor:pointer;border:none;transition:all .15s;white-space:nowrap;}
+.tbtn:active{transform:scale(.97);}
+.tbtn.p{background:var(--accent);color:#fff;}
+.tbtn.p:hover{opacity:.9;}
+.tbtn.s{background:var(--g3);color:var(--l2);border:1px solid var(--sep2);}
+.tbtn.s:hover{background:var(--g4);}
+.tbtn svg{width:12px;height:12px;}
+.subject-bar{flex:1;max-width:380px;background:var(--g2);border:1.5px solid var(--sep2);border-radius:9px;padding:0 12px;display:flex;align-items:center;gap:8px;height:32px;transition:border-color .2s;}
+.subject-bar:focus-within{border-color:var(--accent);}
+.subject-label{font-size:10px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;}
+.subject-input{flex:1;border:none;outline:none;background:transparent;font-family:'Manrope',sans-serif;font-size:13px;font-weight:500;color:var(--white);caret-color:var(--accent);}
+.subject-input::placeholder{color:var(--l4);}
+
+/* ── LEFT PANEL ── */
+.left-panel{background:var(--g1);border-right:1px solid var(--sep);overflow-y:auto;overflow-x:hidden;}
+.left-panel::-webkit-scrollbar{width:4px;}
+.left-panel::-webkit-scrollbar-track{background:transparent;}
+.left-panel::-webkit-scrollbar-thumb{background:var(--g4);border-radius:2px;}
+.panel-section{padding:16px 14px 8px;}
+.panel-section-label{font-size:9px;font-weight:800;color:var(--l3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+.panel-section-label span{font-size:10px;font-weight:700;color:var(--accent);cursor:pointer;text-transform:none;letter-spacing:0;}
+
+/* Block palette */
+.block-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.block-tile{background:var(--g2);border:1.5px solid var(--sep);border-radius:10px;padding:10px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;}
+.block-tile:hover{background:var(--as);border-color:var(--ab);transform:translateY(-1px);}
+.block-tile:active{transform:scale(.96);}
+.block-tile-icon{width:30px;height:30px;border-radius:8px;background:var(--as);border:1px solid var(--ab);display:flex;align-items:center;justify-content:center;color:var(--accent);}
+.block-tile-icon svg{width:14px;height:14px;}
+.block-tile-icon.gr{background:var(--gs);border-color:var(--gb);color:var(--green);}
+.block-tile-name{font-size:11px;font-weight:700;color:var(--white);line-height:1;}
+.block-tile-desc{font-size:9px;font-weight:500;color:var(--l3);line-height:1.3;}
+
+/* Saved emails list */
+.saved-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;cursor:pointer;transition:background .12s;margin-bottom:4px;}
+.saved-item:hover{background:var(--g2);}
+.saved-item-icon{width:28px;height:28px;border-radius:7px;background:var(--as);border:1px solid var(--ab);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent);}
+.saved-item-icon svg{width:12px;height:12px;}
+.saved-item-body{flex:1;min-width:0;}
+.saved-item-name{font-size:12px;font-weight:700;color:var(--white);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.saved-item-meta{font-size:10px;font-weight:500;color:var(--l3);margin-top:1px;}
+.saved-item-del{width:22px;height:22px;border-radius:6px;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--l3);opacity:0;transition:all .15s;flex-shrink:0;}
+.saved-item:hover .saved-item-del{opacity:1;}
+.saved-item-del:hover{background:rgba(239,68,68,.15);color:#ef4444;}
+.saved-item-del svg{width:10px;height:10px;}
+
+/* Assets grid */
+.asset-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;}
+.asset-thumb{aspect-ratio:1;border-radius:7px;overflow:hidden;cursor:pointer;border:1.5px solid var(--sep);transition:all .15s;background:var(--g3);display:flex;align-items:center;justify-content:center;}
+.asset-thumb:hover{border-color:var(--ab);transform:scale(1.03);}
+.asset-thumb.sel{border-color:var(--accent);box-shadow:0 0 0 3px var(--as);}
+.asset-thumb img{width:100%;height:100%;object-fit:contain;padding:4px;}
+.asset-upload-zone{border:1.5px dashed var(--sep2);border-radius:9px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:8px;}
+.asset-upload-zone:hover{border-color:var(--ab);background:var(--as);}
+
+/* Broadcast panel */
+.bc-field{margin-bottom:12px;}
+.bc-label{font-size:10px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;}
+.bc-input{width:100%;background:var(--g2);border:1.5px solid var(--sep2);border-radius:9px;padding:10px 12px;font-family:'Manrope',sans-serif;font-size:13px;font-weight:500;color:var(--white);outline:none;caret-color:var(--accent);transition:border-color .2s;}
+.bc-input:focus{border-color:var(--accent);}
+.bc-input::placeholder{color:var(--l4);}
+.bc-ta{width:100%;background:var(--g2);border:1.5px solid var(--sep2);border-radius:9px;padding:10px 12px;font-family:'Manrope',sans-serif;font-size:13px;font-weight:500;color:var(--white);outline:none;caret-color:var(--accent);transition:border-color .2s;resize:none;min-height:120px;line-height:1.65;}
+.bc-ta:focus{border-color:var(--accent);}
+.bc-ta::placeholder{color:var(--l4);}
+.aud-pills{display:flex;gap:5px;flex-wrap:wrap;}
+.aud-pill{height:26px;padding:0 10px;border-radius:20px;background:var(--g3);border:1.5px solid var(--sep2);font-family:'Manrope',sans-serif;font-size:10px;font-weight:700;color:var(--l3);cursor:pointer;transition:all .15s;}
+.aud-pill.sel{background:var(--as);border-color:var(--ab);color:var(--accent);}
+.rich-bar{display:flex;gap:3px;padding:6px 8px;background:var(--g3);border:1.5px solid var(--sep2);border-bottom:none;border-radius:9px 9px 0 0;flex-wrap:wrap;}
+.rtb{height:24px;padding:0 8px;border-radius:5px;background:transparent;border:none;cursor:pointer;font-family:'Manrope',sans-serif;font-size:11px;font-weight:700;color:var(--l2);transition:all .15s;}
+.rtb:hover{background:var(--as);color:var(--accent);}
+.merge-tag{height:20px;padding:0 7px;border-radius:5px;background:var(--g3);border:1px solid var(--sep2);font-size:9px;font-weight:700;color:var(--accent);cursor:pointer;display:inline-flex;align-items:center;transition:background .15s;}
+.merge-tag:hover{background:var(--as);}
+.bc-history{margin-top:16px;}
+.bc-hist-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--g2);border-radius:8px;margin-bottom:5px;}
+.bc-hist-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;}
+.bc-hist-sub{font-size:11px;font-weight:700;color:var(--white);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bc-hist-meta{font-size:10px;font-weight:500;color:var(--l3);}
+
+/* ── RIGHT PANEL — CANVAS ── */
+.right-panel{background:var(--bg);display:flex;flex-direction:column;overflow:hidden;}
+.canvas-toolbar{padding:12px 20px;border-bottom:1px solid var(--sep);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.canvas-label{font-size:11px;font-weight:800;color:var(--l3);text-transform:uppercase;letter-spacing:.6px;}
+.canvas-count{height:20px;padding:0 8px;border-radius:10px;background:var(--as);border:1px solid var(--ab);font-size:10px;font-weight:800;color:var(--accent);}
+.canvas-actions{margin-left:auto;display:flex;gap:6px;}
+.canvas-area{flex:1;overflow-y:auto;padding:20px;background:var(--bg);}
+.canvas-area::-webkit-scrollbar{width:5px;}
+.canvas-area::-webkit-scrollbar-track{background:transparent;}
+.canvas-area::-webkit-scrollbar-thumb{background:var(--g3);border-radius:3px;}
+
+/* Canvas empty */
+.canvas-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:16px;opacity:.5;}
+.canvas-empty-icon{width:60px;height:60px;border-radius:18px;background:var(--g2);display:flex;align-items:center;justify-content:center;}
+.canvas-empty-icon svg{width:26px;height:26px;color:var(--l3);}
+.canvas-empty-title{font-size:15px;font-weight:800;color:var(--white);}
+.canvas-empty-sub{font-size:12px;font-weight:500;color:var(--l3);text-align:center;max-width:280px;line-height:1.6;}
+
+/* Email preview wrapper */
+.email-preview{max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 40px rgba(0,0,0,.5);}
+.email-preview.dark-mode{background:#111;}
+
+/* Block cards in canvas */
+.eblock{border-radius:10px;overflow:hidden;margin-bottom:10px;border:1.5px solid transparent;transition:all .15s;position:relative;animation:fadeIn .2s ease both;}
+.eblock:hover{border-color:var(--sep2);}
+.eblock.selected{border-color:var(--accent);}
+.eblock-handle{position:absolute;top:6px;left:-28px;width:22px;height:22px;border-radius:6px;background:var(--g3);display:flex;align-items:center;justify-content:center;cursor:grab;opacity:0;transition:opacity .15s;color:var(--l3);}
+.eblock:hover .eblock-handle{opacity:1;}
+.eblock-actions{position:absolute;top:6px;right:6px;display:flex;gap:4px;opacity:0;transition:opacity .15s;}
+.eblock:hover .eblock-actions{opacity:1;}
+.eblock-btn{width:24px;height:24px;border-radius:6px;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.15);cursor:pointer;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.8);transition:all .15s;backdrop-filter:blur(8px);}
+.eblock-btn:hover{background:var(--accent);border-color:var(--accent);color:#fff;}
+.eblock-btn.del:hover{background:#ef4444;border-color:#ef4444;}
+.eblock-btn svg{width:10px;height:10px;}
+
+/* Block content editing */
+.block-text-edit{width:100%;background:transparent;border:none;outline:none;font-family:Georgia,serif;font-size:15px;color:#333;line-height:1.75;resize:none;min-height:60px;padding:4px 0;}
+.block-input{width:100%;background:rgba(0,0,0,.05);border:1.5px solid rgba(0,0,0,.1);border-radius:6px;padding:8px 10px;font-family:'Manrope',sans-serif;font-size:13px;color:#333;outline:none;caret-color:var(--accent);margin-top:6px;transition:border-color .2s;}
+.block-input:focus{border-color:var(--accent);}
+
+/* Preview mode */
+.preview-panel{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:200;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px);}
+.preview-panel.hidden{display:none;}
+.preview-inner{background:var(--g1);border-radius:20px;width:680px;max-width:95vw;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;animation:popIn .3s ease;}
+.preview-hdr{padding:16px 20px;border-bottom:1px solid var(--sep);display:flex;align-items:center;gap:10px;}
+.preview-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;}
+.preview-toggle{display:flex;gap:4px;margin-left:auto;}
+.ptog{height:28px;padding:0 12px;border-radius:7px;background:var(--g3);border:none;font-family:'Manrope',sans-serif;font-size:11px;font-weight:700;color:var(--l3);cursor:pointer;transition:all .15s;}
+.ptog.on{background:var(--as);color:var(--accent);}
+.preview-close{width:30px;height:30px;border-radius:8px;background:var(--g2);border:1px solid var(--sep2);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--l3);}
+.preview-close:hover{color:var(--accent);}
+.preview-close svg{width:12px;height:12px;}
+.preview-body{flex:1;overflow-y:auto;padding:20px;}
+.preview-body::-webkit-scrollbar{width:4px;}
+.preview-body::-webkit-scrollbar-thumb{background:var(--g4);border-radius:2px;}
+
+/* Overlay sheets */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:400;align-items:center;justify-content:center;backdrop-filter:blur(8px);}
+.overlay.open{display:flex;}
+.modal{background:var(--g1);border-radius:18px;width:100%;max-width:500px;max-height:88vh;overflow-y:auto;animation:popIn .25s ease;}
+.modal-hdr{padding:20px 22px 16px;border-bottom:1px solid var(--sep);display:flex;align-items:flex-start;justify-content:space-between;}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;}
+.modal-title em{color:var(--accent);font-style:normal;}
+.modal-close{width:28px;height:28px;border-radius:7px;background:var(--g2);border:1px solid var(--sep2);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--l3);}
+.modal-close:hover{color:var(--accent);}
+.modal-close svg{width:11px;height:11px;}
+.modal-body{padding:20px 22px;}
+.ml{font-size:10px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;}
+.mi{width:100%;background:var(--bg);border:1.5px solid var(--sep2);border-radius:9px;padding:11px 13px;font-family:'Manrope',sans-serif;font-size:13px;font-weight:500;color:var(--white);outline:none;caret-color:var(--accent);transition:border-color .2s;margin-bottom:12px;}
+.mi:focus{border-color:var(--accent);}
+.mi::placeholder{color:var(--l4);}
+.mta{width:100%;background:var(--bg);border:1.5px solid var(--sep2);border-radius:9px;padding:11px 13px;font-family:'Manrope',sans-serif;font-size:13px;font-weight:500;color:var(--white);outline:none;caret-color:var(--accent);transition:border-color .2s;margin-bottom:12px;resize:none;min-height:80px;line-height:1.6;}
+.mta:focus{border-color:var(--accent);}
+.mta::placeholder{color:var(--l4);}
+.modal-footer{padding:0 22px 20px;display:flex;gap:8px;justify-content:flex-end;}
+.mbtn-p{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:10px 20px;font-size:13px;font-weight:800;font-family:'Manrope',sans-serif;cursor:pointer;}
+.mbtn-p:hover{opacity:.9;}
+.mbtn-s{background:var(--g3);color:var(--l2);border:1px solid var(--sep2);border-radius:9px;padding:10px 18px;font-size:13px;font-weight:700;font-family:'Manrope',sans-serif;cursor:pointer;}
+
+/* Color swatches */
+.csw{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.csw-dot{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:all .15s;}
+.csw-dot:hover{transform:scale(1.1);}
+.csw-dot.sel{border-color:#fff;transform:scale(1.15);}
+
+/* Empty saved */
+.panel-empty{text-align:center;padding:24px 16px;color:var(--l3);}
+.panel-empty svg{width:24px;height:24px;margin-bottom:8px;color:var(--l4);}
+.panel-empty-title{font-size:13px;font-weight:700;color:var(--l2);margin-bottom:4px;}
+.panel-empty-sub{font-size:11px;font-weight:500;line-height:1.5;}
+
+/* Mobile fallback */
+@media(max-width:767px){
+  .app{grid-template-columns:1fr;grid-template-rows:var(--toolbar-h) auto 1fr;}
+  .left-panel{display:none;}
+  .mobile-msg{display:flex !important;}
+}
+.mobile-msg{display:none;position:fixed;inset:0;background:var(--bg);z-index:500;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;gap:16px;}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"><div class="toast-dot"></div><span id="tMsg"></span></div>
+
+<!-- Mobile message -->
+<div class="mobile-msg">
+  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1.5px;">Use on Desktop</div>
+  <div style="font-size:14px;font-weight:500;color:var(--l2);line-height:1.7;">The Email Studio is designed for desktop. On your phone, use <strong style="color:var(--white);">admin-email.html</strong> instead.</div>
+  <a href="admin-email.html" style="display:inline-block;background:var(--accent);color:#fff;border-radius:10px;padding:12px 22px;font-family:'Manrope',sans-serif;font-size:14px;font-weight:800;text-decoration:none;margin-top:8px;">Open Mobile Version</a>
+</div>
+
+<!-- APP -->
+<div class="app">
+
+  <!-- TOOLBAR -->
+  <header class="toolbar">
+    <div class="toolbar-brand">Shannon <em>Craft</em></div>
+    <div class="toolbar-sep"></div>
+    <div class="toolbar-tabs">
+      <button class="ttab on" id="tab-builder" onclick="switchTab('builder')">✏️ Builder</button>
+      <button class="ttab" id="tab-saved" onclick="switchTab('saved')">📋 Saved</button>
+      <button class="ttab" id="tab-assets" onclick="switchTab('assets')">🖼️ Assets</button>
+      <button class="ttab" id="tab-broadcast" onclick="switchTab('broadcast')">📤 Broadcast</button>
+    </div>
+    <div class="toolbar-sep"></div>
+    <div class="subject-bar" id="subjectBar">
+      <span class="subject-label">Subject</span>
+      <input class="subject-input" id="emailSubject" placeholder="Your subject line…">
+    </div>
+    <div class="toolbar-right">
+      <button class="tbtn s" onclick="newEmail()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New
+      </button>
+      <button class="tbtn s" onclick="openPreview()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        Preview
+      </button>
+      <button class="tbtn p" onclick="saveEmail()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save
+      </button>
+      <div class="toolbar-sep"></div>
+      <a href="admin-desktop.html" class="tbtn s" style="text-decoration:none;">← Dashboard</a>
+    </div>
+  </header>
+
+  <!-- LEFT PANEL -->
+  <aside class="left-panel">
+
+    <!-- BUILDER TAB -->
+    <div id="panel-builder">
+      <div class="panel-section">
+        <div class="panel-section-label">Add a Block</div>
+        <div class="block-grid">
+          <div class="block-tile" onclick="addBlock('logo')">
+            <div class="block-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg></div>
+            <div class="block-tile-name">Logo</div>
+            <div class="block-tile-desc">Brand header</div>
+          </div>
+          <div class="block-tile" onclick="addBlock('text')">
+            <div class="block-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg></div>
+            <div class="block-tile-name">Text</div>
+            <div class="block-tile-desc">Paragraph</div>
+          </div>
+          <div class="block-tile" onclick="addBlock('image')">
+            <div class="block-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+            <div class="block-tile-name">Image</div>
+            <div class="block-tile-desc">Photo or graphic</div>
+          </div>
+          <div class="block-tile" onclick="addBlock('button')">
+            <div class="block-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="8" width="20" height="8" rx="4"/></svg></div>
+            <div class="block-tile-name">Button</div>
+            <div class="block-tile-desc">Call to action</div>
+          </div>
+          <div class="block-tile" onclick="addBlock('divider')">
+            <div class="block-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"/></svg></div>
+            <div class="block-tile-name">Divider</div>
+            <div class="block-tile-desc">Line or space</div>
+          </div>
+          <div class="block-tile" onclick="addBlock('testimonial')">
+            <div class="block-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+            <div class="block-tile-name">Quote</div>
+            <div class="block-tile-desc">Testimonial</div>
+          </div>
+          <div class="block-tile" onclick="addBlock('banner')">
+            <div class="block-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+            <div class="block-tile-name">Banner</div>
+            <div class="block-tile-desc">Promo block</div>
+          </div>
+          <div class="block-tile" onclick="addBlock('social')">
+            <div class="block-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
+            <div class="block-tile-name">Socials</div>
+            <div class="block-tile-desc">Icon links</div>
+          </div>
+          <div class="block-tile" onclick="pickFromAssets()" style="grid-column:1/-1;">
+            <div class="block-tile-icon gr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+            <div class="block-tile-name" style="color:var(--green);">From My Assets</div>
+            <div class="block-tile-desc">Use a saved logo or image</div>
+          </div>
+        </div>
+      </div>
+      <div style="height:1px;background:var(--sep);margin:4px 0;"></div>
+      <div class="panel-section">
+        <div class="panel-section-label">Merge Tags <span onclick="insertMerge()">+ Insert</span></div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;">
+          <div class="merge-tag" onclick="copyMerge('{{first_name}}')">{{first_name}}</div>
+          <div class="merge-tag" onclick="copyMerge('{{full_name}}')">{{full_name}}</div>
+          <div class="merge-tag" onclick="copyMerge('{{product_name}}')">{{product_name}}</div>
+          <div class="merge-tag" onclick="copyMerge('{{download_link}}')">{{download_link}}</div>
+          <div class="merge-tag" onclick="copyMerge('{{unsubscribe_link}}')">{{unsubscribe_link}}</div>
+        </div>
+        <div style="font-size:10px;font-weight:500;color:var(--l3);margin-top:8px;line-height:1.5;">Click any tag to copy it, then paste it into a text block.</div>
+      </div>
+    </div>
+
+    <!-- SAVED TAB -->
+    <div id="panel-saved" style="display:none;">
+      <div class="panel-section">
+        <div class="panel-section-label">Saved Emails <span onclick="newEmail()">+ New</span></div>
+        <div id="savedList"></div>
+      </div>
+    </div>
+
+    <!-- ASSETS TAB -->
+    <div id="panel-assets" style="display:none;">
+      <div class="panel-section">
+        <div class="panel-section-label">Brand Assets <span onclick="document.getElementById('assetUpload').click()">+ Upload</span></div>
+        <input type="file" id="assetUpload" accept="image/*" multiple style="display:none" onchange="handleAssetUpload(this)">
+        <div class="asset-upload-zone" onclick="document.getElementById('assetUpload').click()">
+          <div style="font-size:22px;margin-bottom:6px;">🖼️</div>
+          <div style="font-size:12px;font-weight:700;color:var(--white);margin-bottom:2px;">Upload Images</div>
+          <div style="font-size:10px;font-weight:500;color:var(--l3);">PNG · JPG · SVG · WEBP</div>
+        </div>
+        <div class="asset-grid" id="assetGrid"></div>
+      </div>
+    </div>
+
+    <!-- BROADCAST TAB -->
+    <div id="panel-broadcast" style="display:none;">
+      <div class="panel-section">
+        <div class="panel-section-label">Send Broadcast</div>
+
+        <div class="bc-field">
+          <div class="bc-label">Send To</div>
+          <div class="aud-pills" id="audPills">
+            <div class="aud-pill sel" data-a="everyone" onclick="pickAud(this)">Everyone</div>
+            <div class="aud-pill" data-a="buyer" onclick="pickAud(this)">Buyers</div>
+            <div class="aud-pill" data-a="lead" onclick="pickAud(this)">Leads</div>
+            <div class="aud-pill" data-a="vip" onclick="pickAud(this)">VIP</div>
+            <div class="aud-pill" data-a="youtube" onclick="pickAud(this)">YouTube</div>
+            <div class="aud-pill" data-a="newsletter" onclick="pickAud(this)">Newsletter</div>
+          </div>
+        </div>
+
+        <div class="bc-field">
+          <div class="bc-label">Reach: <span id="bcReach" style="color:var(--accent);">0</span> contacts</div>
+        </div>
+
+        <div class="bc-field">
+          <div class="bc-label">Subject Line</div>
+          <input class="bc-input" id="bcSubject" placeholder="Subject…" oninput="updReach()">
+        </div>
+
+        <div class="bc-field">
+          <div class="bc-label">Merge Tags</div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;">
+            <div class="merge-tag" onclick="insMerge('bcBody','{{first_name}}')">{{first_name}}</div>
+            <div class="merge-tag" onclick="insMerge('bcBody','{{unsubscribe_link}}')">{{unsubscribe_link}}</div>
+          </div>
+        </div>
+
+        <div class="bc-field">
+          <div class="bc-label">Body</div>
+          <div class="rich-bar">
+            <button class="rtb" onmousedown="event.preventDefault();document.execCommand('bold')"><b>B</b></button>
+            <button class="rtb" onmousedown="event.preventDefault();document.execCommand('italic')"><i>I</i></button>
+            <button class="rtb" onmousedown="event.preventDefault();document.execCommand('underline')"><u>U</u></button>
+            <button class="rtb" onmousedown="event.preventDefault();document.execCommand('insertUnorderedList')">• List</button>
+          </div>
+          <div class="bc-ta" id="bcBody" contenteditable="true" style="border-radius:0 0 9px 9px;border-top:none;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--sep2)'"></div>
+        </div>
+
+        <div style="background:var(--as);border:1px solid var(--ab);border-radius:9px;padding:10px 12px;margin-bottom:12px;font-size:11px;font-weight:600;color:var(--accent);line-height:1.5;">
+          ⚠️ Always include {{unsubscribe_link}} in every broadcast.
+        </div>
+
+        <button onclick="sendBroadcast()" style="width:100%;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:9px;font-family:'Manrope',sans-serif;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:8px;">Send Broadcast</button>
+        <button onclick="previewBroadcast()" style="width:100%;padding:10px;background:var(--g3);color:var(--l2);border:1px solid var(--sep2);border-radius:9px;font-family:'Manrope',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">Preview First</button>
+
+        <div class="bc-history">
+          <div class="panel-section-label" style="margin-bottom:8px;">Sent History</div>
+          <div id="bcHistory"></div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- RIGHT PANEL — CANVAS -->
+  <main class="right-panel">
+    <div class="canvas-toolbar">
+      <span class="canvas-label">Email Canvas</span>
+      <span class="canvas-count" id="blockCount" style="display:none;">0 blocks</span>
+      <div class="canvas-actions">
+        <button class="tbtn s" onclick="clearCanvas()" style="font-size:11px;height:28px;padding:0 10px;">Clear All</button>
+      </div>
+    </div>
+    <div class="canvas-area" id="canvasArea">
+      <div class="canvas-empty" id="canvasEmpty">
+        <div class="canvas-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+        <div class="canvas-empty-title">Your email starts here</div>
+        <div class="canvas-empty-sub">Click any block on the left to add it. Your email builds up here in real time.</div>
+      </div>
+      <div id="emailCanvas" style="max-width:600px;margin:0 auto;"></div>
+    </div>
+  </main>
+
+</div><!-- /app -->
+
+<!-- PREVIEW PANEL -->
+<div class="preview-panel hidden" id="previewPanel">
+  <div class="preview-inner">
+    <div class="preview-hdr">
+      <div class="preview-title">Preview</div>
+      <div class="preview-toggle">
+        <button class="ptog on" id="pvDark" onclick="setPvMode('dark')">Dark</button>
+        <button class="ptog" id="pvLight" onclick="setPvMode('light')">Light</button>
+      </div>
+      <button class="preview-close" onclick="closePreview()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="preview-body" id="previewBody"></div>
+  </div>
+</div>
+
+<!-- ASSET PICKER MODAL -->
+<div class="overlay" id="assetPickerModal" onclick="if(event.target===this)closeModal('assetPickerModal')">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div><div class="modal-title">Pick an <em>Asset</em></div></div>
+      <button class="modal-close" onclick="closeModal('assetPickerModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="asset-grid" id="assetPickerGrid" style="grid-template-columns:repeat(4,1fr);gap:8px;"></div>
+      <div id="assetPickerEmpty" style="display:none;" class="panel-empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <div class="panel-empty-title">No assets yet</div>
+        <div class="panel-empty-sub">Upload some in the Assets tab first</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="mbtn-s" onclick="closeModal('assetPickerModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── KEYS ── */
+const K={EMAILS:'sc_emails_v1',ASSETS:'sc_assets_v1',CONTACTS:'sc_contacts_v1',BCAST:'sc_bcast_v1',CFG:'sc_cfg_v1'};
+const COLORS=['#E8571A','#2563EB','#7C3AED','#16A34A','#DC2626','#0D9488','#DB2777','#D97706','#000000','#ffffff'];
+
+/* ── UTILS ── */
+function gd(k,def){try{const v=JSON.parse(localStorage.getItem(k));return v!==null?v:def;}catch(e){return def;}}
+function sd(k,v){localStorage.setItem(k,JSON.stringify(v));}
+function uid(){return 'e'+Date.now().toString(36)+Math.random().toString(36).slice(2);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function fmtD(iso){if(!iso)return'';return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
+let _tt;
+function showToast(msg){document.getElementById('tMsg').textContent=msg;const t=document.getElementById('toast');t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),2600);}
+function openModal(id){document.getElementById(id)?.classList.add('open');}
+function closeModal(id){document.getElementById(id)?.classList.remove('open');}
+
+/* ── TABS ── */
+const TABS=['builder','saved','assets','broadcast'];
+function switchTab(tab){
+  TABS.forEach(t=>{
+    document.getElementById('tab-'+t)?.classList.toggle('on',t===tab);
+    document.getElementById('panel-'+t).style.display=t===tab?'block':'none';
+  });
+  const subjectBar=document.getElementById('subjectBar');
+  subjectBar.style.display=tab==='broadcast'?'none':'flex';
+  if(tab==='saved')renderSavedList();
+  if(tab==='assets')renderAssets();
+  if(tab==='broadcast'){updReach();renderBcHistory();}
+}
+
+/* ── BLOCKS ── */
+let blocks=[];
+let curEmailId=null;
+
+const BLOCK_DEFAULTS={
+  logo:{type:'logo',brandName:'Shannon Craft',bgColor:'#000000',textColor:'#E8571A',logoUrl:''},
+  text:{type:'text',html:'<p>Write your message here. You can style it using the formatting buttons above.</p>'},
+  image:{type:'image',url:'',alt:'',link:''},
+  button:{type:'button',label:'Click Here',url:'#',bgColor:'#E8571A',textColor:'#ffffff'},
+  divider:{type:'divider',style:'line',color:'#333333'},
+  testimonial:{type:'testimonial',quote:'This changed my life!',author:'— Happy Customer',bgColor:'#1a1a1a'},
+  banner:{type:'banner',eyebrow:'Limited Time',headline:'Special Offer',sub:"Don't miss out.",bgColor:'#E8571A',textColor:'#000000'},
+  social:{type:'social',links:{instagram:'',youtube:'',tiktok:'',facebook:'',x:'',linkedin:''}},
+};
+
+function addBlock(type,data){
+  const block={id:uid(),...JSON.parse(JSON.stringify(BLOCK_DEFAULTS[type]||{type})),...(data||{})};
+  blocks.push(block);
+  renderCanvas();
+  showToast(type+' block added');
+  // Scroll canvas to bottom
+  setTimeout(()=>{const ca=document.getElementById('canvasArea');ca.scrollTo({top:ca.scrollHeight,behavior:'smooth'});},100);
+}
+
+function removeBlock(id){blocks=blocks.filter(b=>b.id!==id);renderCanvas();}
+function moveBlock(id,dir){
+  const i=blocks.findIndex(b=>b.id===id);const ni=i+dir;
+  if(ni<0||ni>=blocks.length)return;
+  [blocks[i],blocks[ni]]=[blocks[ni],blocks[i]];renderCanvas();
+}
+function updateBlock(id,key,val){const b=blocks.find(x=>x.id===id);if(b)b[key]=val;renderCanvas();}
+
+function renderCanvas(){
+  const canvas=document.getElementById('emailCanvas');
+  const empty=document.getElementById('canvasEmpty');
+  const count=document.getElementById('blockCount');
+  empty.style.display=blocks.length?'none':'flex';
+  count.style.display=blocks.length?'inline-flex':'none';
+  count.textContent=blocks.length+' block'+(blocks.length!==1?'s':'');
+  canvas.innerHTML=blocks.map((b,i)=>renderBlock(b,i)).join('');
+}
+
+function renderBlock(b,idx){
+  const isFirst=idx===0;const isLast=idx===blocks.length-1;
+  const actions=`
+    <div class="eblock-actions">
+      ${!isFirst?`<button class="eblock-btn" onclick="moveBlock('${b.id}',-1)" title="Move up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg></button>`:''}
+      ${!isLast?`<button class="eblock-btn" onclick="moveBlock('${b.id}',1)" title="Move down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></button>`:''}
+      <button class="eblock-btn del" onclick="removeBlock('${b.id}')" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>`;
+
+  let inner='';
+  switch(b.type){
+    case 'logo':
+      inner=`<div style="background:${b.bgColor};padding:16px;text-align:center;border-radius:8px;">
+        ${b.logoUrl?`<img src="${esc(b.logoUrl)}" style="max-height:50px;max-width:220px;object-fit:contain;">`
+        :`<div style="font-family:'Bebas Neue',Georgia,serif;font-size:22px;letter-spacing:3px;color:${b.textColor};">${esc(b.brandName||'Shannon Craft')}</div>`}
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center;">
+        <input type="file" id="lf-${b.id}" accept="image/*" style="display:none" onchange="handleLogoUpload('${b.id}',this)">
+        <button onclick="document.getElementById('lf-${b.id}').click()" style="height:28px;padding:0 12px;background:var(--g3);border:1px solid var(--sep2);border-radius:6px;font-family:'Manrope',sans-serif;font-size:11px;font-weight:700;color:var(--l2);cursor:pointer;">Upload Logo</button>
+        <span style="font-size:10px;color:var(--l3);">or</span>
+        <input placeholder="Logo URL" value="${esc(b.logoUrl||'')}" oninput="updateBlock('${b.id}','logoUrl',this.value)" style="flex:1;min-width:120px;height:28px;background:var(--g3);border:1px solid var(--sep2);border-radius:6px;padding:0 10px;font-family:'Manrope',sans-serif;font-size:12px;color:var(--white);outline:none;caret-color:var(--accent);">
+        <input placeholder="Brand name text" value="${esc(b.brandName||'')}" oninput="updateBlock('${b.id}','brandName',this.value)" style="flex:1;min-width:100px;height:28px;background:var(--g3);border:1px solid var(--sep2);border-radius:6px;padding:0 10px;font-family:'Manrope',sans-serif;font-size:12px;color:var(--white);outline:none;caret-color:var(--accent);">
+      </div>`;
+      break;
+
+    case 'text':
+      inner=`<div style="background:#fff;padding:16px;border-radius:8px;">
+        <div style="display:flex;gap:3px;margin-bottom:8px;background:#f5f5f5;border-radius:6px;padding:4px 6px;">
+          <button onmousedown="event.preventDefault();document.execCommand('bold')" style="height:22px;padding:0 6px;border-radius:4px;background:transparent;border:none;cursor:pointer;font-weight:800;font-size:11px;color:#333;">B</button>
+          <button onmousedown="event.preventDefault();document.execCommand('italic')" style="height:22px;padding:0 6px;border-radius:4px;background:transparent;border:none;cursor:pointer;font-style:italic;font-size:11px;color:#333;">I</button>
+          <button onmousedown="event.preventDefault();document.execCommand('underline')" style="height:22px;padding:0 6px;border-radius:4px;background:transparent;border:none;cursor:pointer;text-decoration:underline;font-size:11px;color:#333;">U</button>
+          <button onmousedown="event.preventDefault();document.execCommand('justifyCenter')" style="height:22px;padding:0 6px;border-radius:4px;background:transparent;border:none;cursor:pointer;font-size:11px;color:#333;">Center</button>
+          <button onmousedown="event.preventDefault();document.execCommand('justifyLeft')" style="height:22px;padding:0 6px;border-radius:4px;background:transparent;border:none;cursor:pointer;font-size:11px;color:#333;">Left</button>
+        </div>
+        <div contenteditable="true" id="te-${b.id}" style="font-family:Georgia,serif;font-size:15px;color:#333;line-height:1.75;outline:none;min-height:60px;" oninput="blocks.find(x=>x.id==='${b.id}').html=this.innerHTML">${b.html||''}</div>
+      </div>`;
+      break;
+
+    case 'image':
+      inner=`${b.url?`<div style="background:#f5f5f5;border-radius:8px;overflow:hidden;"><img src="${esc(b.url)}" style="width:100%;display:block;max-height:300px;object-fit:cover;" onerror="this.parentElement.innerHTML='<div style=padding:20px;text-align:center;color:#999;font-size:13px;>Image not found</div>'"></div>`
+      :`<div style="background:var(--g3);border-radius:8px;padding:28px;text-align:center;cursor:pointer;" onclick="document.getElementById('if-${b.id}').click()"><div style="font-size:28px;margin-bottom:8px;">🖼️</div><div style="font-size:12px;font-weight:600;color:var(--l3);">Click to upload an image</div></div>`}
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <input type="file" id="if-${b.id}" accept="image/*" style="display:none" onchange="handleImgUpload('${b.id}',this)">
+        <button onclick="document.getElementById('if-${b.id}').click()" style="height:28px;padding:0 12px;background:var(--g3);border:1px solid var(--sep2);border-radius:6px;font-family:'Manrope',sans-serif;font-size:11px;font-weight:700;color:var(--l2);cursor:pointer;">Upload</button>
+        <input placeholder="Or paste image URL" value="${esc(b.url||'')}" oninput="updateBlock('${b.id}','url',this.value)" style="flex:1;height:28px;background:var(--g3);border:1px solid var(--sep2);border-radius:6px;padding:0 10px;font-family:'Manrope',sans-serif;font-size:12px;color:var(--white);outline:none;caret-color:var(--accent);">
+        <input placeholder="Click URL (optional)" value="${esc(b.link||'')}" oninput="updateBlock('${b.id}','link',this.value)" style="flex:1;height:28px;background:var(--g3);border:1px solid var(--sep2);border-radius:6px;padding:0 10px;font-family:'Manrope',sans-serif;font-size:12px;color:var(--white);outline:none;caret-color:var(--accent);">
+      </div>`;
+      break;
+
+    case 'button':
+      inner=`<div style="background:#fff;padding:14px;border-radius:8px;text-align:center;">
+        <a style="display:inline-block;background:${b.bgColor};color:${b.textColor};padding:12px 28px;border-radius:9px;font-family:'Manrope',sans-serif;font-size:15px;font-weight:800;text-decoration:none;">${esc(b.label||'Click Here')}</a>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+        <input placeholder="Button text" value="${esc(b.label||'')}" oninput="updateBlock('${b.id}','label',this.value);this.closest('.eblock').querySelector('a').textContent=this.value||'Click Here'" style="flex:1;min-width:100px;height:28px;background:var(--g3);border:1px solid var(--sep2);border-radius:6px;padding:0 10px;font-family:'Manrope',sans-serif;font-size:12px;color:var(--white);outline:none;caret-color:var(--accent);">
+        <input placeholder="Button URL" value="${esc(b.url||'')}" oninput="updateBlock('${b.id}','url',this.value)" style="flex:1;min-width:100px;height:28px;background:var(--g3);border:1px solid var(--sep2);border-radius:6px;padding:0 10px;font-family:'Manrope',sans-serif;font-size:12px;color:var(--white);outline:none;caret-color:var(--accent);">
+        <div style="display:flex;gap:4px;align-items:center;">
+          ${COLORS.map(c=>`<div style="width:18px;height:18px;border-radius:50%;background:${c};cursor:pointer;border:${b.bgColor===c?'2.5px solid #fff':'1px solid rgba(255,255,255,.2)'};" onclick="updateBlock('${b.id}','bgColor','${c}')"></div>`).join('')}
+        </div>
+      </div>`;
+      break;
+
+    case 'divider':
+      inner=`<div style="padding:10px 0;">${b.style==='dots'?`<div style="text-align:center;color:${b.color||'#ccc'};font-size:20px;letter-spacing:6px;">• • •</div>`:`<hr style="border:none;border-top:2px solid ${b.color||'#eee'};">`}</div>
+      <div style="display:flex;gap:6px;margin-top:4px;align-items:center;">
+        <button onclick="updateBlock('${b.id}','style','line')" style="height:24px;padding:0 10px;background:${b.style!=='dots'?'var(--as)':'var(--g3)'};border:1px solid ${b.style!=='dots'?'var(--ab)':'var(--sep2)'};border-radius:5px;font-family:'Manrope',sans-serif;font-size:10px;font-weight:700;color:${b.style!=='dots'?'var(--accent)':'var(--l3)'};cursor:pointer;">Line</button>
+        <button onclick="updateBlock('${b.id}','style','dots')" style="height:24px;padding:0 10px;background:${b.style==='dots'?'var(--as)':'var(--g3)'};border:1px solid ${b.style==='dots'?'var(--ab)':'var(--sep2)'};border-radius:5px;font-family:'Manrope',sans-serif;font-size:10px;font-weight:700;color:${b.style==='dots'?'var(--accent)':'var(--l3)'};cursor:pointer;">Dots</button>
+        <span style="font-size:10px;color:var(--l3);">Color:</span>
+        ${COLORS.map(c=>`<div style="width:16px;height:16px;border-radius:50%;background:${c};cursor:pointer;border:${(b.color||'#333333')===c?'2.5px solid #fff':'1px solid rgba(255,255,255,.2)'};" onclick="updateBlock('${b.id}','color','${c}')"></div>`).join('')}
+      </div>`;
+      break;
+
+    case 'testimonial':
+      inner=`<div style="background:${b.bgColor||'#1a1a1a'};border-radius:8px;padding:16px;border-left:3px solid #E8571A;">
+        <div style="font-style:italic;color:rgba(255,255,255,.75);font-family:Georgia,serif;font-size:15px;line-height:1.7;margin-bottom:8px;">"${esc(b.quote||'')}"</div>
+        <div style="color:#E8571A;font-size:12px;font-weight:700;">${esc(b.author||'')}</div>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:8px;">
+        <input placeholder="Quote text" value="${esc(b.quote||'')}" oninput="updateBlock('${b.id}','quote',this.value)" style="flex:2;height:28px;background:var(--g3);border:1px solid var(--sep2);border-radius:6px;padding:0 10px;font-family:'Manrope',sans-serif;font-size:12px;color:var(--white);outline:none;caret-color:var(--accent);">
+        <input placeholder="— Author" value="${esc(b.author||'')}" oninput="updateBlock('${b.id}','author',this.value)" style="flex:1;height:28px;background:var(--g3);border:1px solid var(--sep2);border-radius:6px;padding:0 10px;font-family:'Manrope',sans-serif;font-size:12px;color:var(--white);outline:none;caret-color:var(--accent);">
+      </div>`;
+      break;
+
+    case 'banner':
+      inner=`<div style="background:${b.bgColor||'#E8571A'};border-radius:8px;padding:16px 18px;">
+        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:${b.textColor||'#000'};opacity:.6;margin-bottom:3px;">${esc(b.eyebrow||'')}</div>
+        <div style="font-family:'Bebas Neue',Georgia,serif;font-size:24px;letter-spacing:1px;color:${b.textColor||'#000'};margin-bottom:3px;">${esc(b.headline||'')}</div>
+        <div style="font-size:13px;color:${b.textColor||'#000'};opacity:.7;">${esc(b.sub||'')}</div>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+        <input placeholder="Eyebrow" value="${esc(b.eyebrow||'')}" oninput="updateBlock('${b.id}','eyebrow',this.value)" style="flex:1;min-width:80px;height:28px;background:var(--g3);border:1px solid var(--sep2);border-radius:6px;padding:0 10px;font-family:'Manrope',sans-serif;font-size:12px;color:var(--white);outline:none;caret-color:var(--accent);">
+        <input placeholder="Headline" value="${esc(b.headline||'')}" oninput="updateBlock('${b.id}','headline',this.value)" style="flex:1;min-width:80px;height:28px;background:var(--g3);border:1px solid var(--sep2);border-radius:6px;padding:0 10px;font-family:'Manrope',sans-serif;font-size:12px;color:var(--white);outline:none;caret-color:var(--accent);">
+        <input placeholder="Sub text" value="${esc(b.sub||'')}" oninput="updateBlock('${b.id}','sub',this.value)" style="flex:1;min-width:80px;height:28px;background:var(--g3);border:1px solid var(--sep2);border-radius:6px;padding:0 10px;font-family:'Manrope',sans-serif;font-size:12px;color:var(--white);outline:none;caret-color:var(--accent);">
+        <div style="display:flex;gap:3px;align-items:center;">
+          ${COLORS.map(c=>`<div style="width:16px;height:16px;border-radius:50%;background:${c};cursor:pointer;border:${(b.bgColor)===c?'2.5px solid #fff':'1px solid rgba(255,255,255,.2)'};" onclick="updateBlock('${b.id}','bgColor','${c}')"></div>`).join('')}
+        </div>
+      </div>`;
+      break;
+
+    case 'social':
+      const socLinks=b.links||{};
+      inner=`<div style="background:#fff;padding:14px;border-radius:8px;text-align:center;">
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+          ${['instagram','tiktok','youtube','facebook','x','linkedin'].filter(k=>socLinks[k]).map(k=>`<a href="${esc(socLinks[k])}" style="display:inline-flex;width:32px;height:32px;background:#f5f5f5;border-radius:8px;align-items:center;justify-content:center;font-size:14px;">${{instagram:'📸',tiktok:'🎵',youtube:'▶️',facebook:'👥',x:'𝕏',linkedin:'💼'}[k]}</a>`).join('')}
+          ${!Object.values(socLinks).some(Boolean)?`<div style="font-size:12px;color:#999;">Add your social links below</div>`:''}
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+        ${['instagram','tiktok','youtube','facebook','x','linkedin'].map(k=>`<input placeholder="${k}" value="${esc(socLinks[k]||'')}" oninput="blocks.find(x=>x.id==='${b.id}').links['${k}']=this.value;renderCanvas()" style="flex:1;min-width:80px;height:26px;background:var(--g3);border:1px solid var(--sep2);border-radius:6px;padding:0 8px;font-family:'Manrope',sans-serif;font-size:10px;color:var(--white);outline:none;caret-color:var(--accent);">`).join('')}
+      </div>`;
+      break;
+
+    default:
+      inner=`<div style="padding:12px;color:var(--l3);font-size:12px;">Unknown block type: ${b.type}</div>`;
+  }
+
+  return`<div class="eblock" id="eb-${b.id}" style="position:relative;padding:10px;background:var(--g2);border-radius:10px;">
+    ${actions}
+    ${inner}
+  </div>`;
+}
+
+/* ── FILE UPLOADS ── */
+function handleLogoUpload(id,input){const file=input.files[0];if(!file)return;const r=new FileReader();r.onload=e=>{updateBlock(id,'logoUrl',e.target.result);};r.readAsDataURL(file);input.value='';}
+function handleImgUpload(id,input){const file=input.files[0];if(!file)return;const r=new FileReader();r.onload=e=>{updateBlock(id,'url',e.target.result);};r.readAsDataURL(file);input.value='';}
+
+/* ── SAVE / LOAD ── */
+function newEmail(){
+  blocks=[];curEmailId=null;
+  document.getElementById('emailSubject').value='';
+  renderCanvas();showToast('New email started');
+}
+function saveEmail(){
+  const subj=document.getElementById('emailSubject').value.trim();
+  if(!subj&&!blocks.length){showToast('Add a subject and some blocks first');return;}
+  const emails=gd(K.EMAILS,[]);
+  if(curEmailId){
+    const i=emails.findIndex(e=>e.id===curEmailId);
+    if(i>-1){emails[i]={id:curEmailId,subject:subj||'Untitled',blocks:JSON.parse(JSON.stringify(blocks)),savedAt:new Date().toISOString()};}
+  } else {
+    curEmailId=uid();
+    emails.unshift({id:curEmailId,subject:subj||'Untitled',blocks:JSON.parse(JSON.stringify(blocks)),savedAt:new Date().toISOString()});
+  }
+  sd(K.EMAILS,emails);showToast('Email saved ✓');
+}
+function loadEmail(id){
+  const emails=gd(K.EMAILS,[]);const e=emails.find(x=>x.id===id);if(!e)return;
+  curEmailId=e.id;blocks=JSON.parse(JSON.stringify(e.blocks));
+  document.getElementById('emailSubject').value=e.subject||'';
+  renderCanvas();switchTab('builder');showToast('Loaded: '+e.subject);
+}
+function deleteEmail(id){
+  sd(K.EMAILS,gd(K.EMAILS,[]).filter(e=>e.id!==id));
+  if(curEmailId===id){blocks=[];curEmailId=null;document.getElementById('emailSubject').value='';renderCanvas();}
+  renderSavedList();showToast('Deleted');
+}
+function renderSavedList(){
+  const emails=gd(K.EMAILS,[]);
+  const el=document.getElementById('savedList');
+  if(!emails.length){el.innerHTML=`<div class="panel-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><div class="panel-empty-title">No saved emails</div><div class="panel-empty-sub">Build an email and hit Save</div></div>`;return;}
+  el.innerHTML=emails.map(e=>`<div class="saved-item" onclick="loadEmail('${e.id}')">
+    <div class="saved-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+    <div class="saved-item-body"><div class="saved-item-name">${esc(e.subject)}</div><div class="saved-item-meta">${e.blocks.length} blocks · ${fmtD(e.savedAt)}</div></div>
+    <button class="saved-item-del" onclick="event.stopPropagation();deleteEmail('${e.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>`).join('');
+}
+
+/* ── ASSETS ── */
+function handleAssetUpload(input){
+  const files=Array.from(input.files).filter(f=>f.type.startsWith('image/'));
+  if(!files.length)return;
+  let done=0;
+  files.forEach(file=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      const assets=gd(K.ASSETS,[]);
+      assets.unshift({id:uid(),name:file.name.replace(/\.[^/.]+$/,''),fileName:file.name,type:file.type,size:file.size,dataUrl:e.target.result,uploadedAt:new Date().toISOString()});
+      sd(K.ASSETS,assets);done++;
+      if(done===files.length){renderAssets();showToast(`${done} uploaded ✓`);}
+    };
+    r.readAsDataURL(file);
+  });
+  input.value='';
+}
+function renderAssets(){
+  const assets=gd(K.ASSETS,[]);
+  const grid=document.getElementById('assetGrid');
+  if(!assets.length){grid.innerHTML=`<div style="grid-column:1/-1;" class="panel-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><div class="panel-empty-title">No assets yet</div><div class="panel-empty-sub">Upload your logos and images above</div></div>`;return;}
+  grid.innerHTML=assets.map(a=>`<div class="asset-thumb" title="${esc(a.name)}" onclick="insertAsset('${a.id}')"><img src="${a.dataUrl}" loading="lazy"></div>`).join('');
+}
+function insertAsset(id){const a=gd(K.ASSETS,[]).find(x=>x.id===id);if(!a)return;addBlock('image',{url:a.dataUrl,alt:a.name,link:''});showToast(a.name+' added');}
+function pickFromAssets(){
+  const assets=gd(K.ASSETS,[]);
+  const grid=document.getElementById('assetPickerGrid');
+  const empty=document.getElementById('assetPickerEmpty');
+  if(!assets.length){grid.innerHTML='';empty.style.display='block';}
+  else{empty.style.display='none';grid.innerHTML=assets.map(a=>`<div class="asset-thumb" onclick="insertAsset('${a.id}');closeModal('assetPickerModal')"><img src="${a.dataUrl}" loading="lazy"></div>`).join('');}
+  openModal('assetPickerModal');
+}
+
+/* ── MERGE TAGS ── */
+function copyMerge(tag){navigator.clipboard.writeText(tag).then(()=>showToast(tag+' copied — paste into a text block')).catch(()=>showToast('Copy failed'));}
+function insMerge(id,tag){const el=document.getElementById(id);if(!el)return;const s=el.selectionStart,e=el.selectionEnd;el.value=el.value.slice(0,s)+tag+el.value.slice(e);el.selectionStart=el.selectionEnd=s+tag.length;el.focus();}
+
+/* ── PREVIEW ── */
+let pvMode='dark';
+function openPreview(){
+  document.getElementById('previewBody').innerHTML=buildPreviewHTML(pvMode);
+  document.getElementById('previewPanel').classList.remove('hidden');
+}
+function closePreview(){document.getElementById('previewPanel').classList.add('hidden');}
+function setPvMode(m){
+  pvMode=m;
+  document.getElementById('pvDark').classList.toggle('on',m==='dark');
+  document.getElementById('pvLight').classList.toggle('on',m==='light');
+  document.getElementById('previewBody').innerHTML=buildPreviewHTML(m);
+}
+function buildPreviewHTML(mode){
+  const dk=mode==='dark';
+  const bg=dk?'#111':'#fff';const txt=dk?'rgba(255,255,255,.8)':'#333';const card=dk?'#1a1a1a':'#f5f5f5';
+  let body='';
+  blocks.forEach(b=>{
+    switch(b.type){
+      case 'logo':body+=`<div style="background:${b.bgColor||'#000'};padding:16px;text-align:center;">${b.logoUrl?`<img src="${esc(b.logoUrl)}" style="max-height:44px;">`:`<span style="font-family:Georgia,serif;font-size:22px;font-weight:bold;color:${b.textColor||'#E8571A'};letter-spacing:3px;">${esc(b.brandName||'SHANNON CRAFT')}</span>`}</div>`;break;
+      case 'text':body+=`<div style="padding:16px 20px;color:${txt};font-family:Georgia,serif;font-size:15px;line-height:1.75;">${b.html||''}</div>`;break;
+      case 'image':if(b.url){const img=`<img src="${esc(b.url)}" style="width:100%;display:block;">`;body+=`<div style="padding:6px 20px;">${b.link?`<a href="${esc(b.link)}">${img}</a>`:img}</div>`;}break;
+      case 'button':body+=`<div style="padding:12px 20px;text-align:center;"><a href="${esc(b.url||'#')}" style="display:inline-block;background:${b.bgColor};color:${b.textColor};padding:12px 28px;border-radius:9px;font-family:'Manrope',Arial,sans-serif;font-size:15px;font-weight:800;text-decoration:none;">${esc(b.label||'Click Here')}</a></div>`;break;
+      case 'divider':body+=b.style==='dots'?`<div style="text-align:center;padding:8px;color:${b.color||'#555'};font-size:18px;letter-spacing:6px;">• • •</div>`:`<div style="padding:6px 20px;"><hr style="border:none;border-top:2px solid ${b.color||'#eee'};"></div>`;break;
+      case 'testimonial':body+=`<div style="padding:6px 20px;"><div style="background:${b.bgColor||'#1a1a1a'};border-radius:8px;padding:14px;border-left:3px solid #E8571A;"><p style="font-style:italic;color:${dk?'rgba(255,255,255,.75)':'#555'};font-family:Georgia,serif;font-size:15px;line-height:1.7;margin-bottom:6px;">"${esc(b.quote||'')}"</p><p style="color:#E8571A;font-size:12px;font-weight:700;">${esc(b.author||'')}</p></div></div>`;break;
+      case 'banner':body+=`<div style="padding:6px 20px;"><div style="background:${b.bgColor||'#E8571A'};border-radius:8px;padding:16px 18px;"><div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:${b.textColor||'#000'};opacity:.6;margin-bottom:3px;">${esc(b.eyebrow||'')}</div><div style="font-family:Georgia,serif;font-size:22px;font-weight:bold;color:${b.textColor||'#000'};margin-bottom:3px;">${esc(b.headline||'')}</div><div style="font-size:13px;color:${b.textColor||'#000'};opacity:.7;">${esc(b.sub||'')}</div></div></div>`;break;
+      case 'social':{const sl=b.links||{};const icons={instagram:'📸',tiktok:'🎵',youtube:'▶️',facebook:'👥',x:'𝕏',linkedin:'💼'};const active=Object.keys(sl).filter(k=>sl[k]);if(active.length)body+=`<div style="padding:10px 20px;text-align:center;">${active.map(k=>`<a href="${esc(sl[k])}" style="display:inline-block;margin:0 4px;width:34px;height:34px;background:${card};border-radius:8px;text-align:center;line-height:34px;text-decoration:none;font-size:16px;">${icons[k]||k}</a>`).join('')}</div>`;break;}
+    }
+  });
+  if(!body)body=`<div style="padding:24px;text-align:center;color:${dk?'rgba(255,255,255,.3)':'#ccc'};font-size:13px;">No blocks yet — add some blocks in the builder.</div>`;
+  return`<div style="background:${bg};border-radius:10px;overflow:hidden;font-family:Georgia,sans-serif;">${body}<div style="padding:14px 20px;text-align:center;border-top:1px solid ${dk?'rgba(255,255,255,.07)':'#eee'};"><p style="margin:0;font-size:11px;color:${dk?'rgba(255,255,255,.3)':'#aaa'};">© Shannon Craft · <a href="#" style="color:#E8571A;text-decoration:none;">Unsubscribe</a></p></div></div>`;
+}
+
+/* ── CLEAR ── */
+function clearCanvas(){if(!blocks.length)return;if(confirm('Clear all blocks?')){blocks=[];renderCanvas();showToast('Canvas cleared');}}
+
+/* ── BROADCAST ── */
+let bAud='everyone';
+function pickAud(el){document.querySelectorAll('.aud-pill').forEach(p=>p.classList.remove('sel'));el.classList.add('sel');bAud=el.dataset.a;updReach();}
+function updReach(){const c=gd(K.CONTACTS,[]).filter(x=>!x.unsubscribed);document.getElementById('bcReach').textContent=bAud==='everyone'?c.length:c.filter(x=>x.tags?.includes(bAud)).length;}
+async function sendBroadcast(){
+  const subj=document.getElementById('bcSubject').value.trim();
+  const body=document.getElementById('bcBody').innerHTML.trim();
+  if(!subj||!body){showToast('Add subject and body first');return;}
+  const contacts=gd(K.CONTACTS,[]).filter(x=>!x.unsubscribed);
+  const recipients=bAud==='everyone'?contacts:contacts.filter(x=>x.tags?.includes(bAud));
+  if(!recipients.length){showToast('No recipients in this audience');return;}
+  const cfg=gd(K.CFG,{});
+  if(!cfg.resendKey){showToast('Add your Resend API key in admin Settings first');return;}
+  showToast(`Sending to ${recipients.length} contacts…`);
+  let sent=0,failed=0;
+  for(const contact of recipients){
+    const repl=s=>s.replace(/\{\{first_name\}\}/gi,contact.firstName||contact.email.split('@')[0]).replace(/\{\{full_name\}\}/gi,`${contact.firstName||''} ${contact.lastName||''}`.trim());
+    const html=`<!DOCTYPE html><html><body style="margin:0;padding:0;background:#f5f5f5;font-family:Georgia,Arial,sans-serif;"><table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:20px 0;"><table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#fff;border-radius:12px;overflow:hidden;"><tr><td style="background:#000;padding:20px;text-align:center;"><span style="font-family:Georgia,serif;font-size:22px;font-weight:bold;color:#E8571A;letter-spacing:3px;">${esc(cfg.fromName||'SHANNON CRAFT')}</span></td></tr><tr><td style="padding:32px 36px;color:#333;font-size:15px;line-height:1.75;">${repl(body)}</td></tr><tr><td style="background:#f8f8f8;padding:14px;text-align:center;border-top:1px solid #eee;"><p style="margin:0;font-size:12px;color:#999;">© ${esc(cfg.fromName||'Shannon Craft')} · <a href="#unsubscribe" style="color:#E8571A;">Unsubscribe</a></p></td></tr></table></td></tr></table></body></html>`;
+    try{const res=await fetch('https://sc-send-email.shannonlcraft.workers.dev',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to:contact.email,subject:repl(subj),html,fromName:cfg.fromName||'Shannon Craft',fromEmail:cfg.fromEmail||''})});if(res.ok)sent++;else failed++;}catch(e){failed++;}
+  }
+  const history=gd(K.BCAST,[]);
+  history.push({id:uid(),subject:subj,audience:bAud,count:sent,failed,sentAt:new Date().toISOString()});
+  sd(K.BCAST,history);
+  document.getElementById('bcSubject').value='';
+  document.getElementById('bcBody').innerHTML='';
+  renderBcHistory();updReach();
+  showToast(failed>0?`Sent ${sent}, ${failed} failed`:`✓ Sent to ${sent} contacts`);
+}
+function previewBroadcast(){
+  const subj=document.getElementById('bcSubject').value.trim();
+  const body=document.getElementById('bcBody').innerHTML.trim();
+  if(!subj||!body){showToast('Add subject and body first');return;}
+  const cfg=gd(K.CFG,{});
+  document.getElementById('previewBody').innerHTML=`<div style="background:var(--bg);border-radius:10px;padding:16px;border:1px solid var(--sep2);margin-bottom:14px;"><div style="font-size:11px;font-weight:700;color:var(--l3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;">From: ${esc(cfg.fromName||'Shannon Craft')}</div><div style="font-size:15px;font-weight:800;color:var(--white);margin-bottom:10px;">${esc(subj)}</div><div style="font-size:14px;font-weight:500;color:var(--l2);line-height:1.7;">${body}</div></div>`;
+  document.getElementById('previewPanel').classList.remove('hidden');
+}
+function renderBcHistory(){
+  const history=gd(K.BCAST,[]).slice().reverse().slice(0,10);
+  const el=document.getElementById('bcHistory');
+  if(!history.length){el.innerHTML=`<div style="font-size:11px;font-weight:500;color:var(--l3);text-align:center;padding:12px 0;">No broadcasts sent yet</div>`;return;}
+  el.innerHTML=history.map(h=>`<div class="bc-hist-item"><div class="bc-hist-dot"></div><div class="bc-hist-sub">${esc(h.subject)}</div><div class="bc-hist-meta">${h.count} sent · ${fmtD(h.sentAt)}</div></div>`).join('');
+}
+
+/* ── BOOT ── */
+renderCanvas();
+</script>
+</body>
+</html>
