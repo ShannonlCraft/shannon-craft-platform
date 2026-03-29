@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#000000">
+<title>How To Use · Shannon Craft Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#000;--g1:#161616;--g2:#242424;--g3:#333;
+  --sep:rgba(255,255,255,0.07);--sep2:rgba(255,255,255,0.11);
+  --accent:#E8571A;--as:rgba(232,87,26,0.13);--ab:rgba(232,87,26,0.28);
+  --white:#fff;--l2:rgba(255,255,255,0.5);--l3:rgba(255,255,255,0.28);--l4:rgba(255,255,255,0.13);
+  --green:#16A34A;--gs:rgba(22,163,74,0.13);--gb:rgba(22,163,74,0.25);
+  --r-lg:16px;--r-md:12px;--r-sm:8px;
+}
+html,body{min-height:100%;background:var(--bg);color:var(--white);font-family:'Manrope',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+body{max-width:430px;margin:0 auto;padding-bottom:40px;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 var(--as)}50%{box-shadow:0 0 0 12px transparent}}
+@keyframes draw{from{stroke-dashoffset:1000}to{stroke-dashoffset:0}}
+@keyframes ripple{0%{transform:scale(0);opacity:.6}100%{transform:scale(2.5);opacity:0}}
+
+/* ── HEADER ── */
+.hdr{padding:52px 18px 16px;border-bottom:1px solid var(--sep);background:rgba(0,0,0,.96);backdrop-filter:blur(20px);position:sticky;top:0;z-index:20;}
+.hdr-top{display:flex;align-items:center;gap:12px;}
+.back-btn{width:36px;height:36px;border-radius:10px;background:var(--g1);border:1px solid var(--sep2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--l2);flex-shrink:0;text-decoration:none;}
+.back-btn svg{width:14px;height:14px;}
+.hdr-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1.5px;line-height:1;}
+.hdr-title em{color:var(--accent);font-style:normal;}
+.hdr-sub{font-size:11px;font-weight:600;color:var(--l3);margin-top:2px;}
+
+/* ── PROGRESS BAR ── */
+.progress-wrap{padding:14px 18px 0;}
+.progress-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.progress-step-label{font-size:11px;font-weight:700;color:var(--accent);}
+.progress-count{font-size:11px;font-weight:700;color:var(--l3);}
+.progress-track{height:3px;background:var(--g3);border-radius:2px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s cubic-bezier(.34,1.56,.64,1);}
+
+/* ── STEP DOTS ── */
+.step-dots{display:flex;gap:8px;justify-content:center;padding:16px 0 0;}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--g3);transition:all .3s;cursor:pointer;}
+.step-dot.active{background:var(--accent);transform:scale(1.3);}
+.step-dot.done{background:var(--green);}
+
+/* ── STEP CARD ── */
+.step-card{margin:16px 16px 0;background:var(--g1);border-radius:20px;overflow:hidden;border:1px solid var(--sep);animation:fadeUp .35s ease both;}
+
+/* ── VISUAL DEMO AREA ── */
+.demo-area{background:var(--g2);min-height:240px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-direction:column;}
+
+/* Step 1 - Overview */
+.overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:20px;width:100%;}
+.ov-block{background:var(--g1);border-radius:12px;padding:12px;border:1px solid var(--sep);display:flex;flex-direction:column;align-items:center;gap:6px;animation:fadeUp .4s ease both;}
+.ov-icon{width:36px;height:36px;border-radius:10px;background:var(--as);border:1px solid var(--ab);display:flex;align-items:center;justify-content:center;color:var(--accent);}
+.ov-icon svg{width:16px;height:16px;}
+.ov-label{font-size:11px;font-weight:800;color:var(--white);text-align:center;}
+.ov-sub{font-size:9px;font-weight:500;color:var(--l3);text-align:center;line-height:1.4;}
+
+/* Step 2 - Tap block demo */
+.demo-palette{padding:16px;width:100%;}
+.demo-pal-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;}
+.demo-pal-item{background:var(--g1);border-radius:10px;padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;border:1.5px solid var(--sep);transition:all .2s;cursor:pointer;position:relative;}
+.demo-pal-item.highlighted{border-color:var(--accent);background:var(--as);animation:glow 1.5s infinite;}
+.demo-pal-item.tapped{border-color:var(--green);background:var(--gs);transform:scale(.95);}
+.demo-pal-icon{width:26px;height:26px;border-radius:7px;background:var(--as);border:1px solid var(--ab);display:flex;align-items:center;justify-content:center;color:var(--accent);}
+.demo-pal-icon svg{width:12px;height:12px;}
+.demo-pal-label{font-size:9px;font-weight:700;color:var(--white);text-align:center;}
+.tap-hint{position:absolute;top:-8px;right:-8px;width:20px;height:20px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;animation:bounce .8s infinite;}
+.ripple{position:absolute;width:40px;height:40px;border-radius:50%;background:var(--accent);opacity:0;animation:ripple .6s ease-out forwards;}
+.demo-arrow{text-align:center;color:var(--accent);font-size:20px;margin:4px 0;animation:bounce .8s infinite;}
+.demo-canvas-preview{background:var(--g1);border-radius:10px;padding:10px 12px;border:1.5px solid var(--green);display:flex;align-items:center;gap:10px;}
+.demo-canvas-block{flex:1;}
+.demo-canvas-label{font-size:11px;font-weight:700;color:var(--white);}
+.demo-canvas-sub{font-size:9px;font-weight:500;color:var(--l3);margin-top:2px;}
+.demo-check{width:20px;height:20px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.demo-check svg{width:10px;height:10px;}
+
+/* Step 3 - Blocks explained */
+.blocks-list{padding:16px;width:100%;}
+.block-explain{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--sep);}
+.block-explain:last-child{border-bottom:none;}
+.be-icon{width:30px;height:30px;border-radius:8px;background:var(--as);border:1px solid var(--ab);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent);margin-top:1px;}
+.be-icon svg{width:13px;height:13px;}
+.be-body{flex:1;}
+.be-name{font-size:12px;font-weight:800;color:var(--white);}
+.be-desc{font-size:11px;font-weight:500;color:var(--l3);margin-top:2px;line-height:1.5;}
+.be-tag{display:inline-block;height:16px;padding:0 6px;border-radius:4px;background:var(--accent);color:#fff;font-size:9px;font-weight:800;margin-top:4px;}
+
+/* Step 4 - Logo upload */
+.logo-demo{padding:16px;width:100%;}
+.logo-step-row{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;}
+.logo-step-num{width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.logo-step-body{flex:1;}
+.logo-step-title{font-size:13px;font-weight:800;color:var(--white);margin-bottom:3px;}
+.logo-step-desc{font-size:11px;font-weight:500;color:var(--l3);line-height:1.6;}
+.logo-step-visual{background:var(--g1);border-radius:10px;border:1.5px solid var(--sep2);overflow:hidden;margin-top:8px;}
+.logo-step-visual-hdr{background:var(--g2);padding:7px 10px;font-size:9px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--sep);}
+.logo-upload-zone{padding:14px;text-align:center;border:2px dashed var(--sep2);margin:8px;border-radius:8px;cursor:pointer;}
+.logo-upload-zone.lit{border-color:var(--ab);background:var(--as);}
+.logo-preview-strip{background:var(--g2);padding:10px;display:flex;align-items:center;gap:10px;}
+.logo-preview-thumb{width:40px;height:40px;border-radius:8px;background:var(--g3);border:1px solid var(--sep2);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;}
+.logo-preview-thumb img{width:100%;height:100%;object-fit:contain;}
+
+/* Step 5 - Reorder */
+.reorder-demo{padding:16px;width:100%;}
+.rd-block{background:var(--g1);border-radius:10px;padding:11px 12px;margin-bottom:7px;display:flex;align-items:center;gap:10px;border:1.5px solid var(--sep);transition:all .3s;}
+.rd-block.moving{background:var(--as);border-color:var(--ab);transform:scale(1.02);}
+.rd-handle{color:var(--l3);cursor:grab;flex-shrink:0;}
+.rd-handle svg{width:14px;height:14px;}
+.rd-label{font-size:12px;font-weight:700;color:var(--white);flex:1;}
+.rd-btns{display:flex;gap:4px;}
+.rd-btn{width:24px;height:24px;border-radius:6px;background:var(--g2);border:1px solid var(--sep2);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--l3);font-size:10px;}
+.rd-btn.lit{background:var(--as);border-color:var(--ab);color:var(--accent);}
+
+/* Step 6 - Preview */
+.preview-demo{padding:16px;width:100%;}
+.preview-toggle-demo{display:flex;gap:6px;margin-bottom:12px;}
+.ptd-btn{flex:1;height:28px;border-radius:20px;background:var(--g2);border:1.5px solid var(--sep2);font-family:'Manrope',sans-serif;font-size:10px;font-weight:700;color:var(--l3);cursor:pointer;transition:all .2s;}
+.ptd-btn.on{background:var(--as);border-color:var(--ab);color:var(--accent);}
+.preview-frame-demo{border-radius:10px;overflow:hidden;border:1px solid var(--sep2);}
+.pfd-dark{background:#000;padding:14px;}
+.pfd-light{background:#fff;padding:14px;}
+.pfd-logo{text-align:center;padding:10px;background:#111;margin-bottom:8px;border-radius:6px;}
+.pfd-logo-light{text-align:center;padding:10px;background:#f5f5f5;margin-bottom:8px;border-radius:6px;}
+.pfd-text{font-size:12px;font-weight:500;line-height:1.6;margin-bottom:8px;}
+.pfd-btn{text-align:center;margin-bottom:8px;}
+.pfd-cta{display:inline-block;background:var(--accent);color:#fff;padding:9px 20px;border-radius:8px;font-size:12px;font-weight:800;}
+.pfd-footer{text-align:center;font-size:9px;padding-top:8px;border-top:1px solid rgba(255,255,255,.07);}
+
+/* Step 7 - Save & Send */
+.save-demo{padding:16px;width:100%;}
+.flow-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.flow-step{flex:1;background:var(--g1);border-radius:10px;padding:10px;text-align:center;border:1px solid var(--sep);}
+.flow-step.accent{background:var(--as);border-color:var(--ab);}
+.flow-icon{font-size:20px;margin-bottom:4px;}
+.flow-label{font-size:10px;font-weight:800;color:var(--white);}
+.flow-arrow{color:var(--accent);font-size:18px;flex-shrink:0;}
+
+/* ── STEP CONTENT ── */
+.step-content{padding:18px 18px 20px;}
+.step-eyebrow{font-size:10px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;display:flex;align-items:center;gap:6px;}
+.step-eyebrow::before{content:'';width:4px;height:4px;background:var(--accent);border-radius:50%;}
+.step-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1px;color:var(--white);line-height:1;margin-bottom:6px;}
+.step-body{font-size:13px;font-weight:500;color:var(--l2);line-height:1.75;}
+.step-body strong{color:var(--white);font-weight:800;}
+.tip-box{background:var(--as);border:1px solid var(--ab);border-radius:var(--r-md);padding:12px 14px;margin-top:12px;display:flex;gap:10px;align-items:flex-start;}
+.tip-box svg{width:14px;height:14px;color:var(--accent);flex-shrink:0;margin-top:1px;}
+.tip-text{font-size:12px;font-weight:600;color:var(--accent);line-height:1.55;}
+
+/* ── NAV BUTTONS ── */
+.nav-btns{display:flex;gap:10px;padding:0 16px 0;margin-top:16px;}
+.nav-prev{flex:1;height:46px;border-radius:var(--r-lg);background:var(--g1);border:1.5px solid var(--sep2);font-family:'Manrope',sans-serif;font-size:13px;font-weight:800;color:var(--l2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;}
+.nav-prev:active{background:var(--g2);}
+.nav-prev svg{width:12px;height:12px;}
+.nav-next{flex:2;height:46px;border-radius:var(--r-lg);background:var(--accent);border:none;font-family:'Manrope',sans-serif;font-size:13px;font-weight:800;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;animation:pulse 2s infinite;}
+.nav-next:active{opacity:.85;transform:scale(.97);}
+.nav-next svg{width:12px;height:12px;}
+.nav-next.done{background:var(--green);animation:none;}
+
+/* ── CHAPTER PILLS ── */
+.chapters{display:flex;gap:6px;padding:14px 16px 0;overflow-x:auto;scrollbar-width:none;}
+.chapters::-webkit-scrollbar{display:none;}
+.chapter{height:26px;padding:0 12px;border-radius:20px;background:var(--g1);border:1px solid var(--sep2);font-size:10px;font-weight:700;color:var(--l3);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;}
+.chapter.active{background:var(--as);border-color:var(--ab);color:var(--accent);}
+.chapter.done{background:var(--gs);border-color:var(--gb);color:var(--green);}
+
+/* ── QUICK REF ── */
+.quick-ref{margin:16px 16px 0;background:var(--g1);border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--sep);}
+.qr-hdr{padding:12px 14px;border-bottom:1px solid var(--sep);font-size:11px;font-weight:800;color:var(--white);display:flex;align-items:center;gap:8px;}
+.qr-hdr svg{width:14px;height:14px;color:var(--accent);}
+.qr-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--sep);}
+.qr-row:last-child{border-bottom:none;}
+.qr-emoji{font-size:16px;width:28px;text-align:center;flex-shrink:0;}
+.qr-body{flex:1;}
+.qr-action{font-size:12px;font-weight:700;color:var(--white);}
+.qr-result{font-size:10px;font-weight:500;color:var(--l3);margin-top:1px;}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-top">
+    <a class="back-btn" href="admin-email.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </a>
+    <div>
+      <div class="hdr-title">Email <em>Builder</em> Guide</div>
+      <div class="hdr-sub">Tap through each step</div>
+    </div>
+  </div>
+</div>
+
+<!-- Progress -->
+<div class="progress-wrap">
+  <div class="progress-label">
+    <span class="progress-step-label" id="stepLabel">Step 1 of 7</span>
+    <span class="progress-count" id="stepName">Overview</span>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:14%;"></div></div>
+</div>
+
+<!-- Chapter pills -->
+<div class="chapters" id="chapters">
+  <button class="chapter active" onclick="goTo(0)">Overview</button>
+  <button class="chapter" onclick="goTo(1)">Add Blocks</button>
+  <button class="chapter" onclick="goTo(2)">Block Types</button>
+  <button class="chapter" onclick="goTo(3)">Logo &amp; Images</button>
+  <button class="chapter" onclick="goTo(4)">Reorder</button>
+  <button class="chapter" onclick="goTo(5)">Preview</button>
+  <button class="chapter" onclick="goTo(6)">Save &amp; Send</button>
+</div>
+
+<!-- Step dots -->
+<div class="step-dots" id="stepDots"></div>
+
+<!-- STEP CARD -->
+<div class="step-card" id="stepCard"></div>
+
+<!-- Nav buttons -->
+<div class="nav-btns">
+  <button class="nav-prev" id="prevBtn" onclick="prev()" style="display:none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Back
+  </button>
+  <button class="nav-next" id="nextBtn" onclick="next()">
+    Let's Go
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+</div>
+
+<!-- Quick Reference (always visible) -->
+<div class="quick-ref" style="margin-bottom:20px;">
+  <div class="qr-hdr">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    Quick Reference
+  </div>
+  <div class="qr-row"><div class="qr-emoji">👆</div><div class="qr-body"><div class="qr-action">Tap a block button</div><div class="qr-result">Adds it to your email canvas below</div></div></div>
+  <div class="qr-row"><div class="qr-emoji">↕️</div><div class="qr-body"><div class="qr-action">Tap ↑ ↓ arrows on a block</div><div class="qr-result">Moves it up or down in your email</div></div></div>
+  <div class="qr-row"><div class="qr-emoji">✕</div><div class="qr-body"><div class="qr-action">Tap ✕ on a block</div><div class="qr-result">Removes it completely</div></div></div>
+  <div class="qr-row"><div class="qr-emoji">🖼️</div><div class="qr-body"><div class="qr-action">Tap "From Library" block</div><div class="qr-result">Pick a logo or image you already uploaded</div></div></div>
+  <div class="qr-row"><div class="qr-emoji">👁️</div><div class="qr-body"><div class="qr-action">Tap Preview button</div><div class="qr-result">See exactly how it looks — dark or light</div></div></div>
+  <div class="qr-row"><div class="qr-emoji">💾</div><div class="qr-body"><div class="qr-action">Tap Save button</div><div class="qr-result">Saves as a template you can reuse</div></div></div>
+  <div class="qr-row"><div class="qr-emoji">📤</div><div class="qr-body"><div class="qr-action">Go to Broadcast tab</div><div class="qr-result">Send to your whole list or a segment</div></div></div>
+</div>
+
+<script>
+let cur=0;
+const STEPS=[
+  {
+    eyebrow:'How It Works',
+    title:'The Email Builder',
+    body:'The email builder works like building with <strong>blocks</strong> — similar to how Beacons works, just fully yours. You choose which blocks to add, arrange them how you want, and only the blocks you add will appear in the final email.',
+    tip:'Nothing shows up until you add it. You\'re in complete control of every piece.',
+    demo:'overview'
+  },
+  {
+    eyebrow:'Step 1',
+    title:'Tap a Block to Add It',
+    body:'At the top of the Builder you\'ll see a grid of block buttons — <strong>Logo, Text, Image, Button, Divider, Socials, Testimonial, Banner, From Library</strong>.\n\nJust <strong>tap any one</strong> and it instantly drops into your email canvas below. That\'s it.',
+    tip:'You can add the same block multiple times. Add 3 text blocks, 2 images — whatever you need.',
+    demo:'tap'
+  },
+  {
+    eyebrow:'Step 2',
+    title:'What Each Block Does',
+    body:'Each block has a specific job. Here\'s a quick rundown of all 9:',
+    tip:'You don\'t have to use all of them. Most emails only need 3–4 blocks.',
+    demo:'blocks'
+  },
+  {
+    eyebrow:'Step 3',
+    title:'Adding Your Logo & Images',
+    body:'There are <strong>two ways</strong> to get your logo or images into an email:\n\n<strong>Option A</strong> — Tap the <strong>Image</strong> block or <strong>Logo</strong> block, then tap "Upload Logo File" inside that block. Pick your PNG or JPG right there.\n\n<strong>Option B</strong> — Go to the <strong>Assets tab</strong> first, upload all your logos there, then come back to Builder and tap <strong>"From Library"</strong> to pick one.',
+    tip:'Option A is faster for one-off images. Option B is better for logos you reuse in every email.',
+    demo:'logo'
+  },
+  {
+    eyebrow:'Step 4',
+    title:'Reordering Your Blocks',
+    body:'Once you\'ve added blocks to your canvas, you can change the order anytime.\n\nEach block has <strong>↑ and ↓ arrows</strong> in its top bar. Tap ↑ to move it up, ↓ to move it down.\n\nOn a desktop browser you can also <strong>drag blocks</strong> by grabbing the ≡ handle on the left.',
+    tip:'Put your Logo block at the very top, then a Text block, then your main image or button — that\'s a great starting structure.',
+    demo:'reorder'
+  },
+  {
+    eyebrow:'Step 5',
+    title:'Preview Before You Send',
+    body:'Before sending anything, always tap the <strong>Preview</strong> button in the top right corner.\n\nYou\'ll see exactly how your email looks to the reader. You can toggle between <strong>Dark</strong> (your black/orange brand) and <strong>Light</strong> (standard white email look).',
+    tip:'Check the preview every time. What looks good in the builder sometimes needs a small tweak when you see the full email.',
+    demo:'preview'
+  },
+  {
+    eyebrow:'Step 6',
+    title:'Save, Then Send',
+    body:'When your email looks good:\n\n<strong>1. Tap Save</strong> — this saves it as a template. You can come back and edit it anytime from the Saved tab.\n\n<strong>2. Go to Broadcast tab</strong> — choose who to send to (Everyone, Buyers, YouTube, etc.), write your subject line, paste or write your body, and tap Send.',
+    tip:'Save your email first even if you plan to send right away. This gives you a backup you can reuse for future campaigns.',
+    demo:'save'
+  }
+];
+
+function renderStep(){
+  const s=STEPS[cur];
+  const card=document.getElementById('stepCard');
+  card.style.animation='none';
+  card.offsetHeight; // reflow
+  card.style.animation='fadeUp .35s ease both';
+
+  let demoHTML='';
+  if(s.demo==='overview') demoHTML=renderOverview();
+  else if(s.demo==='tap') demoHTML=renderTap();
+  else if(s.demo==='blocks') demoHTML=renderBlocks();
+  else if(s.demo==='logo') demoHTML=renderLogo();
+  else if(s.demo==='reorder') demoHTML=renderReorder();
+  else if(s.demo==='preview') demoHTML=renderPreview();
+  else if(s.demo==='save') demoHTML=renderSave();
+
+  card.innerHTML=`
+    <div class="demo-area">${demoHTML}</div>
+    <div class="step-content">
+      <div class="step-eyebrow">${s.eyebrow}</div>
+      <div class="step-title">${s.title}</div>
+      <div class="step-body">${s.body.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>')}</div>
+      <div class="tip-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span class="tip-text">${s.tip}</span>
+      </div>
+    </div>`;
+
+  // Progress
+  document.getElementById('stepLabel').textContent=`Step ${cur+1} of ${STEPS.length}`;
+  document.getElementById('stepName').textContent=s.eyebrow;
+  document.getElementById('progressFill').style.width=((cur+1)/STEPS.length*100)+'%';
+
+  // Dots
+  const dots=document.getElementById('stepDots');
+  dots.innerHTML=STEPS.map((_,i)=>`<div class="step-dot${i===cur?' active':i<cur?' done':''}" onclick="goTo(${i})"></div>`).join('');
+
+  // Chapters
+  document.querySelectorAll('.chapter').forEach((c,i)=>{
+    c.className='chapter'+(i===cur?' active':i<cur?' done':'');
+  });
+
+  // Nav
+  const prev=document.getElementById('prevBtn');
+  const next=document.getElementById('nextBtn');
+  prev.style.display=cur>0?'flex':'none';
+  if(cur===STEPS.length-1){
+    next.className='nav-next done';
+    next.innerHTML='Open Email Builder <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>';
+  } else {
+    next.className='nav-next';
+    next.innerHTML=`Next <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>`;
+  }
+}
+
+function next(){
+  if(cur===STEPS.length-1){window.location.href='admin-email.html';return;}
+  cur++;renderStep();window.scrollTo({top:0,behavior:'smooth'});
+}
+function prev(){if(cur>0){cur--;renderStep();window.scrollTo({top:0,behavior:'smooth'});}}
+function goTo(i){cur=i;renderStep();window.scrollTo({top:0,behavior:'smooth'});}
+
+/* ── DEMO RENDERERS ── */
+function renderOverview(){
+  return`<div class="overview-grid">
+    <div class="ov-block" style="animation-delay:.05s">
+      <div class="ov-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+      <div class="ov-label">Add Blocks</div>
+      <div class="ov-sub">Tap to add Logo, Text, Image etc.</div>
+    </div>
+    <div class="ov-block" style="animation-delay:.1s">
+      <div class="ov-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg></div>
+      <div class="ov-label">Arrange</div>
+      <div class="ov-sub">Move blocks up & down</div>
+    </div>
+    <div class="ov-block" style="animation-delay:.15s">
+      <div class="ov-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+      <div class="ov-label">Preview</div>
+      <div class="ov-sub">See it dark or light</div>
+    </div>
+    <div class="ov-block" style="animation-delay:.2s">
+      <div class="ov-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+      <div class="ov-label">Send</div>
+      <div class="ov-sub">Broadcast to your list</div>
+    </div>
+  </div>`;
+}
+
+function renderTap(){
+  return`<div class="demo-palette">
+    <div style="font-size:10px;font-weight:700;color:var(--l3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;">Builder Block Buttons (tap one)</div>
+    <div class="demo-pal-grid">
+      <div class="demo-pal-item">
+        <div class="demo-pal-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg></div>
+        <div class="demo-pal-label">Logo</div>
+      </div>
+      <div class="demo-pal-item highlighted" id="tapDemo">
+        <div class="tap-hint">👆</div>
+        <div class="demo-pal-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg></div>
+        <div class="demo-pal-label">Text</div>
+      </div>
+      <div class="demo-pal-item">
+        <div class="demo-pal-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+        <div class="demo-pal-label">Image</div>
+      </div>
+    </div>
+    <div class="demo-arrow">↓</div>
+    <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;">Appears in your canvas ↓</div>
+    <div class="demo-canvas-preview">
+      <div style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;"></div>
+      <div class="demo-canvas-block">
+        <div class="demo-canvas-label">Text Block</div>
+        <div class="demo-canvas-sub">Write your message here…</div>
+      </div>
+      <div style="display:flex;gap:4px;">
+        <div style="width:22px;height:22px;border-radius:5px;background:var(--g3);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--l3);">↑</div>
+        <div style="width:22px;height:22px;border-radius:5px;background:var(--g3);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--l3);">↓</div>
+        <div style="width:22px;height:22px;border-radius:5px;background:var(--g3);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--l3);">✕</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderBlocks(){
+  const BLIST=[
+    {icon:'<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/>',name:'Logo',desc:'Your brand header. Upload a PNG file or type your brand name.',tag:'First block'},
+    {icon:'<line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/>',name:'Text',desc:'Paragraphs, headings, lists. Rich text editor with merge tags like {{first_name}}.'},
+    {icon:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>',name:'Image',desc:'Upload any image file OR paste an image URL. Can be made clickable.',tag:'Upload PNG/JPG'},
+    {icon:'<rect x="2" y="8" width="20" height="8" rx="4"/>',name:'Button',desc:'A clickable call-to-action. Filled, outline, or text link style. Pick any color.'},
+    {icon:'<line x1="3" y1="12" x2="21" y2="12"/>',name:'Divider',desc:'A horizontal line, dots, or just blank space to separate sections.'},
+    {icon:'<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>',name:'Socials',desc:'Instagram, TikTok, YouTube, Facebook, X, LinkedIn icons with your links.',tag:'Last block'},
+    {icon:'<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>',name:'Testimonial',desc:'A styled quote block with author name. Great for social proof.'},
+    {icon:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',name:'Banner',desc:'A bold colored banner with eyebrow text, headline, and subtitle.'},
+    {icon:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>',name:'From Library',desc:'Pick any logo or image you\'ve already uploaded in the Assets tab.',tag:'Reusable'}
+  ];
+  return`<div class="blocks-list">${BLIST.map(b=>`
+    <div class="block-explain">
+      <div class="be-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">${b.icon}</svg></div>
+      <div class="be-body">
+        <div class="be-name">${b.name}${b.tag?` <span class="be-tag">${b.tag}</span>`:''}</div>
+        <div class="be-desc">${b.desc}</div>
+      </div>
+    </div>`).join('')}</div>`;
+}
+
+function renderLogo(){
+  return`<div class="logo-demo">
+    <div class="logo-step-row">
+      <div class="logo-step-num">A</div>
+      <div class="logo-step-body">
+        <div class="logo-step-title">Upload right inside the block</div>
+        <div class="logo-step-desc">Tap <strong>Logo</strong> block → it appears in canvas → inside that block tap <strong>"Upload Logo File"</strong> → pick your PNG or JPG</div>
+        <div class="logo-step-visual">
+          <div class="logo-step-visual-hdr">Logo Block</div>
+          <div style="padding:10px;">
+            <div style="background:#000;border-radius:6px;padding:10px;text-align:center;margin-bottom:8px;">
+              <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--accent);">SHANNON CRAFT</span>
+            </div>
+            <div style="height:28px;background:var(--g2);border:1px solid var(--sep2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--accent);cursor:pointer;">📁 Upload Logo File</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="logo-step-row" style="margin-bottom:0;">
+      <div class="logo-step-num">B</div>
+      <div class="logo-step-body">
+        <div class="logo-step-title">Upload to Assets, then reuse</div>
+        <div class="logo-step-desc">Assets tab → upload logo → come back to Builder → tap <strong>"From Library"</strong> → your logo appears as an image block. Best for logos used in every email.</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:8px;background:var(--g1);border-radius:8px;padding:10px;">
+          <div style="font-size:18px;">🖼️</div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--white);">From Library block</div>
+            <div style="font-size:10px;font-weight:500;color:var(--l3);">Shows all your uploaded assets</div>
+          </div>
+          <div style="font-size:10px;font-weight:800;color:var(--green);background:var(--gs);border:1px solid var(--gb);border-radius:5px;padding:2px 7px;">Pick</div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderReorder(){
+  return`<div class="reorder-demo">
+    <div style="font-size:10px;font-weight:700;color:var(--l3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;">Your Email Canvas</div>
+    <div class="rd-block">
+      <div class="rd-handle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
+      <div class="rd-label">🏷️ Logo Block</div>
+      <div class="rd-btns"><div class="rd-btn">↑</div><div class="rd-btn">↓</div><div class="rd-btn">✕</div></div>
+    </div>
+    <div class="rd-block moving">
+      <div class="rd-handle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
+      <div class="rd-label">📝 Text Block <span style="font-size:9px;color:var(--accent);font-weight:800;margin-left:4px;">← Moving</span></div>
+      <div class="rd-btns"><div class="rd-btn lit">↑</div><div class="rd-btn">↓</div><div class="rd-btn">✕</div></div>
+    </div>
+    <div class="rd-block">
+      <div class="rd-handle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
+      <div class="rd-label">🖼️ Image Block</div>
+      <div class="rd-btns"><div class="rd-btn">↑</div><div class="rd-btn lit">↓</div><div class="rd-btn">✕</div></div>
+    </div>
+    <div style="margin-top:8px;background:var(--as);border-radius:8px;padding:10px 12px;border:1px solid var(--ab);display:flex;align-items:center;gap:8px;">
+      <span style="font-size:16px;">💡</span>
+      <span style="font-size:11px;font-weight:600;color:var(--accent);line-height:1.5;">On desktop, grab the ≡ handle on the left and drag to reorder</span>
+    </div>
+  </div>`;
+}
+
+function renderPreview(){
+  return`<div class="preview-demo">
+    <div style="font-size:10px;font-weight:700;color:var(--l3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;">Tap Preview button → choose theme</div>
+    <div class="preview-toggle-demo">
+      <button class="ptd-btn on" id="pvDk" onclick="setPvDemo('dark')">Dark</button>
+      <button class="ptd-btn" id="pvLt" onclick="setPvDemo('light')">Light</button>
+    </div>
+    <div class="preview-frame-demo" id="pvFrame">
+      <div class="pfd-dark">
+        <div class="pfd-logo"><span style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--accent);">SHANNON CRAFT</span></div>
+        <div class="pfd-text" style="color:rgba(255,255,255,.7);">Hey {{first_name}}, your download is ready! Thank you so much for your purchase.</div>
+        <div class="pfd-btn"><div class="pfd-cta">Download Now</div></div>
+        <div class="pfd-footer" style="color:rgba(255,255,255,.3);">© Shannon Craft · Unsubscribe</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderSave(){
+  return`<div class="save-demo">
+    <div style="font-size:10px;font-weight:700;color:var(--l3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px;">The flow from build to send</div>
+    <div class="flow-row">
+      <div class="flow-step accent">
+        <div class="flow-icon">✏️</div>
+        <div class="flow-label">Build</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step accent">
+        <div class="flow-icon">👁️</div>
+        <div class="flow-label">Preview</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step accent">
+        <div class="flow-icon">💾</div>
+        <div class="flow-label">Save</div>
+      </div>
+    </div>
+    <div style="text-align:center;color:var(--accent);font-size:20px;margin:6px 0;">↓</div>
+    <div style="background:var(--g1);border-radius:10px;padding:12px;border:1px solid var(--sep);margin-bottom:8px;">
+      <div style="font-size:11px;font-weight:800;color:var(--white);margin-bottom:3px;">📤 Go to Broadcast tab</div>
+      <div style="font-size:10px;font-weight:500;color:var(--l3);line-height:1.6;">Choose audience → Everyone / Buyers / YouTube / etc.<br>Write subject + body → Hit Send Broadcast</div>
+    </div>
+    <div style="background:var(--g1);border-radius:10px;padding:12px;border:1px solid var(--sep);">
+      <div style="font-size:11px;font-weight:800;color:var(--white);margin-bottom:3px;">📋 Or go to Sequences tab</div>
+      <div style="font-size:10px;font-weight:500;color:var(--l3);line-height:1.6;">For post-purchase automated emails that go out automatically when someone buys</div>
+    </div>
+  </div>`;
+}
+
+function setPvDemo(mode){
+  document.getElementById('pvDk').classList.toggle('on',mode==='dark');
+  document.getElementById('pvLt').classList.toggle('on',mode==='light');
+  const frame=document.getElementById('pvFrame');
+  if(!frame)return;
+  if(mode==='dark'){
+    frame.innerHTML=`<div class="pfd-dark"><div class="pfd-logo"><span style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--accent);">SHANNON CRAFT</span></div><div class="pfd-text" style="color:rgba(255,255,255,.7);">Hey {{first_name}}, your download is ready! Thank you so much for your purchase.</div><div class="pfd-btn"><div class="pfd-cta">Download Now</div></div><div class="pfd-footer" style="color:rgba(255,255,255,.3);">© Shannon Craft · Unsubscribe</div></div>`;
+  } else {
+    frame.innerHTML=`<div class="pfd-light"><div class="pfd-logo-light"><span style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--accent);">SHANNON CRAFT</span></div><div class="pfd-text" style="color:rgba(0,0,0,.7);">Hey {{first_name}}, your download is ready! Thank you so much for your purchase.</div><div class="pfd-btn"><div class="pfd-cta">Download Now</div></div><div style="text-align:center;font-size:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.07);color:rgba(0,0,0,.3);">© Shannon Craft · Unsubscribe</div></div>`;
+  }
+}
+
+/* BOOT */
+renderStep();
+</script>
+</body>
+</html>

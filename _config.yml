@@ -1,0 +1,13 @@
+# GitHub Pages configuration
+# This file tells GitHub Pages how to serve your site
+
+# Your site URL - update when you connect shannoncraft.com
+url: "https://shannonlcraft.github.io"
+baseurl: ""
+
+# Keep all files as-is
+include:
+  - "*.html"
+  - "*.js"
+  - "*.toml"
+  - "*.md"

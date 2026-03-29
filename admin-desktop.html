@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#000000">
+<title>Admin · Shannon Craft</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#000;--g1:#161616;--g2:#242424;--g3:#333;--g4:#444;
+  --sep:rgba(255,255,255,0.07);--sep2:rgba(255,255,255,0.11);
+  --accent:#E8571A;--as:rgba(232,87,26,0.13);--ab:rgba(232,87,26,0.28);
+  --white:#fff;--l1:rgba(255,255,255,0.85);--l2:rgba(255,255,255,0.5);
+  --l3:rgba(255,255,255,0.28);--l4:rgba(255,255,255,0.13);
+  --green:#16A34A;--gs:rgba(22,163,74,0.13);--gb:rgba(22,163,74,0.25);
+  --red:#DC2626;--rs:rgba(220,38,38,0.13);
+  --sidebar:240px;
+}
+html,body{height:100%;background:var(--bg);color:var(--white);font-family:'Manrope',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ══════════ DESKTOP LAYOUT ══════════ */
+#app{display:block;height:100vh;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{
+  position:fixed;top:0;left:0;bottom:0;width:var(--sidebar);
+  background:var(--g1);border-right:1px solid var(--sep);
+  display:flex;flex-direction:column;z-index:50;
+  overflow:hidden;
+}
+.sidebar-brand{
+  padding:24px 20px 20px;border-bottom:1px solid var(--sep);flex-shrink:0;
+}
+.sidebar-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--white);line-height:1;}
+.sidebar-logo em{color:var(--accent);font-style:normal;}
+.sidebar-badge{font-size:9px;font-weight:700;color:var(--l3);text-transform:uppercase;letter-spacing:1px;margin-top:3px;}
+.sidebar-nav{flex:1;overflow-y:auto;padding:12px 0;}
+.sidebar-nav::-webkit-scrollbar{display:none;}
+.nav-section-label{font-size:9px;font-weight:800;color:var(--l3);text-transform:uppercase;letter-spacing:1px;padding:14px 20px 6px;}
+.nav-item{display:flex;align-items:center;gap:11px;padding:10px 20px;cursor:pointer;transition:all .15s;border-left:3px solid transparent;color:var(--l3);font-size:13px;font-weight:600;user-select:none;}
+.nav-item:hover{background:var(--g2);color:var(--l2);}
+.nav-item.active{background:var(--as);border-left-color:var(--accent);color:var(--accent);}
+.nav-item svg{width:16px;height:16px;flex-shrink:0;}
+.nav-item-badge{margin-left:auto;height:18px;min-width:18px;padding:0 5px;border-radius:9px;background:var(--accent);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.sidebar-footer{padding:16px 20px;border-top:1px solid var(--sep);flex-shrink:0;}
+.sidebar-user{display:flex;align-items:center;gap:10px;}
+.sidebar-avatar{width:34px;height:34px;border-radius:50%;background:var(--as);border:1.5px solid var(--ab);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--accent);flex-shrink:0;}
+.sidebar-user-info{flex:1;min-width:0;}
+.sidebar-user-name{font-size:12px;font-weight:700;color:var(--white);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sidebar-user-role{font-size:10px;font-weight:500;color:var(--l3);}
+
+/* MAIN CONTENT */
+.main{margin-left:var(--sidebar);height:100vh;overflow-y:auto;background:var(--bg);}
+.main::-webkit-scrollbar{width:6px;}
+.main::-webkit-scrollbar-track{background:var(--bg);}
+.main::-webkit-scrollbar-thumb{background:var(--g3);border-radius:3px;}
+
+/* PAGE HEADER */
+.page-hdr{padding:28px 32px 20px;border-bottom:1px solid var(--sep);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:rgba(0,0,0,.95);backdrop-filter:blur(20px);z-index:10;}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:1.5px;line-height:1;}
+.page-title em{color:var(--accent);font-style:normal;}
+.page-sub{font-size:12px;font-weight:500;color:var(--l3);margin-top:3px;}
+.page-actions{display:flex;gap:8px;align-items:center;}
+.btn{display:flex;align-items:center;gap:6px;border:none;border-radius:10px;padding:9px 16px;font-size:12px;font-weight:800;font-family:'Manrope',sans-serif;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.btn:active{transform:scale(.97);}
+.btn.p{background:var(--accent);color:#fff;}
+.btn.p:hover{opacity:.9;}
+.btn.s{background:var(--g1);color:var(--l2);border:1px solid var(--sep2);}
+.btn.s:hover{background:var(--g2);}
+.btn.g{background:var(--gs);color:var(--green);border:1px solid var(--gb);}
+.btn svg{width:12px;height:12px;}
+
+/* CONTENT AREA */
+.content{padding:28px 32px;}
+
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+.stat-card{background:var(--g1);border-radius:16px;padding:20px;border:1px solid var(--sep);animation:fadeUp .3s ease both;}
+.stat-card-num{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--accent);letter-spacing:1px;line-height:1;margin-bottom:4px;}
+.stat-card-label{font-size:11px;font-weight:700;color:var(--l3);text-transform:uppercase;letter-spacing:.6px;}
+.stat-card-change{font-size:11px;font-weight:600;color:var(--green);margin-top:6px;}
+.stat-card-icon{width:36px;height:36px;border-radius:10px;background:var(--as);border:1px solid var(--ab);display:flex;align-items:center;justify-content:center;color:var(--accent);margin-bottom:12px;}
+.stat-card-icon svg{width:16px;height:16px;}
+
+/* TWO COLUMN */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:20px;}
+
+/* SECTION CARD */
+.sec-card{background:var(--g1);border-radius:16px;border:1px solid var(--sep);overflow:hidden;}
+.sec-card-hdr{padding:16px 20px;border-bottom:1px solid var(--sep);display:flex;align-items:center;justify-content:space-between;}
+.sec-card-title{font-size:13px;font-weight:800;color:var(--white);}
+.sec-card-sub{font-size:11px;font-weight:500;color:var(--l3);margin-top:2px;}
+.sec-card-action{font-size:11px;font-weight:700;color:var(--accent);cursor:pointer;}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;}
+.data-table{width:100%;border-collapse:collapse;}
+.data-table th{padding:11px 16px;text-align:left;font-size:10px;font-weight:800;color:var(--l3);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--sep);}
+.data-table td{padding:12px 16px;border-bottom:1px solid var(--sep);font-size:13px;font-weight:500;color:var(--l2);}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:rgba(255,255,255,.02);}
+.data-table td strong{color:var(--white);font-weight:700;}
+
+/* CONTACT AVATAR */
+.c-av{width:30px;height:30px;border-radius:50%;background:var(--as);border:1px solid var(--ab);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:11px;color:var(--accent);flex-shrink:0;}
+
+/* TAG BADGES */
+.tb{height:18px;padding:0 8px;border-radius:5px;font-size:10px;font-weight:800;display:inline-flex;align-items:center;white-space:nowrap;}
+.tbuyer{background:var(--as);color:var(--accent);border:1px solid var(--ab);}
+.tlead{background:var(--gs);color:var(--green);border:1px solid var(--gb);}
+.tvip{background:rgba(124,58,237,.15);color:#a78bfa;border:1px solid rgba(124,58,237,.3);}
+.tyoutube{background:rgba(220,38,38,.13);color:#f87171;border:1px solid rgba(220,38,38,.25);}
+.tnewsletter{background:rgba(13,148,136,.13);color:#2dd4bf;border:1px solid rgba(13,148,136,.25);}
+.tactive{background:var(--gs);color:var(--green);border:1px solid var(--gb);}
+.tdraft{background:var(--g2);color:var(--l3);border:1px solid var(--sep2);}
+
+/* SEQ CARD */
+.seq-row{display:flex;align-items:center;gap:14px;padding:13px 20px;border-bottom:1px solid var(--sep);cursor:pointer;transition:background .12s;}
+.seq-row:last-child{border-bottom:none;}
+.seq-row:hover{background:rgba(255,255,255,.02);}
+.seq-icon{width:34px;height:34px;border-radius:9px;background:var(--as);border:1px solid var(--ab);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent);}
+.seq-icon svg{width:15px;height:15px;}
+.seq-info{flex:1;min-width:0;}
+.seq-name{font-size:13px;font-weight:700;color:var(--white);}
+.seq-meta{font-size:11px;font-weight:500;color:var(--l3);margin-top:2px;}
+.seq-actions{display:flex;gap:6px;}
+.seq-act-btn{height:28px;padding:0 12px;border-radius:7px;background:var(--g2);border:1px solid var(--sep2);font-family:'Manrope',sans-serif;font-size:10px;font-weight:800;color:var(--l2);cursor:pointer;transition:all .15s;}
+.seq-act-btn:hover{background:var(--as);border-color:var(--ab);color:var(--accent);}
+.seq-act-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+/* STEP LIST */
+.step-list-item{display:flex;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid var(--sep);}
+.step-list-item:last-child{border-bottom:none;}
+.step-day-badge{height:20px;padding:0 8px;border-radius:5px;background:var(--g2);font-size:10px;font-weight:800;color:var(--l3);display:flex;align-items:center;flex-shrink:0;}
+.step-day-badge.d0{background:var(--as);color:var(--accent);border:1px solid var(--ab);}
+.step-type-badge{font-size:10px;font-weight:700;color:var(--l3);flex-shrink:0;width:60px;}
+.step-subject{font-size:12px;font-weight:600;color:var(--white);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.step-actions{display:flex;gap:4px;}
+.step-btn{width:24px;height:24px;border-radius:6px;background:var(--g2);border:1px solid var(--sep2);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--l3);transition:all .15s;}
+.step-btn:hover{background:var(--as);color:var(--accent);border-color:var(--ab);}
+.step-btn svg{width:10px;height:10px;}
+
+/* SEARCH */
+.search-bar{display:flex;align-items:center;gap:10px;background:var(--g2);border:1.5px solid var(--sep2);border-radius:10px;padding:10px 14px;transition:border-color .2s;}
+.search-bar:focus-within{border-color:var(--accent);}
+.search-bar svg{width:14px;height:14px;color:var(--l3);flex-shrink:0;}
+.search-bar input{flex:1;border:none;outline:none;background:transparent;font-family:'Manrope',sans-serif;font-size:13px;font-weight:500;color:var(--white);caret-color:var(--accent);}
+.search-bar input::placeholder{color:var(--l4);}
+
+/* FILTER ROW */
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;}
+.filter-chip{height:28px;padding:0 12px;border-radius:20px;background:var(--g1);border:1px solid var(--sep2);font-size:11px;font-weight:700;color:var(--l3);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.filter-chip:hover{border-color:var(--ab);color:var(--l2);}
+.filter-chip.on{background:var(--as);border-color:var(--ab);color:var(--accent);}
+
+/* SETTINGS */
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.settings-sec{background:var(--g1);border-radius:16px;border:1px solid var(--sep);overflow:hidden;}
+.settings-sec-hdr{padding:16px 20px;border-bottom:1px solid var(--sep);font-size:12px;font-weight:800;color:var(--white);}
+.settings-row{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--sep);}
+.settings-row:last-child{border-bottom:none;}
+.settings-row-icon{width:32px;height:32px;border-radius:9px;background:var(--as);border:1px solid var(--ab);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent);}
+.settings-row-icon svg{width:14px;height:14px;}
+.settings-row-icon.n{background:var(--g2);border-color:var(--sep2);color:var(--l2);}
+.settings-row-body{flex:1;}
+.settings-row-label{font-size:13px;font-weight:600;color:var(--white);}
+.settings-row-sub{font-size:11px;font-weight:500;color:var(--l3);margin-top:1px;}
+.settings-input{background:var(--bg);border:1.5px solid var(--sep2);border-radius:8px;padding:8px 12px;font-family:'Manrope',sans-serif;font-size:13px;font-weight:500;color:var(--white);outline:none;caret-color:var(--accent);transition:border-color .2s;min-width:180px;}
+.settings-input:focus{border-color:var(--accent);}
+.settings-input::placeholder{color:var(--l4);}
+.toggle{position:relative;width:44px;height:26px;background:var(--g3);border-radius:13px;cursor:pointer;transition:background .25s;border:none;padding:0;display:block;flex-shrink:0;}
+.toggle.on{background:var(--accent);}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .25s cubic-bezier(.34,1.56,.64,1);box-shadow:0 2px 6px rgba(0,0,0,.3);}
+.toggle.on::after{transform:translateX(18px);}
+.color-swatches{display:flex;gap:8px;flex-wrap:wrap;padding:14px 20px;}
+.swatch{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:all .15s;flex-shrink:0;}
+.swatch:hover{transform:scale(1.1);}
+.swatch.sel{border-color:#fff;transform:scale(1.15);}
+
+/* OVERLAY / SHEET */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(8px);}
+.overlay.open{display:flex;}
+.modal{background:var(--g1);border-radius:20px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;animation:fadeUp .3s ease;}
+.modal-hdr{padding:22px 24px 18px;border-bottom:1px solid var(--sep);display:flex;align-items:flex-start;justify-content:space-between;}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1px;}
+.modal-title em{color:var(--accent);font-style:normal;}
+.modal-sub{font-size:12px;font-weight:500;color:var(--l3);margin-top:3px;}
+.modal-close{width:30px;height:30px;border-radius:8px;background:var(--g2);border:1px solid var(--sep2);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--l3);flex-shrink:0;transition:all .15s;}
+.modal-close:hover{color:var(--accent);border-color:var(--ab);}
+.modal-close svg{width:12px;height:12px;}
+.modal-body{padding:22px 24px;}
+.field-label{font-size:10px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;}
+.field-input{width:100%;background:var(--bg);border:1.5px solid var(--sep2);border-radius:10px;padding:12px 14px;font-family:'Manrope',sans-serif;font-size:14px;font-weight:500;color:var(--white);outline:none;caret-color:var(--accent);transition:border-color .2s;margin-bottom:14px;}
+.field-input:focus{border-color:var(--accent);}
+.field-input::placeholder{color:var(--l4);}
+.field-textarea{width:100%;background:var(--bg);border:1.5px solid var(--sep2);border-radius:10px;padding:12px 14px;font-family:'Manrope',sans-serif;font-size:14px;font-weight:500;color:var(--white);outline:none;caret-color:var(--accent);transition:border-color .2s;margin-bottom:14px;resize:none;line-height:1.6;}
+.field-textarea:focus{border-color:var(--accent);}
+.field-textarea::placeholder{color:var(--l4);}
+.field-select{width:100%;background:var(--bg);border:1.5px solid var(--sep2);border-radius:10px;padding:12px 14px;font-family:'Manrope',sans-serif;font-size:14px;font-weight:500;color:var(--white);outline:none;transition:border-color .2s;margin-bottom:14px;appearance:none;cursor:pointer;}
+.field-select:focus{border-color:var(--accent);}
+.field-select option{background:#1a1a1a;}
+.tag-picker{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.tag-opt{height:28px;padding:0 12px;border-radius:20px;background:var(--g2);border:1.5px solid var(--sep2);font-family:'Manrope',sans-serif;font-size:11px;font-weight:700;color:var(--l3);cursor:pointer;transition:all .15s;}
+.tag-opt.sel{background:var(--as);border-color:var(--ab);color:var(--accent);}
+.modal-footer{padding:0 24px 22px;display:flex;gap:8px;justify-content:flex-end;}
+.save-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:11px 22px;font-size:13px;font-weight:800;font-family:'Manrope',sans-serif;cursor:pointer;transition:opacity .15s;}
+.save-btn:hover{opacity:.9;}
+.cancel-btn2{background:var(--g2);color:var(--l2);border:1px solid var(--sep2);border-radius:10px;padding:11px 20px;font-size:13px;font-weight:700;font-family:'Manrope',sans-serif;cursor:pointer;transition:all .15s;}
+.cancel-btn2:hover{background:var(--g3);}
+.danger-btn{background:transparent;color:var(--red);border:1px solid rgba(220,38,38,.25);border-radius:10px;padding:11px 20px;font-size:13px;font-weight:700;font-family:'Manrope',sans-serif;cursor:pointer;}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:48px 24px;}
+.empty-icon{width:52px;height:52px;border-radius:16px;background:var(--g2);border:1px solid var(--sep2);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
+.empty-icon svg{width:24px;height:24px;color:var(--l3);}
+.empty-title{font-size:16px;font-weight:800;color:var(--white);margin-bottom:6px;}
+.empty-sub{font-size:13px;font-weight:500;color:var(--l3);line-height:1.6;}
+
+/* BROADCAST */
+.bcast-body-wrap{background:var(--bg);border:1.5px solid var(--sep2);border-top:none;border-radius:0 0 10px 10px;padding:14px;font-family:'Manrope',sans-serif;font-size:14px;color:var(--white);outline:none;min-height:200px;line-height:1.7;caret-color:var(--accent);width:100%;}
+.bcast-body-wrap:focus{border-color:var(--accent);}
+.rich-bar{display:flex;gap:4px;background:var(--g2);border:1.5px solid var(--sep2);border-bottom:none;border-radius:10px 10px 0 0;padding:8px 10px;flex-wrap:wrap;}
+.rtb{height:26px;padding:0 9px;border-radius:6px;background:transparent;border:none;cursor:pointer;font-family:'Manrope',sans-serif;font-size:12px;font-weight:700;color:var(--l2);transition:all .15s;}
+.rtb:hover,.rtb:active{background:var(--as);color:var(--accent);}
+.merge-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;}
+.mc{height:22px;padding:0 8px;border-radius:5px;background:var(--g2);border:1px solid var(--sep2);font-size:10px;font-weight:700;color:var(--accent);cursor:pointer;display:flex;align-items:center;transition:background .15s;}
+.mc:hover{background:var(--as);}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--g2);border:1px solid var(--sep2);color:var(--white);border-radius:12px;padding:12px 18px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;box-shadow:0 8px 40px rgba(0,0,0,.8);transform:translateY(20px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:center;gap:8px;}
+.toast-dot{width:6px;height:6px;background:var(--accent);border-radius:50%;flex-shrink:0;}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* MOBILE OVERRIDES (under 768px falls back to mobile layout) */
+@media(max-width:768px){
+  html,body{overflow:auto;height:auto;}
+  #app{height:auto;overflow:visible;}
+  .sidebar{display:none;}
+  .main{margin-left:0;height:auto;overflow:visible;}
+  .stat-grid{grid-template-columns:1fr 1fr;}
+  .two-col,.three-col,.settings-grid{grid-template-columns:1fr;}
+  .page-hdr{padding:52px 18px 14px;position:sticky;}
+  .content{padding:16px;}
+  body{padding-bottom:80px;}
+  /* Mobile bottom nav */
+  .mobile-nav{display:flex !important;}
+}
+@media(min-width:769px){
+  .mobile-nav{display:none !important;}
+}
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(6,6,6,.97);border-top:1px solid rgba(255,255,255,.1);backdrop-filter:blur(24px);padding:6px 0 env(safe-area-inset-bottom,12px);z-index:100;}
+.mnav-inner{display:flex;max-width:430px;margin:0 auto;}
+.mnb{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;background:none;border:none;cursor:pointer;font-family:'Manrope',sans-serif;color:rgba(255,255,255,.3);transition:color .15s;}
+.mnb.on{color:var(--accent);}
+.mnb-icon{width:22px;height:22px;display:flex;align-items:center;justify-content:center;}
+.mnb-label{font-size:8px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"><div class="toast-dot"></div><span id="tMsg"></span></div>
+
+<!-- ══════════ MAIN APP ══════════ -->
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-logo">Shannon <em>Craft</em></div>
+      <div class="sidebar-badge">Admin Dashboard</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <div class="nav-item active" id="nav-dashboard" onclick="sT('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </div>
+
+      <div class="nav-section-label">Contacts</div>
+      <div class="nav-item" id="nav-contacts" onclick="sT('contacts')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        All Contacts
+        <span class="nav-item-badge" id="nb-contacts" style="display:none;">0</span>
+      </div>
+      <div class="nav-item" id="nav-import" onclick="openModal('importModal')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Import Contacts
+      </div>
+
+      <div class="nav-section-label">Email</div>
+      <div class="nav-item" id="nav-sequences" onclick="sT('sequences')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Sequences
+      </div>
+      <div class="nav-item" id="nav-broadcast" onclick="sT('broadcast')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Broadcast
+      </div>
+      <div class="nav-item" id="nav-builder" onclick="window.open('admin-email.html','_blank')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        Email Builder ↗
+      </div>
+
+      <div class="nav-section-label">System</div>
+      <div class="nav-item" id="nav-settings" onclick="sT('settings')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Settings
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar" id="sidebarAvatar">SC</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebarName">Shannon Craft</div>
+          <div class="sidebar-user-role">Admin</div>
+        </div>
+        
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main" id="mainContent">
+
+    <!-- ── DASHBOARD ── -->
+    <div id="vDashboard" class="view-panel">
+      <div class="page-hdr">
+        <div>
+          <div class="page-title">Dashboard</div>
+          <div class="page-sub" id="dashGreeting">Welcome back, Shannon</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn s" onclick="openModal('addContactModal')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Contact
+          </button>
+          <button class="btn p" onclick="sT('broadcast')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Send Broadcast
+          </button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
+            <div class="stat-card-num" id="dashTotal">0</div>
+            <div class="stat-card-label">Total Contacts</div>
+          </div>
+          <div class="stat-card" style="animation-delay:.05s">
+            <div class="stat-card-icon" style="background:var(--gs);border-color:var(--gb);color:var(--green);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></div>
+            <div class="stat-card-num" id="dashBuyers" style="color:var(--green);">0</div>
+            <div class="stat-card-label">Buyers</div>
+          </div>
+          <div class="stat-card" style="animation-delay:.1s">
+            <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+            <div class="stat-card-num" id="dashSeqs">0</div>
+            <div class="stat-card-label">Active Sequences</div>
+          </div>
+          <div class="stat-card" style="animation-delay:.15s">
+            <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+            <div class="stat-card-num" id="dashBcast">0</div>
+            <div class="stat-card-label">Broadcasts Sent</div>
+          </div>
+        </div>
+        <div class="two-col">
+          <!-- Recent Contacts -->
+          <div class="sec-card">
+            <div class="sec-card-hdr">
+              <div><div class="sec-card-title">Recent Contacts</div><div class="sec-card-sub">Latest additions to your list</div></div>
+              <span class="sec-card-action" onclick="sT('contacts')">View all →</span>
+            </div>
+            <div id="dashRecentContacts"></div>
+          </div>
+          <!-- Sequences Overview -->
+          <div class="sec-card">
+            <div class="sec-card-hdr">
+              <div><div class="sec-card-title">Email Sequences</div><div class="sec-card-sub">Post-purchase automation</div></div>
+              <span class="sec-card-action" onclick="sT('sequences')">Manage →</span>
+            </div>
+            <div id="dashSeqList"></div>
+          </div>
+        </div>
+        <!-- Quick Actions -->
+        <div class="sec-card">
+          <div class="sec-card-hdr"><div class="sec-card-title">Quick Actions</div></div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;">
+            <div onclick="openModal('addContactModal')" style="padding:20px;text-align:center;cursor:pointer;border-right:1px solid var(--sep);transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,.02)'" onmouseout="this.style.background='transparent'">
+              <div style="font-size:24px;margin-bottom:8px;">➕</div>
+              <div style="font-size:12px;font-weight:700;color:var(--white);">Add Contact</div>
+            </div>
+            <div onclick="openModal('importModal')" style="padding:20px;text-align:center;cursor:pointer;border-right:1px solid var(--sep);transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,.02)'" onmouseout="this.style.background='transparent'">
+              <div style="font-size:24px;margin-bottom:8px;">📥</div>
+              <div style="font-size:12px;font-weight:700;color:var(--white);">Import List</div>
+            </div>
+            <div onclick="window.open('admin-email.html','_blank')" style="padding:20px;text-align:center;cursor:pointer;border-right:1px solid var(--sep);transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,.02)'" onmouseout="this.style.background='transparent'">
+              <div style="font-size:24px;margin-bottom:8px;">✉️</div>
+              <div style="font-size:12px;font-weight:700;color:var(--white);">Build Email</div>
+            </div>
+            <div onclick="sT('broadcast')" style="padding:20px;text-align:center;cursor:pointer;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,.02)'" onmouseout="this.style.background='transparent'">
+              <div style="font-size:24px;margin-bottom:8px;">📤</div>
+              <div style="font-size:12px;font-weight:700;color:var(--white);">Send Broadcast</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CONTACTS ── -->
+    <div id="vContacts" class="view-panel" style="display:none;">
+      <div class="page-hdr">
+        <div>
+          <div class="page-title">My <em>List</em></div>
+          <div class="page-sub">All contacts &amp; subscribers</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn s" onclick="openModal('importModal')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Import
+          </button>
+          <button class="btn p" onclick="openModal('addContactModal')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Contact
+          </button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="stat-grid" style="margin-bottom:20px;">
+          <div class="stat-card"><div class="stat-card-num" id="cTotal">0</div><div class="stat-card-label">Total</div></div>
+          <div class="stat-card"><div class="stat-card-num" id="cBuyers" style="color:var(--green);">0</div><div class="stat-card-label">Buyers</div></div>
+          <div class="stat-card"><div class="stat-card-num" id="cLeads">0</div><div class="stat-card-label">Leads</div></div>
+          <div class="stat-card"><div class="stat-card-num" id="cUnsub" style="color:var(--red);">0</div><div class="stat-card-label">Unsubscribed</div></div>
+        </div>
+        <div class="sec-card">
+          <div style="padding:16px 20px;border-bottom:1px solid var(--sep);display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+            <div class="search-bar" style="flex:1;min-width:200px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input id="cSearch" placeholder="Search name or email…" oninput="rContacts()">
+            </div>
+            <div class="filter-row" id="cFilterRow">
+              <button class="filter-chip on" data-f="all" onclick="sCF('all',this)">All</button>
+              <button class="filter-chip" data-f="buyer" onclick="sCF('buyer',this)">Buyers</button>
+              <button class="filter-chip" data-f="lead" onclick="sCF('lead',this)">Leads</button>
+              <button class="filter-chip" data-f="vip" onclick="sCF('vip',this)">VIP</button>
+              <button class="filter-chip" data-f="youtube" onclick="sCF('youtube',this)">YouTube</button>
+              <button class="filter-chip" data-f="newsletter" onclick="sCF('newsletter',this)">Newsletter</button>
+              <button class="filter-chip" data-f="unsubscribed" onclick="sCF('unsubscribed',this)">Unsubscribed</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table" id="contactTable">
+              <thead><tr>
+                <th>Contact</th><th>Email</th><th>Tags</th><th>Source</th><th>Added</th><th>Status</th><th></th>
+              </tr></thead>
+              <tbody id="contactTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SEQUENCES ── -->
+    <div id="vSequences" class="view-panel" style="display:none;">
+      <div class="page-hdr">
+        <div>
+          <div class="page-title">Email <em>Sequences</em></div>
+          <div class="page-sub">Post-purchase automation</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn p" onclick="openModal('newSeqModal')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New Sequence
+          </button>
+        </div>
+      </div>
+      <div class="content">
+        <div id="seqList"></div>
+      </div>
+    </div>
+
+    <!-- ── BROADCAST ── -->
+    <div id="vBroadcast" class="view-panel" style="display:none;">
+      <div class="page-hdr">
+        <div>
+          <div class="page-title">Broadcast <em>Email</em></div>
+          <div class="page-sub">Send to your list</div>
+        </div>
+        <div class="page-actions">
+          <div style="background:var(--g1);border-radius:10px;padding:8px 16px;border:1px solid var(--sep2);font-size:13px;font-weight:700;color:var(--white);">Reach: <span id="bReach" style="color:var(--accent);">0</span></div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="two-col" style="align-items:start;">
+          <!-- Left: compose -->
+          <div style="display:flex;flex-direction:column;gap:16px;">
+            <div class="sec-card">
+              <div class="sec-card-hdr"><div class="sec-card-title">Compose</div></div>
+              <div style="padding:20px;">
+                <div class="field-label">Send To</div>
+                <div class="tag-picker" id="bAudPick" style="margin-bottom:16px;">
+                  <button class="tag-opt sel" data-a="everyone" onclick="pickAud(this)">Everyone</button>
+                  <button class="tag-opt" data-a="buyer" onclick="pickAud(this)">Buyers</button>
+                  <button class="tag-opt" data-a="lead" onclick="pickAud(this)">Leads</button>
+                  <button class="tag-opt" data-a="vip" onclick="pickAud(this)">VIP</button>
+                  <button class="tag-opt" data-a="youtube" onclick="pickAud(this)">YouTube</button>
+                  <button class="tag-opt" data-a="newsletter" onclick="pickAud(this)">Newsletter</button>
+                </div>
+                <div class="field-label">Subject Line</div>
+                <input class="field-input" id="bSubject" placeholder="Your subject line here…" oninput="updBReach()">
+                <div class="field-label">Merge Tags</div>
+                <div class="merge-row">
+                  <div class="mc" onclick="insBMerge('{{first_name}}')">{{first_name}}</div>
+                  <div class="mc" onclick="insBMerge('{{full_name}}')">{{full_name}}</div>
+                  <div class="mc" onclick="insBMerge('{{unsubscribe_link}}')">{{unsubscribe_link}}</div>
+                </div>
+                <div class="field-label">Email Body</div>
+                <div class="rich-bar">
+                  <button class="rtb" onmousedown="event.preventDefault();document.execCommand('bold')"><b>B</b></button>
+                  <button class="rtb" onmousedown="event.preventDefault();document.execCommand('italic')"><i>I</i></button>
+                  <button class="rtb" onmousedown="event.preventDefault();document.execCommand('underline')"><u>U</u></button>
+                  <button class="rtb" onmousedown="event.preventDefault();document.execCommand('insertUnorderedList')">• List</button>
+                  <button class="rtb" onmousedown="event.preventDefault();insertBLink()">🔗 Link</button>
+                </div>
+                <div class="bcast-body-wrap" id="bBody" contenteditable="true" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--sep2)'"></div>
+                <div style="margin-top:12px;padding:12px 14px;background:var(--as);border-radius:10px;border:1px solid var(--ab);display:flex;align-items:center;gap:8px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  <span style="font-size:12px;font-weight:600;color:var(--accent);">Include {{unsubscribe_link}} in every broadcast.</span>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;">
+              <button class="btn s" style="flex:1;justify-content:center;" onclick="pvBcast()">Preview First</button>
+              <button class="btn p" style="flex:2;justify-content:center;" onclick="sendBcast()">Send Broadcast</button>
+            </div>
+          </div>
+          <!-- Right: history -->
+          <div class="sec-card">
+            <div class="sec-card-hdr"><div class="sec-card-title">Sent History</div></div>
+            <div id="bcastHistory"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS ── -->
+    <div id="vSettings" class="view-panel" style="display:none;">
+      <div class="page-hdr">
+        <div>
+          <div class="page-title">Settings</div>
+          <div class="page-sub">Admin preferences &amp; configuration</div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="settings-grid">
+          <!-- Security -->
+          <div class="settings-sec">
+            <div class="settings-sec-hdr">🔒 Security <span style="font-size:10px;font-weight:500;color:var(--l3);">(Email auth coming soon)</span></div>
+            <div class="settings-row">
+              <div class="settings-row-icon n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+              <div class="settings-row-body"><div class="settings-row-label">Authentication</div><div class="settings-row-sub">Email-based login coming when backend is connected</div></div>
+            </div>
+          </div>
+          <!-- Profile -->
+          <div class="settings-sec">
+            <div class="settings-sec-hdr">👤 Profile</div>
+            <div class="settings-row">
+              <div class="settings-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+              <div class="settings-row-body"><div class="settings-row-label">Your Name</div><div class="settings-row-sub">Shown in sidebar</div></div>
+              <input class="settings-input" id="settingsName" placeholder="Shannon Craft" oninput="saveSettings()">
+            </div>
+          </div>
+          <!-- Email Config -->
+          <div class="settings-sec">
+            <div class="settings-sec-hdr">📧 Email Sending (Resend)</div>
+            <div class="settings-row">
+              <div class="settings-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+              <div class="settings-row-body"><div class="settings-row-label">Resend API Key</div><div class="settings-row-sub">Free · 3,000 emails/month</div></div>
+              <input class="settings-input" id="sResendKey" type="password" placeholder="re_xxxxx" oninput="saveCfg()">
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-icon n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+              <div class="settings-row-body"><div class="settings-row-label">From Email</div></div>
+              <input class="settings-input" id="sFromEmail" type="email" placeholder="you@domain.com" oninput="saveCfg()">
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-icon n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+              <div class="settings-row-body"><div class="settings-row-label">From Name</div></div>
+              <input class="settings-input" id="sFromName" placeholder="Shannon Craft" oninput="saveCfg()">
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:16px;">
+          <button class="danger-btn" onclick="if(confirm('Clear ALL data? Cannot undo.'))clearAll()">Clear All Data</button>
+        </div>
+        <div style="text-align:center;font-size:12px;font-weight:500;color:var(--l3);padding:20px 0 0;">Shannon Craft Admin · Desktop</div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MOBILE BOTTOM NAV -->
+  <nav class="mobile-nav">
+    <div class="mnav-inner">
+      <button class="mnb on" id="mnb-dashboard" onclick="sT('dashboard')"><div class="mnb-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div><span class="mnb-label">Home</span></button>
+      <button class="mnb" id="mnb-contacts" onclick="sT('contacts')"><div class="mnb-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><span class="mnb-label">Contacts</span></button>
+      <button class="mnb" id="mnb-sequences" onclick="sT('sequences')"><div class="mnb-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><span class="mnb-label">Sequences</span></button>
+      <button class="mnb" id="mnb-broadcast" onclick="sT('broadcast')"><div class="mnb-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><span class="mnb-label">Broadcast</span></button>
+      <button class="mnb" id="mnb-settings" onclick="sT('settings')"><div class="mnb-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div><span class="mnb-label">Settings</span></button>
+    </div>
+  </nav>
+</div>
+
+<!-- ══ MODALS ══ -->
+<!-- Add Contact -->
+<div class="overlay" id="addContactModal" onclick="closeModal('addContactModal',event)">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div><div class="modal-title">Add <em>Contact</em></div><div class="modal-sub">Add someone to your list manually</div></div>
+      <button class="modal-close" onclick="closeModal('addContactModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div><div class="field-label">First Name</div><input class="field-input" id="acFirst" placeholder="First name" style="margin-bottom:0;"></div>
+        <div><div class="field-label">Last Name</div><input class="field-input" id="acLast" placeholder="Last name" style="margin-bottom:0;"></div>
+      </div>
+      <div style="height:14px;"></div>
+      <div class="field-label">Email Address</div>
+      <input class="field-input" id="acEmail" placeholder="email@example.com" type="email">
+      <div class="field-label">Tags</div>
+      <div class="tag-picker" id="acTagPicker">
+        <button class="tag-opt" data-t="buyer" onclick="togTag(this)">Buyer</button>
+        <button class="tag-opt" data-t="lead" onclick="togTag(this)">Lead</button>
+        <button class="tag-opt" data-t="vip" onclick="togTag(this)">VIP</button>
+        <button class="tag-opt" data-t="youtube" onclick="togTag(this)">YouTube</button>
+        <button class="tag-opt" data-t="newsletter" onclick="togTag(this)">Newsletter</button>
+      </div>
+      <div class="field-label">Source Note</div>
+      <input class="field-input" id="acSource" placeholder="e.g. YouTube lead magnet" style="margin-bottom:0;">
+    </div>
+    <div class="modal-footer">
+      <button class="cancel-btn2" onclick="closeModal('addContactModal')">Cancel</button>
+      <button class="save-btn" onclick="saveContact()">Add Contact</button>
+    </div>
+  </div>
+</div>
+
+<!-- Import -->
+<div class="overlay" id="importModal" onclick="closeModal('importModal',event)">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div><div class="modal-title">Import <em>Contacts</em></div><div class="modal-sub">Paste from Beacons, Mailchimp, or any source</div></div>
+      <button class="modal-close" onclick="closeModal('importModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="field-label">Paste emails (one per line) or CSV format</div>
+      <textarea class="field-textarea" id="impPaste" rows="8" placeholder="email@example.com&#10;another@email.com&#10;&#10;Or CSV: first,last,email&#10;Shannon,Craft,shannon@example.com"></textarea>
+      <div class="field-label">Tag all imported contacts as</div>
+      <div class="tag-picker" id="impTagPicker">
+        <button class="tag-opt sel" data-t="lead" onclick="togImportTag(this)">Lead</button>
+        <button class="tag-opt" data-t="buyer" onclick="togImportTag(this)">Buyer</button>
+        <button class="tag-opt" data-t="youtube" onclick="togImportTag(this)">YouTube</button>
+        <button class="tag-opt" data-t="newsletter" onclick="togImportTag(this)">Newsletter</button>
+      </div>
+      <div class="field-label">Source Note</div>
+      <input class="field-input" id="impSource" placeholder="e.g. Beacons import May 2025" style="margin-bottom:0;">
+    </div>
+    <div class="modal-footer">
+      <button class="cancel-btn2" onclick="closeModal('importModal')">Cancel</button>
+      <button class="save-btn" onclick="runImport()">Import</button>
+    </div>
+  </div>
+</div>
+
+<!-- Contact Detail -->
+<div class="overlay" id="contactDetailModal" onclick="closeModal('contactDetailModal',event)">
+  <div class="modal"><div id="contactDetailInner"></div></div>
+</div>
+
+<!-- New Sequence -->
+<div class="overlay" id="newSeqModal" onclick="closeModal('newSeqModal',event)">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div><div class="modal-title">New <em>Sequence</em></div><div class="modal-sub">Create an automated email sequence</div></div>
+      <button class="modal-close" onclick="closeModal('newSeqModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="field-label">Sequence Name</div>
+      <input class="field-input" id="nsName" placeholder="e.g. Digital Product Welcome">
+      <div class="field-label">Triggered By</div>
+      <select class="field-select" id="nsTrig">
+        <option value="any">Any Purchase</option>
+        <option value="digital">Digital Product</option>
+        <option value="physical">Physical Product</option>
+        <option value="course">Course / Membership</option>
+        <option value="lead">Lead Magnet Signup</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="cancel-btn2" onclick="closeModal('newSeqModal')">Cancel</button>
+      <button class="save-btn" onclick="createSeq()">Create Sequence</button>
+    </div>
+  </div>
+</div>
+
+<!-- Step Editor -->
+<div class="overlay" id="stepModal" onclick="closeModal('stepModal',event)">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div><div class="modal-title" id="stepModalTitle">Add <em>Email Step</em></div><div class="modal-sub">Define when it sends and what it says</div></div>
+      <button class="modal-close" onclick="closeModal('stepModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:4px;">
+        <div>
+          <div class="field-label">Email Type</div>
+          <div class="tag-picker" id="stepTypePicker" style="flex-wrap:wrap;">
+            <button class="tag-opt sel" data-st="welcome" onclick="pickST(this)">👋 Welcome</button>
+            <button class="tag-opt" data-st="delivery" onclick="pickST(this)">📦 Delivery</button>
+            <button class="tag-opt" data-st="followup" onclick="pickST(this)">💬 Follow-Up</button>
+            <button class="tag-opt" data-st="upsell" onclick="pickST(this)">🚀 Upsell</button>
+          </div>
+        </div>
+        <div>
+          <div class="field-label">Send On</div>
+          <div class="tag-picker" id="stepDayPicker" style="flex-wrap:wrap;">
+            <button class="tag-opt sel" data-d="0" onclick="pickSD(this)">Immediately</button>
+            <button class="tag-opt" data-d="1" onclick="pickSD(this)">Day 1</button>
+            <button class="tag-opt" data-d="2" onclick="pickSD(this)">Day 2</button>
+            <button class="tag-opt" data-d="3" onclick="pickSD(this)">Day 3</button>
+            <button class="tag-opt" data-d="5" onclick="pickSD(this)">Day 5</button>
+            <button class="tag-opt" data-d="7" onclick="pickSD(this)">Day 7</button>
+            <button class="tag-opt" data-d="14" onclick="pickSD(this)">Day 14</button>
+            <button class="tag-opt" data-d="30" onclick="pickSD(this)">Day 30</button>
+          </div>
+        </div>
+      </div>
+      <div class="field-label">Subject Line</div>
+      <input class="field-input" id="stepSubject" placeholder="Your download is ready, {{first_name}}!">
+      <div class="field-label">Merge Tags</div>
+      <div class="merge-row" style="margin-bottom:12px;">
+        <div class="mc" onclick="insSMerge('stepSubject','{{first_name}}')">{{first_name}}</div>
+        <div class="mc" onclick="insSMerge('stepSubject','{{product_name}}')">{{product_name}}</div>
+        <div class="mc" onclick="insSMerge('stepSubject','{{download_link}}')">{{download_link}}</div>
+      </div>
+      <div class="field-label">Email Body</div>
+      <div class="rich-bar">
+        <button class="rtb" onmousedown="event.preventDefault();document.execCommand('bold')"><b>B</b></button>
+        <button class="rtb" onmousedown="event.preventDefault();document.execCommand('italic')"><i>I</i></button>
+        <button class="rtb" onmousedown="event.preventDefault();document.execCommand('underline')"><u>U</u></button>
+        <button class="rtb" onmousedown="event.preventDefault();document.execCommand('insertUnorderedList')">• List</button>
+      </div>
+      <div class="bcast-body-wrap" id="stepBody" contenteditable="true" style="min-height:120px;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--sep2)'"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="cancel-btn2" onclick="closeModal('stepModal')">Cancel</button>
+      <button class="save-btn" onclick="saveStep()">Save Email Step</button>
+    </div>
+  </div>
+</div>
+
+<!-- Broadcast Preview -->
+<div class="overlay" id="bcastPreviewModal" onclick="closeModal('bcastPreviewModal',event)">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div><div class="modal-title" id="bpTitle">Preview</div><div class="modal-sub" id="bpSub">Sending to: Everyone</div></div>
+      <button class="modal-close" onclick="closeModal('bcastPreviewModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div style="background:var(--bg);border-radius:10px;padding:16px;border:1px solid var(--sep2);">
+        <div style="font-size:11px;font-weight:700;color:var(--l3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">From: Shannon Craft</div>
+        <div id="bpBody" style="font-size:14px;font-weight:500;color:var(--l2);line-height:1.7;"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="cancel-btn2" onclick="closeModal('bcastPreviewModal')">Edit First</button>
+      <button class="save-btn" onclick="closeModal('bcastPreviewModal');sendBcast(true)">Send It</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════ KEYS ══════ */
+const K={LOCK:'sc_lock_v1',CONTACTS:'sc_contacts_v1',SEQS:'sc_seqs_v1',BCAST:'sc_bcast_v1',SETTINGS:'sc_settings_v1',CFG:'sc_cfg_v1'};
+const COLORS=['#E8571A','#2563EB','#7C3AED','#16A34A','#DC2626','#0D9488','#DB2777','#D97706'];
+
+/* ══════ UTILS ══════ */
+function ld(k){try{return JSON.parse(localStorage.getItem(k)||'[]');}catch(e){return[];}}
+function sd(k,d){localStorage.setItem(k,JSON.stringify(d));}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function fmtD(iso){if(!iso)return'';return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
+let _tt;
+function showT(msg){const el=document.getElementById('tMsg');el.textContent=msg;const t=document.getElementById('toast');t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),2600);}
+
+/* ══════ INIT ══════ */
+function initApp(){
+  applySettings();loadSettingsPanel();sT('dashboard');
+  if(!ld(K.CONTACTS).length){
+    sd(K.CONTACTS,[
+      {id:uid(),firstName:'Example',lastName:'Buyer',email:'buyer@example.com',tags:['buyer'],source:'Digital Product',addedAt:new Date().toISOString(),unsubscribed:false},
+      {id:uid(),firstName:'YouTube',lastName:'Lead',email:'ytlead@example.com',tags:['lead','youtube'],source:'YouTube Lead Magnet',addedAt:new Date().toISOString(),unsubscribed:false},
+      {id:uid(),firstName:'Newsletter',lastName:'Sub',email:'news@example.com',tags:['newsletter'],source:'Newsletter',addedAt:new Date().toISOString(),unsubscribed:false},
+    ]);
+  }
+  if(!ld(K.SEQS).length){
+    sd(K.SEQS,[{id:uid(),name:'Digital Product Welcome',trigger:'digital',active:false,steps:[
+      {id:uid(),type:'delivery',day:0,subject:'Your download is ready, {{first_name}}! 🎉',body:'<p>Hey {{first_name}},</p><p>Thank you so much! Here\'s your download: <strong>{{download_link}}</strong></p><p>With love, Shannon</p>'},
+      {id:uid(),type:'followup',day:2,subject:'How are you getting on, {{first_name}}?',body:'<p>Hey {{first_name}}!</p><p>Just checking in — how is it going?</p><p>Shannon</p>'},
+      {id:uid(),type:'upsell',day:14,subject:'Ready for the next step? ✨',body:'<p>Hey {{first_name}},</p><p>I\'d love to invite you to my next offer!</p><p>Shannon</p>'},
+    ]}]);
+  }
+  updateGreeting();
+}
+
+/* ══════ TABS ══════ */
+let curTab='dashboard';
+const TAB_MAP={
+  dashboard:'vDashboard',contacts:'vContacts',sequences:'vSequences',
+  broadcast:'vBroadcast',settings:'vSettings'
+};
+const NAV_IDS=['nav-dashboard','nav-contacts','nav-sequences','nav-broadcast','nav-settings'];
+const MNAV_IDS=['mnb-dashboard','mnb-contacts','mnb-sequences','mnb-broadcast','mnb-settings'];
+
+function sT(id){
+  Object.values(TAB_MAP).forEach(v=>{const el=document.getElementById(v);if(el)el.style.display='none';});
+  NAV_IDS.forEach(n=>{const el=document.getElementById(n);if(el)el.classList.remove('active');});
+  MNAV_IDS.forEach(n=>{const el=document.getElementById(n);if(el)el.classList.remove('on');});
+  const panel=document.getElementById(TAB_MAP[id]);
+  if(panel)panel.style.display='block';
+  const navEl=document.getElementById('nav-'+id);
+  if(navEl)navEl.classList.add('active');
+  const mnavEl=document.getElementById('mnb-'+id);
+  if(mnavEl)mnavEl.classList.add('on');
+  curTab=id;
+  const mc=document.getElementById('mainContent');
+  if(mc)mc.scrollTo(0,0);
+  if(id==='dashboard')rDashboard();
+  if(id==='contacts')rContacts();
+  if(id==='sequences')rSeqs();
+  if(id==='settings')loadSettingsPanel();
+  if(id==='broadcast'){updBReach();rBcastHistory();}
+}
+
+function updateGreeting(){
+  const h=new Date().getHours();
+  let g='Good morning';
+  if(h>=12&&h<17)g='Good afternoon';
+  else if(h>=17)g='Good evening';
+  const s=JSON.parse(localStorage.getItem(K.SETTINGS)||'{}');
+  const name=s.name||'Shannon';
+  document.getElementById('dashGreeting').textContent=g+', '+name;
+  document.getElementById('sidebarName').textContent=s.name||'Shannon Craft';
+  const av=document.getElementById('sidebarAvatar');
+  const parts=(s.name||'Shannon Craft').split(' ');
+  if(av)av.textContent=(parts[0][0]+(parts[1]?.[0]||'')).toUpperCase();
+}
+
+/* ══════ MODALS ══════ */
+function openModal(id){document.getElementById(id)?.classList.add('open');}
+function closeModal(id,e){if(!e||e.target===document.getElementById(id))document.getElementById(id)?.classList.remove('open');}
+
+/* ══════ DASHBOARD ══════ */
+function rDashboard(){
+  const contacts=ld(K.CONTACTS);
+  const seqs=ld(K.SEQS);
+  const bcast=ld(K.BCAST);
+  document.getElementById('dashTotal').textContent=contacts.length;
+  document.getElementById('dashBuyers').textContent=contacts.filter(c=>c.tags?.includes('buyer')).length;
+  document.getElementById('dashSeqs').textContent=seqs.filter(s=>s.active).length;
+  document.getElementById('dashBcast').textContent=bcast.length;
+  // Recent contacts
+  const rc=document.getElementById('dashRecentContacts');
+  const recent=contacts.slice(0,5);
+  if(!recent.length){rc.innerHTML=`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="empty-title">No contacts yet</div><div class="empty-sub">Add or import contacts to get started.</div></div>`;return;}
+  rc.innerHTML=`<table class="data-table"><thead><tr><th>Contact</th><th>Email</th><th>Tag</th><th>Added</th></tr></thead><tbody>${recent.map(c=>{
+    const init=((c.firstName||'')[0]||(c.email||'?')[0]).toUpperCase()+((c.lastName||'')[0]||'').toUpperCase();
+    const tag=c.tags?.[0]||'lead';
+    return`<tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="c-av">${init}</div><strong>${esc(c.firstName||'')} ${esc(c.lastName||'')}</strong></div></td><td>${esc(c.email)}</td><td><span class="tb t${tag}">${tag}</span></td><td>${fmtD(c.addedAt)}</td></tr>`;
+  }).join('')}</tbody></table>`;
+  // Sequences
+  const dsl=document.getElementById('dashSeqList');
+  if(!seqs.length){dsl.innerHTML=`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="empty-title">No sequences</div><div class="empty-sub">Create a sequence to automate emails.</div></div>`;return;}
+  dsl.innerHTML=seqs.map(sq=>`<div class="seq-row" onclick="sT('sequences')">
+    <div class="seq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+    <div class="seq-info"><div class="seq-name">${esc(sq.name)}</div><div class="seq-meta">${sq.steps.length} emails · ${sq.trigger}</div></div>
+    <span class="tb ${sq.active?'tactive':'tdraft'}">${sq.active?'Active':'Draft'}</span>
+  </div>`).join('');
+}
+
+/* ══════ CONTACTS ══════ */
+let cFilter='all',importTag='lead';
+
+function rContacts(){
+  const contacts=ld(K.CONTACTS);
+  const q=(document.getElementById('cSearch')?.value||'').toLowerCase();
+  let list=contacts;
+  if(cFilter==='unsubscribed')list=list.filter(c=>c.unsubscribed);
+  else if(cFilter!=='all')list=list.filter(c=>!c.unsubscribed&&c.tags?.includes(cFilter));
+  if(q)list=list.filter(c=>(c.firstName+' '+c.lastName+' '+c.email).toLowerCase().includes(q));
+  document.getElementById('cTotal').textContent=contacts.length;
+  document.getElementById('cBuyers').textContent=contacts.filter(c=>c.tags?.includes('buyer')).length;
+  document.getElementById('cLeads').textContent=contacts.filter(c=>c.tags?.includes('lead')).length;
+  document.getElementById('cUnsub').textContent=contacts.filter(c=>c.unsubscribed).length;
+  const nb=document.getElementById('nb-contacts');
+  nb.style.display=contacts.length?'flex':'none';nb.textContent=contacts.length;
+  const tbody=document.getElementById('contactTbody');
+  if(!tbody)return;
+  if(!list.length){tbody.innerHTML=`<tr><td colspan="7"><div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="empty-title">${cFilter==='all'&&!q?'No contacts yet':'No results'}</div><div class="empty-sub">${cFilter==='all'&&!q?'Add or import contacts to get started.':'Try a different filter.'}</div></div></td></tr>`;return;}
+  tbody.innerHTML=list.map(c=>{
+    const init=((c.firstName||'')[0]||(c.email||'?')[0]).toUpperCase()+((c.lastName||'')[0]||'').toUpperCase();
+    const tags=(c.tags||[]).map(t=>`<span class="tb t${t}" style="margin-right:4px;">${t}</span>`).join('');
+    return`<tr>
+      <td><div style="display:flex;align-items:center;gap:8px;"><div class="c-av">${init}</div><strong>${esc(c.firstName||'')} ${esc(c.lastName||'')}</strong></div></td>
+      <td>${esc(c.email)}</td>
+      <td>${tags}</td>
+      <td>${esc(c.source||'Manual')}</td>
+      <td>${fmtD(c.addedAt)}</td>
+      <td><span class="tb ${c.unsubscribed?'tdraft':'tactive'}">${c.unsubscribed?'Unsub':'Active'}</span></td>
+      <td><button onclick="openCD('${c.id}')" style="height:26px;padding:0 10px;border-radius:7px;background:var(--g2);border:1px solid var(--sep2);font-family:'Manrope',sans-serif;font-size:10px;font-weight:700;color:var(--l2);cursor:pointer;transition:all .15s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--l2)'">View</button></td>
+    </tr>`;
+  }).join('');
+}
+function sCF(f,btn){
+  cFilter=f;
+  document.querySelectorAll('#cFilterRow .filter-chip').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');rContacts();
+}
+function togTag(btn){btn.classList.toggle('sel');}
+function saveContact(){
+  const first=document.getElementById('acFirst').value.trim();
+  const last=document.getElementById('acLast').value.trim();
+  const email=document.getElementById('acEmail').value.trim().toLowerCase();
+  if(!email||!/\S+@\S+\.\S+/.test(email)){showT('Valid email required');return;}
+  const tags=[...document.querySelectorAll('#acTagPicker .tag-opt.sel')].map(t=>t.dataset.t);
+  const source=document.getElementById('acSource').value.trim();
+  const list=ld(K.CONTACTS);
+  if(list.find(c=>c.email===email)){showT('Email already exists');return;}
+  list.unshift({id:uid(),firstName:first,lastName:last,email,tags:tags.length?tags:['lead'],source,addedAt:new Date().toISOString(),unsubscribed:false});
+  sd(K.CONTACTS,list);
+  closeModal('addContactModal');
+  ['acFirst','acLast','acEmail','acSource'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.querySelectorAll('#acTagPicker .tag-opt').forEach(t=>t.classList.remove('sel'));
+  rContacts();if(curTab==='dashboard')rDashboard();showT('Contact added ✓');
+}
+function openCD(id){
+  const c=ld(K.CONTACTS).find(x=>x.id===id);if(!c)return;
+  const init=((c.firstName||'')[0]||'?').toUpperCase()+((c.lastName||'')[0]||'').toUpperCase();
+  document.getElementById('contactDetailInner').innerHTML=`
+    <div class="modal-hdr">
+      <div><div class="modal-title">${esc(c.firstName||'')} <em>${esc(c.lastName||'')}</em></div><div class="modal-sub">${esc(c.email)}</div></div>
+      <button class="modal-close" onclick="closeModal('contactDetailModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--sep);">
+        <div style="width:56px;height:56px;border-radius:50%;background:var(--as);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--accent);flex-shrink:0;">${init}</div>
+        <div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;">${(c.tags||[]).map(t=>`<span class="tb t${t}">${t}</span>`).join('')}${c.unsubscribed?'<span class="tb" style="background:var(--rs);color:var(--red);border:1px solid rgba(220,38,38,.25);">Unsubscribed</span>':''}</div>
+          <div style="font-size:12px;font-weight:500;color:var(--l3);margin-top:6px;">Source: ${esc(c.source||'Manual')} · Added ${fmtD(c.addedAt)}</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="background:var(--bg);border-radius:10px;padding:12px 14px;">
+          <div style="font-size:10px;font-weight:700;color:var(--l3);text-transform:uppercase;margin-bottom:4px;">Status</div>
+          <div style="font-size:14px;font-weight:700;color:${c.unsubscribed?'var(--red)':'var(--green)'};">${c.unsubscribed?'Unsubscribed':'Subscribed'}</div>
+        </div>
+        <div style="background:var(--bg);border-radius:10px;padding:12px 14px;">
+          <div style="font-size:10px;font-weight:700;color:var(--l3);text-transform:uppercase;margin-bottom:4px;">Email</div>
+          <div style="font-size:13px;font-weight:600;color:var(--white);overflow:hidden;text-overflow:ellipsis;">${esc(c.email)}</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      ${!c.unsubscribed?`<button class="cancel-btn2" onclick="unsubC('${c.id}')">Mark Unsubscribed</button>`:`<button class="save-btn" style="background:var(--green);" onclick="resubC('${c.id}')">Re-subscribe</button>`}
+      <button class="danger-btn" onclick="delC('${c.id}')">Delete</button>
+      <button class="save-btn" onclick="closeModal('contactDetailModal')">Close</button>
+    </div>`;
+  openModal('contactDetailModal');
+}
+function unsubC(id){const l=ld(K.CONTACTS);const c=l.find(x=>x.id===id);if(c){c.unsubscribed=true;c.unsubscribedAt=new Date().toISOString();}sd(K.CONTACTS,l);closeModal('contactDetailModal');rContacts();showT('Marked unsubscribed');}
+function resubC(id){const l=ld(K.CONTACTS);const c=l.find(x=>x.id===id);if(c){c.unsubscribed=false;delete c.unsubscribedAt;}sd(K.CONTACTS,l);closeModal('contactDetailModal');rContacts();showT('Re-subscribed');}
+function delC(id){sd(K.CONTACTS,ld(K.CONTACTS).filter(x=>x.id!==id));closeModal('contactDetailModal');rContacts();if(curTab==='dashboard')rDashboard();showT('Deleted');}
+
+function togImportTag(btn){document.querySelectorAll('#impTagPicker .tag-opt').forEach(t=>t.classList.remove('sel'));btn.classList.add('sel');importTag=btn.dataset.t;}
+function runImport(){
+  const raw=document.getElementById('impPaste').value.trim();
+  if(!raw){showT('Paste emails first');return;}
+  const source=document.getElementById('impSource').value.trim()||'Import';
+  const lines=raw.split('\n').map(l=>l.trim()).filter(Boolean);
+  const existing=ld(K.CONTACTS);
+  const emails=new Set(existing.map(c=>c.email));
+  let added=0,skipped=0;
+  lines.forEach(line=>{
+    let email='',first='',last='';
+    if(line.includes(',')){const p=line.split(',').map(x=>x.trim().replace(/"/g,''));if(p.length>=3){first=p[0];last=p[1];email=p[2];}else if(p.length===2){if(p[0].includes('@')){email=p[0];first=p[1];}else{first=p[0];email=p[1];}}else email=p[0];}
+    else if(line.includes('@'))email=line.toLowerCase();
+    if(!email||!email.includes('@')){skipped++;return;}
+    if(emails.has(email)){skipped++;return;}
+    existing.unshift({id:uid(),firstName:first,lastName:last,email,tags:[importTag],source,addedAt:new Date().toISOString(),unsubscribed:false});
+    emails.add(email);added++;
+  });
+  sd(K.CONTACTS,existing);closeModal('importModal');
+  document.getElementById('impPaste').value='';
+  rContacts();if(curTab==='dashboard')rDashboard();
+  showT(`${added} imported, ${skipped} skipped`);
+}
+
+/* ══════ SEQUENCES ══════ */
+let expSeqs={},editSQId=null,editStepIdx=null,sType='welcome',sDay=0;
+
+function rSeqs(){
+  const seqs=ld(K.SEQS);
+  const container=document.getElementById('seqList');
+  if(!seqs.length){container.innerHTML=`<div class="sec-card"><div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="empty-title">No sequences yet</div><div class="empty-sub">Create one to automate post-purchase emails.</div></div></div>`;return;}
+  container.innerHTML=seqs.map(sq=>rSeqCard(sq)).join('');
+}
+function rSeqCard(sq){
+  const open=expSeqs[sq.id]!==false;
+  return`<div class="sec-card" style="margin-bottom:16px;">
+    <div class="seq-row" onclick="expSeqs['${sq.id}']=expSeqs['${sq.id}']===false?true:false;rSeqs()" style="cursor:pointer;">
+      <div class="seq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+      <div class="seq-info">
+        <div class="seq-name">${esc(sq.name)}</div>
+        <div class="seq-meta">${sq.steps.length} email${sq.steps.length!==1?'s':''} · Trigger: ${sq.trigger}</div>
+      </div>
+      <span class="tb ${sq.active?'tactive':'tdraft'}" style="margin-right:8px;">${sq.active?'Active':'Draft'}</span>
+      <div class="seq-actions">
+        <button class="seq-act-btn" onclick="event.stopPropagation();togSQActive('${sq.id}')">${sq.active?'Pause':'Activate'}</button>
+        <button class="seq-act-btn" onclick="event.stopPropagation();dupSQ('${sq.id}')">Duplicate</button>
+        <button class="seq-act-btn primary" onclick="event.stopPropagation();openStep('${sq.id}',null)">+ Email</button>
+      </div>
+    </div>
+    ${open?`<div>
+      ${sq.steps.map((s,i)=>`<div class="step-list-item">
+        <span class="step-day-badge${s.day===0?' d0':''}">${s.day===0?'Now':'Day '+s.day}</span>
+        <span class="step-type-badge">${s.type}</span>
+        <span class="step-subject">${esc(s.subject||'No subject')}</span>
+        <div class="step-actions">
+          <button class="step-btn" onclick="openStep('${sq.id}',${i})" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+          <button class="step-btn" onclick="mvStep('${sq.id}',${i},-1)" title="Up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg></button>
+          <button class="step-btn" onclick="mvStep('${sq.id}',${i},1)" title="Down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+          <button class="step-btn" onclick="dlStep('${sq.id}',${i})" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        </div>
+      </div>`).join('')}
+      <div style="padding:12px 20px;border-top:1px solid var(--sep);">
+        <button class="btn s" onclick="openStep('${sq.id}',null)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add Email Step</button>
+      </div>
+    </div>`:''}
+  </div>`;
+}
+function createSeq(){
+  const name=document.getElementById('nsName').value.trim();
+  if(!name){showT('Enter a name');return;}
+  const trig=document.getElementById('nsTrig').value;
+  const seqs=ld(K.SEQS);
+  seqs.push({id:uid(),name,trigger:trig,active:false,steps:[]});
+  sd(K.SEQS,seqs);closeModal('newSeqModal');document.getElementById('nsName').value='';rSeqs();showT('Sequence created');
+}
+function togSQActive(id){const seqs=ld(K.SEQS);const s=seqs.find(x=>x.id===id);if(!s)return;if(!s.steps.length&&!s.active){showT('Add at least one email first');return;}s.active=!s.active;sd(K.SEQS,seqs);rSeqs();showT(s.active?'Activated':'Paused');}
+function dupSQ(id){const seqs=ld(K.SEQS);const orig=seqs.find(x=>x.id===id);if(!orig)return;const copy=JSON.parse(JSON.stringify(orig));copy.id=uid();copy.name=copy.name+' (Copy)';copy.active=false;seqs.push(copy);sd(K.SEQS,seqs);rSeqs();showT('Duplicated');}
+function mvStep(sqId,idx,dir){const seqs=ld(K.SEQS);const s=seqs.find(x=>x.id===sqId);if(!s)return;const ni=idx+dir;if(ni<0||ni>=s.steps.length)return;[s.steps[idx],s.steps[ni]]=[s.steps[ni],s.steps[idx]];sd(K.SEQS,seqs);rSeqs();}
+function dlStep(sqId,idx){const seqs=ld(K.SEQS);const s=seqs.find(x=>x.id===sqId);if(!s)return;s.steps.splice(idx,1);sd(K.SEQS,seqs);rSeqs();showT('Removed');}
+function openStep(sqId,stepIdx){
+  editSQId=sqId;editStepIdx=stepIdx;
+  document.getElementById('stepModalTitle').innerHTML=stepIdx!==null?'Edit <em>Email Step</em>':'Add <em>Email Step</em>';
+  sType='welcome';sDay=0;
+  if(stepIdx!==null){const sq=ld(K.SEQS).find(x=>x.id===sqId);const step=sq?.steps[stepIdx];if(step){sType=step.type;sDay=step.day;document.getElementById('stepSubject').value=step.subject||'';document.getElementById('stepBody').innerHTML=step.body||'';document.querySelectorAll('#stepTypePicker .tag-opt').forEach(b=>b.classList.toggle('sel',b.dataset.st===step.type));document.querySelectorAll('#stepDayPicker .tag-opt').forEach(b=>b.classList.toggle('sel',parseInt(b.dataset.d)===step.day));}}
+  else{document.getElementById('stepSubject').value='';document.getElementById('stepBody').innerHTML='';document.querySelectorAll('#stepTypePicker .tag-opt').forEach((b,i)=>b.classList.toggle('sel',i===0));document.querySelectorAll('#stepDayPicker .tag-opt').forEach((b,i)=>b.classList.toggle('sel',i===0));}
+  openModal('stepModal');
+}
+function pickST(btn){document.querySelectorAll('#stepTypePicker .tag-opt').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');sType=btn.dataset.st;}
+function pickSD(btn){document.querySelectorAll('#stepDayPicker .tag-opt').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');sDay=parseInt(btn.dataset.d);}
+function insSMerge(id,tag){const inp=document.getElementById(id);if(!inp)return;const s=inp.selectionStart,e=inp.selectionEnd;inp.value=inp.value.slice(0,s)+tag+inp.value.slice(e);inp.selectionStart=inp.selectionEnd=s+tag.length;inp.focus();}
+function saveStep(){
+  const subject=document.getElementById('stepSubject').value.trim();
+  const body=document.getElementById('stepBody').innerHTML.trim();
+  if(!subject){showT('Subject required');return;}
+  const seqs=ld(K.SEQS);const sq=seqs.find(x=>x.id===editSQId);if(!sq)return;
+  const step={id:uid(),type:sType,day:sDay,subject,body};
+  if(editStepIdx!==null)sq.steps[editStepIdx]=step;
+  else{sq.steps.push(step);sq.steps.sort((a,b)=>a.day-b.day);}
+  sd(K.SEQS,seqs);closeModal('stepModal');rSeqs();showT(editStepIdx!==null?'Updated':'Added');
+}
+
+/* ══════ BROADCAST ══════ */
+let bAud='everyone';
+function pickAud(btn){document.querySelectorAll('#bAudPick .tag-opt').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');bAud=btn.dataset.a;updBReach();}
+function updBReach(){const c=ld(K.CONTACTS).filter(x=>!x.unsubscribed);document.getElementById('bReach').textContent=bAud==='everyone'?c.length:c.filter(x=>x.tags?.includes(bAud)).length;}
+function insBMerge(tag){const s=document.getElementById('bSubject');const st=s.selectionStart,en=s.selectionEnd;s.value=s.value.slice(0,st)+tag+s.value.slice(en);s.selectionStart=s.selectionEnd=st+tag.length;s.focus();}
+function insertBLink(){const url=prompt('URL:');if(url)document.execCommand('createLink',false,url);}
+function pvBcast(){
+  const subj=document.getElementById('bSubject').value.trim();
+  const body=document.getElementById('bBody').innerHTML.trim();
+  if(!subj||!body){showT('Add subject and body first');return;}
+  document.getElementById('bpTitle').textContent=subj;
+  const labels={everyone:'Everyone',buyer:'Buyers',lead:'Leads',vip:'VIP',youtube:'YouTube',newsletter:'Newsletter'};
+  document.getElementById('bpSub').textContent='Sending to: '+labels[bAud];
+  document.getElementById('bpBody').innerHTML=body;
+  openModal('bcastPreviewModal');
+}
+
+async function sendBcast(){
+  const subj=document.getElementById('bSubject').value.trim();
+  const body=document.getElementById('bBody').innerHTML.trim();
+  if(!subj||!body){showT('Subject and body required');return;}
+  const contacts=ld(K.CONTACTS).filter(x=>!x.unsubscribed);
+  const recipients=bAud==='everyone'?contacts:contacts.filter(x=>x.tags?.includes(bAud));
+  if(!recipients.length){showT('No recipients in this audience');return;}
+  const cfg=JSON.parse(localStorage.getItem(K.CFG)||'{}');
+  if(!cfg.resendKey){showT('Add your Resend API key in Settings first');return;}
+  showT(`Sending to ${recipients.length} contacts…`);
+  let sent=0,failed=0;
+  for(const contact of recipients){
+    const repl=(s)=>s.replace(/\{\{first_name\}\}/gi,contact.firstName||contact.email.split('@')[0]).replace(/\{\{full_name\}\}/gi,`${contact.firstName||''} ${contact.lastName||''}`.trim());
+    const html=`<!DOCTYPE html><html><body style="margin:0;padding:0;background:#f5f5f5;font-family:Georgia,Arial,sans-serif;"><table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:20px 0;"><table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#fff;border-radius:12px;overflow:hidden;"><tr><td style="background:#000;padding:20px;text-align:center;"><span style="font-family:Georgia,serif;font-size:22px;font-weight:bold;color:#E8571A;letter-spacing:3px;">${esc(cfg.fromName||'SHANNON CRAFT')}</span></td></tr><tr><td style="padding:32px 36px;color:#333;font-size:15px;line-height:1.75;">${repl(body)}</td></tr><tr><td style="background:#f8f8f8;padding:14px;text-align:center;border-top:1px solid #eee;"><p style="margin:0;font-size:12px;color:#999;">© ${esc(cfg.fromName||'Shannon Craft')} · <a href="#unsubscribe" style="color:#E8571A;text-decoration:none;">Unsubscribe</a></p></td></tr></table></td></tr></table></body></html>`;
+    try{
+      const res=await fetch('https://sc-send-email.shannonlcraft.workers.dev',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to:contact.email,subject:repl(subj),html,fromName:cfg.fromName||'Shannon Craft',fromEmail:cfg.fromEmail||''})});
+      if(res.ok)sent++;else failed++;
+    }catch(e){failed++;}
+  }
+  const history=ld(K.BCAST);
+  history.push({id:uid(),subject:subj,audience:bAud,count:sent,failed,sentAt:new Date().toISOString()});
+  sd(K.BCAST,history);
+  document.getElementById('bSubject').value='';
+  document.getElementById('bBody').innerHTML='';
+  rBcastHistory();updBReach();if(curTab==='dashboard')rDashboard();
+  showT(failed>0?`Sent ${sent}, ${failed} failed`:`✓ Sent to ${sent} contacts`);
+}
+
+function rBcastHistory(){
+  const sent=ld(K.BCAST).slice().reverse();
+  const container=document.getElementById('bcastHistory');
+  if(!sent.length){container.innerHTML=`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div class="empty-title">No broadcasts yet</div></div>`;return;}
+  container.innerHTML=`<table class="data-table"><thead><tr><th>Subject</th><th>Audience</th><th>Sent</th><th>Date</th></tr></thead><tbody>${sent.map(s=>`<tr><td><strong>${esc(s.subject)}</strong></td><td>${s.audience}</td><td>${s.count}${s.failed?` <span style="color:#ef4444;">(${s.failed} failed)</span>`:''}</td><td>${fmtD(s.sentAt)}</td></tr>`).join('')}</tbody></table>`;
+}
+
+/* ══════ SETTINGS ══════ */
+function loadST(){try{return JSON.parse(localStorage.getItem(K.SETTINGS)||'{}');}catch(e){return{};}}
+function applySettings(){
+  const s=loadST();
+  const accent=s.accent||'#E8571A';
+  const r=parseInt(accent.slice(1,3),16),g=parseInt(accent.slice(3,5),16),b=parseInt(accent.slice(5,7),16);
+  document.documentElement.style.setProperty('--accent',accent);
+  document.documentElement.style.setProperty('--as',`rgba(${r},${g},${b},.13)`);
+  document.documentElement.style.setProperty('--ab',`rgba(${r},${g},${b},.28)`);
+  if(s.lightMode){
+    [['--bg','#f5f5f5'],['--g1','#ffffff'],['--g2','#ebebeb'],['--g3','#d0d0d0'],['--sep','rgba(0,0,0,.07)'],['--sep2','rgba(0,0,0,.11)'],['--white','#0a0a0a'],['--l1','rgba(0,0,0,.85)'],['--l2','rgba(0,0,0,.55)'],['--l3','rgba(0,0,0,.35)'],['--l4','rgba(0,0,0,.18)']].forEach(([k,v])=>document.documentElement.style.setProperty(k,v));
+  } else {
+    [['--bg','#000'],['--g1','#161616'],['--g2','#242424'],['--g3','#333'],['--sep','rgba(255,255,255,.07)'],['--sep2','rgba(255,255,255,.11)'],['--white','#fff'],['--l1','rgba(255,255,255,.85)'],['--l2','rgba(255,255,255,.5)'],['--l3','rgba(255,255,255,.28)'],['--l4','rgba(255,255,255,.13)']].forEach(([k,v])=>document.documentElement.style.setProperty(k,v));
+  }
+}
+function saveSettings(){
+  const s=loadST();
+  s.name=document.getElementById('settingsName')?.value||s.name;
+  localStorage.setItem(K.SETTINGS,JSON.stringify(s));
+  updateGreeting();
+}
+function saveCfg(){
+  const c={resendKey:document.getElementById('sResendKey')?.value||'',fromEmail:document.getElementById('sFromEmail')?.value||'',fromName:document.getElementById('sFromName')?.value||''};
+  localStorage.setItem(K.CFG,JSON.stringify(c));
+}
+function loadSettingsPanel(){
+  const s=loadST();
+  const tog=document.getElementById('lightToggle');if(tog)tog.className='toggle'+(s.lightMode?' on':'');
+  const sw=document.getElementById('accentSwatches');
+  if(sw)sw.innerHTML=COLORS.map(c=>`<div class="swatch${(s.accent||'#E8571A')===c?' sel':''}" style="background:${c};" onclick="setAccent('${c}')"></div>`).join('');
+  const hi=document.getElementById('hexInput'),hp=document.getElementById('hexPreview');
+  if(hi)hi.value=s.accent||'#E8571A';if(hp)hp.style.background=s.accent||'#E8571A';
+  if(document.getElementById('settingsName'))document.getElementById('settingsName').value=s.name||'';
+  const cfg=JSON.parse(localStorage.getItem(K.CFG)||'{}');
+  const rk=document.getElementById('sResendKey'),fe=document.getElementById('sFromEmail'),fn=document.getElementById('sFromName');
+  if(rk)rk.value=cfg.resendKey||'';if(fe)fe.value=cfg.fromEmail||'';if(fn)fn.value=cfg.fromName||'';
+}
+function togLight(){const s=loadST();s.lightMode=!s.lightMode;localStorage.setItem(K.SETTINGS,JSON.stringify(s));applySettings();loadSettingsPanel();showT(s.lightMode?'Light mode on':'Dark mode on');}
+function setAccent(hex){const s=loadST();s.accent=hex;localStorage.setItem(K.SETTINGS,JSON.stringify(s));applySettings();loadSettingsPanel();showT('Color updated');}
+function applyHex(val){if(!val)return;const hex=val.startsWith('#')?val:'#'+val;if(!/^#[0-9A-Fa-f]{6}$/.test(hex))return;document.getElementById('hexPreview').style.background=hex;setAccent(hex);}
+function clearAll(){Object.values(K).forEach(k=>localStorage.removeItem(k));location.reload();showT('All data cleared');}
+
+/* BOOT */
+applySettings();
+initApp();
+</script>
+</body>
+</html>

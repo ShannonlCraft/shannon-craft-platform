@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#000000">
+<title>Shannon Craft</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#000;--g1:#161616;--g2:#242424;--g3:#333;
+  --sep:rgba(255,255,255,.07);--sep2:rgba(255,255,255,.11);
+  --accent:#E8571A;--as:rgba(232,87,26,.13);--ab:rgba(232,87,26,.28);
+  --white:#fff;--l1:rgba(255,255,255,.85);--l2:rgba(255,255,255,.5);
+  --l3:rgba(255,255,255,.28);--l4:rgba(255,255,255,.13);
+  --green:#16A34A;--gs:rgba(22,163,74,.13);--gb:rgba(22,163,74,.25);
+  --r-lg:16px;--r-md:12px;--r-sm:8px;
+}
+html,body{min-height:100%;overflow-x:hidden;background:var(--bg);color:var(--white);font-family:'Manrope',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+body{max-width:430px;margin:0 auto;padding-bottom:80px;}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+
+/* VIEWS */
+.view{display:none;} .view.active{display:block;}
+
+/* TOAST */
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--g2);border:1px solid var(--sep2);color:var(--white);border-radius:12px;padding:10px 16px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;white-space:nowrap;box-shadow:0 8px 40px rgba(0,0,0,.8);transition:transform .3s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:center;gap:8px;}
+.toast-dot{width:5px;height:5px;background:var(--accent);border-radius:50%;flex-shrink:0;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* HERO */
+.hero{padding:40px 20px 20px;text-align:center;}
+.hero-avatar{width:88px;height:88px;border-radius:50%;background:var(--as);border:2.5px solid var(--accent);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--accent);overflow:hidden;}
+.hero-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.hero-name{font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:2px;line-height:1;margin-bottom:4px;}
+.hero-name em{color:var(--accent);font-style:normal;}
+.hero-tagline{font-size:13px;font-weight:600;color:var(--l3);letter-spacing:.5px;margin-bottom:12px;}
+.hero-bio{font-size:13px;font-weight:500;color:var(--l2);line-height:1.7;margin-bottom:16px;padding:0 8px;}
+.socials{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;padding:0 16px;}
+.soc-btn{width:38px;height:38px;border-radius:10px;background:var(--g1);border:1px solid var(--sep2);display:flex;align-items:center;justify-content:center;color:var(--l2);text-decoration:none;transition:all .15s;}
+.soc-btn:active{background:var(--as);border-color:var(--ab);color:var(--accent);}
+.soc-btn svg{width:16px;height:16px;}
+
+/* MANAGE BANNER */
+.manage-banner{background:var(--as);border:1px solid var(--ab);border-radius:var(--r-md);margin:8px 16px;padding:10px 14px;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--accent);}
+.manage-banner svg{width:14px;height:14px;flex-shrink:0;}
+
+/* SECTION */
+.sec-hdr{font-size:10px;font-weight:800;color:var(--l3);text-transform:uppercase;letter-spacing:.8px;padding:16px 18px 8px;}
+.card{background:var(--g1);border-radius:var(--r-lg);margin:0 16px 10px;overflow:hidden;border:1px solid var(--sep);}
+.card-row{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid var(--sep);cursor:pointer;text-decoration:none;color:inherit;transition:background .12s;}
+.card-row:last-child{border-bottom:none;}
+.card-row:active{background:var(--g2);}
+.row-icon{width:32px;height:32px;border-radius:9px;background:var(--as);border:1px solid var(--ab);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent);}
+.row-icon svg{width:14px;height:14px;}
+.row-icon.n{background:var(--g2);border-color:var(--sep2);color:var(--l2);}
+.row-body{flex:1;min-width:0;}
+.row-title{font-size:14px;font-weight:700;color:var(--white);}
+.row-sub{font-size:11px;font-weight:500;color:var(--l3);margin-top:1px;}
+.row-badge{height:18px;padding:0 7px;border-radius:5px;background:var(--as);border:1px solid var(--ab);font-size:9px;font-weight:800;color:var(--accent);display:flex;align-items:center;flex-shrink:0;}
+.row-chev{color:var(--l3);flex-shrink:0;}
+
+/* PRODUCTS */
+.prod-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:4px 16px 8px;}
+.prod-card{background:var(--g1);border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--sep);cursor:pointer;transition:all .15s;}
+.prod-card:active{transform:scale(.97);}
+.prod-thumb{height:100px;background:var(--g2);display:flex;align-items:center;justify-content:center;}
+.prod-thumb svg{width:28px;height:28px;color:var(--l3);}
+.prod-info{padding:10px;}
+.prod-name{font-size:12px;font-weight:800;color:var(--white);margin-bottom:2px;line-height:1.3;}
+.prod-price{font-size:14px;font-weight:800;color:var(--accent);font-family:'Bebas Neue',sans-serif;letter-spacing:.5px;}
+.prod-type{font-size:9px;font-weight:700;color:var(--l3);text-transform:uppercase;letter-spacing:.5px;margin-top:1px;}
+.add-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:13px;border:1.5px dashed var(--sep2);border-radius:var(--r-lg);cursor:pointer;color:var(--l3);font-size:11px;font-weight:700;transition:all .2s;background:transparent;}
+.add-btn:active{border-color:var(--ab);color:var(--accent);background:var(--as);}
+
+/* DETAIL */
+.detail-ey{font-size:10px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;}
+.detail-name{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:1px;line-height:1;margin-bottom:6px;}
+.detail-price{font-size:26px;font-weight:800;color:var(--accent);margin-bottom:10px;}
+.detail-desc{font-size:14px;font-weight:500;color:var(--l2);line-height:1.75;margin-bottom:14px;}
+.detail-inc{background:var(--g1);border-radius:var(--r-md);padding:14px;margin-bottom:14px;border:1px solid var(--sep);}
+.detail-inc-hdr{font-size:11px;font-weight:800;color:var(--l3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;}
+.inc-item{display:flex;align-items:center;gap:9px;margin-bottom:7px;}
+.inc-item:last-child{margin-bottom:0;}
+.inc-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;}
+.inc-text{font-size:13px;font-weight:600;color:var(--l2);}
+.buy-btn{width:100%;padding:14px;border-radius:var(--r-md);border:none;font-family:'Manrope',sans-serif;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:8px;}
+.buy-btn.stripe{background:var(--accent);color:#fff;}
+.buy-btn.paypal{background:#ffc439;color:#111;}
+.edit-row{display:flex;gap:6px;margin-top:14px;padding-top:14px;border-top:1px solid var(--sep);}
+.edit-row button{flex:1;height:30px;border-radius:var(--r-sm);background:var(--g2);border:1px solid var(--sep2);font-family:'Manrope',sans-serif;font-size:11px;font-weight:700;color:var(--l2);cursor:pointer;}
+.edit-row button.del{color:#ef4444;border-color:rgba(239,68,68,.25);background:transparent;flex:none;padding:0 12px;}
+
+/* COURSE */
+.course-card{background:var(--g1);border-radius:var(--r-lg);margin:0 16px 10px;overflow:hidden;border:1px solid var(--sep);}
+.course-banner{height:76px;background:linear-gradient(135deg,var(--g2),var(--g3));display:flex;align-items:center;justify-content:center;}
+.course-banner svg{width:28px;height:28px;color:var(--accent);}
+.course-body{padding:12px 14px;}
+.course-ey{font-size:9px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;}
+.course-title{font-size:16px;font-weight:800;color:var(--white);margin-bottom:4px;}
+.course-desc{font-size:12px;font-weight:500;color:var(--l3);line-height:1.6;margin-bottom:10px;}
+.course-footer{display:flex;align-items:center;justify-content:space-between;}
+.course-price{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--accent);}
+.course-meta{font-size:10px;font-weight:600;color:var(--l3);}
+.enroll-btn{height:30px;padding:0 14px;border-radius:var(--r-sm);background:var(--accent);border:none;font-family:'Manrope',sans-serif;font-size:12px;font-weight:800;color:#fff;cursor:pointer;}
+.course-edit-row{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--sep);}
+.course-edit-row button{flex:1;height:28px;border-radius:6px;background:var(--g2);border:1px solid var(--sep2);font-family:'Manrope',sans-serif;font-size:10px;font-weight:700;color:var(--l2);cursor:pointer;}
+.course-edit-row button.del{color:#ef4444;border-color:rgba(239,68,68,.25);background:transparent;}
+
+/* BOOK */
+.book-card{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid var(--sep);text-decoration:none;color:inherit;}
+.book-card:last-of-type{border-bottom:none;}
+.book-cover{width:44px;height:56px;border-radius:5px;background:var(--g2);border:1px solid var(--sep2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.book-cover svg{width:18px;height:18px;color:var(--l3);}
+.book-info{flex:1;min-width:0;}
+.book-ey{font-size:9px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px;}
+.book-title{font-size:13px;font-weight:800;color:var(--white);line-height:1.3;margin-bottom:2px;}
+.book-author{font-size:11px;font-weight:500;color:var(--l3);}
+.book-cta{font-size:10px;font-weight:700;color:var(--accent);margin-top:4px;}
+.book-edit-row{display:flex;gap:6px;padding:0 14px 10px;}
+.book-edit-row button{flex:1;height:26px;border-radius:6px;background:var(--g2);border:1px solid var(--sep2);font-family:'Manrope',sans-serif;font-size:10px;font-weight:700;color:var(--l2);cursor:pointer;}
+.book-edit-row button.del{color:#ef4444;border-color:rgba(239,68,68,.25);background:transparent;}
+
+/* BOOKING */
+.booking-card{margin:0 16px 10px;background:var(--accent);border-radius:var(--r-lg);padding:18px 16px;position:relative;overflow:hidden;}
+.booking-card::after{content:'';position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:rgba(255,255,255,.08);border-radius:50%;}
+.booking-ey{font-size:10px;font-weight:800;color:rgba(0,0,0,.5);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;}
+.booking-title{font-family:'Bebas Neue',sans-serif;font-size:26px;color:#000;line-height:1;margin-bottom:6px;}
+.booking-sub{font-size:12px;font-weight:600;color:rgba(0,0,0,.55);margin-bottom:14px;}
+.booking-btn{display:inline-flex;align-items:center;gap:6px;background:#000;color:#fff;border:none;border-radius:var(--r-sm);padding:10px 16px;font-family:'Manrope',sans-serif;font-size:13px;font-weight:800;cursor:pointer;}
+
+/* CONTACT */
+.contact-form{padding:0 16px;}
+.form-input{width:100%;background:var(--g1);border:1.5px solid var(--sep2);border-radius:var(--r-md);padding:13px 14px;font-family:'Manrope',sans-serif;font-size:14px;font-weight:500;color:var(--white);outline:none;caret-color:var(--accent);transition:border-color .2s;margin-bottom:10px;}
+.form-input:focus{border-color:var(--accent);}
+.form-input::placeholder{color:var(--l4);}
+.form-ta{width:100%;background:var(--g1);border:1.5px solid var(--sep2);border-radius:var(--r-md);padding:13px 14px;font-family:'Manrope',sans-serif;font-size:14px;font-weight:500;color:var(--white);outline:none;caret-color:var(--accent);transition:border-color .2s;margin-bottom:10px;resize:none;line-height:1.6;min-height:100px;}
+.form-ta:focus{border-color:var(--accent);}
+.form-ta::placeholder{color:var(--l4);}
+.submit-btn{width:100%;padding:15px;border-radius:var(--r-md);background:var(--accent);border:none;font-family:'Manrope',sans-serif;font-size:14px;font-weight:800;color:#fff;cursor:pointer;}
+
+/* BACK HEADER */
+.back-hdr{padding:52px 18px 14px;border-bottom:1px solid var(--sep);display:flex;align-items:center;gap:12px;position:sticky;top:0;background:rgba(0,0,0,.95);backdrop-filter:blur(20px);z-index:10;}
+.back-btn{width:32px;height:32px;border-radius:9px;background:var(--g1);border:1px solid var(--sep2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--l2);flex-shrink:0;}
+.back-btn:active{background:var(--as);color:var(--accent);}
+.back-btn svg{width:14px;height:14px;}
+.back-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1.5px;}
+.back-title em{color:var(--accent);font-style:normal;}
+
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(6,6,6,.97);border-top:1px solid rgba(255,255,255,.1);backdrop-filter:blur(24px);display:flex;align-items:flex-end;padding:6px 0 env(safe-area-inset-bottom,12px);z-index:100;}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;background:none;border:none;cursor:pointer;font-family:'Manrope',sans-serif;color:rgba(255,255,255,.3);transition:color .15s;}
+.nb.on{color:var(--accent);}
+.nb:active{opacity:.7;}
+.ni{width:22px;height:22px;display:flex;align-items:center;justify-content:center;}
+.nlbl{font-size:8px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+.nb.monly{display:none;}
+body.manage .nb.monly{display:flex;}
+
+/* SETTINGS */
+.sg{font-size:10px;font-weight:800;color:var(--l3);text-transform:uppercase;letter-spacing:.8px;padding:16px 2px 8px;}
+.sc{background:var(--g1);border-radius:var(--r-lg);margin-bottom:10px;overflow:hidden;border:1px solid var(--sep);}
+.sr{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid var(--sep);}
+.sr:last-child{border-bottom:none;}
+.sr.col{flex-direction:column;align-items:flex-start;gap:8px;}
+.si{width:30px;height:30px;border-radius:8px;background:var(--as);border:1px solid var(--ab);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent);}
+.si svg{width:13px;height:13px;}
+.si.n{background:var(--g2);border-color:var(--sep2);color:var(--l2);}
+.sb{flex:1;}
+.sl{font-size:13px;font-weight:600;color:var(--white);}
+.ss{font-size:10px;font-weight:500;color:var(--l3);margin-top:1px;}
+.sinp{background:transparent;border:none;outline:none;font-family:'Manrope',sans-serif;font-size:12px;font-weight:600;color:var(--white);caret-color:var(--accent);text-align:right;max-width:160px;}
+.sinp::placeholder{color:var(--l4);}
+.tog{position:relative;width:42px;height:24px;background:var(--g3);border-radius:12px;cursor:pointer;transition:background .25s;border:none;padding:0;display:block;flex-shrink:0;}
+.tog.on{background:var(--accent);}
+.tog::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .25s cubic-bezier(.34,1.56,.64,1);box-shadow:0 2px 5px rgba(0,0,0,.3);}
+.tog.on::after{transform:translateX(18px);}
+.swatches{display:flex;gap:7px;flex-wrap:wrap;padding:12px 14px;}
+.sw{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:all .15s;flex-shrink:0;}
+.sw.sel{border-color:#fff;transform:scale(1.15);}
+
+/* OVERLAY */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.86);z-index:400;align-items:flex-end;backdrop-filter:blur(8px);}
+.overlay.open{display:flex;}
+.sheet{background:var(--g1);border-radius:24px 24px 0 0;width:100%;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;animation:slideUp .3s cubic-bezier(.34,1.56,.64,1);}
+.si2{padding:20px 20px env(safe-area-inset-bottom,28px);}
+.drag{width:36px;height:4px;background:var(--g3);border-radius:2px;margin:0 auto 18px;}
+.sh-ey{font-size:10px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;}
+.sh-tit{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1px;color:var(--white);margin-bottom:14px;}
+.fl{font-size:10px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;}
+.fi{width:100%;background:var(--bg);border:1.5px solid var(--sep2);border-radius:var(--r-md);padding:12px 14px;font-family:'Manrope',sans-serif;font-size:14px;font-weight:500;color:var(--white);outline:none;caret-color:var(--accent);transition:border-color .2s;margin-bottom:12px;}
+.fi:focus{border-color:var(--accent);}
+.fi::placeholder{color:var(--l4);}
+.fta{width:100%;background:var(--bg);border:1.5px solid var(--sep2);border-radius:var(--r-md);padding:12px 14px;font-family:'Manrope',sans-serif;font-size:14px;font-weight:500;color:var(--white);outline:none;caret-color:var(--accent);transition:border-color .2s;margin-bottom:12px;resize:none;min-height:80px;line-height:1.6;}
+.fta:focus{border-color:var(--accent);}
+.fta::placeholder{color:var(--l4);}
+.okbtn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--r-md);padding:14px;font-size:14px;font-weight:800;font-family:'Manrope',sans-serif;cursor:pointer;margin-top:4px;}
+.cancelbtn{width:100%;background:transparent;color:var(--l3);border:none;font-size:12px;font-weight:600;font-family:'Manrope',sans-serif;cursor:pointer;padding:10px;margin-top:4px;}
+.dbtn{width:100%;background:transparent;color:#ef4444;border:1px solid rgba(239,68,68,.25);border-radius:var(--r-md);padding:12px;font-size:13px;font-weight:700;font-family:'Manrope',sans-serif;cursor:pointer;margin-bottom:10px;}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"><div class="toast-dot"></div><span id="tMsg"></span></div>
+
+<!-- ══ HOME VIEW ══ -->
+<div class="view active" id="homeView">
+  <div class="manage-banner" id="manageBanner" style="display:none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+    <div>Manage mode — visitors can't see this or Settings.<br><span style="font-size:10px;font-weight:500;opacity:.8;">Bookmark this URL with ?manage=true to return anytime.</span></div>
+  </div>
+  <div class="hero">
+    <div class="hero-avatar" id="heroAvatar">SC</div>
+    <div class="hero-name" id="heroName">Shannon <em>Craft</em></div>
+    <div class="hero-tagline" id="heroTagline">Author · Coach · Creator</div>
+    <div class="hero-bio" id="heroBio">Your bio goes here. Tell visitors who you are, what you do, and who you help.</div>
+    <div class="socials" id="socialsRow"></div>
+  </div>
+
+  <!-- Quick Links -->
+  <div id="sec-quickLinks">
+    <div class="sec-hdr">Quick Links</div>
+    <div class="card">
+      <div class="card-row" id="ql-shop" onclick="showView('shopView')" style="display:none;">
+        <div class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></div>
+        <div class="row-body"><div class="row-title">Shop</div><div class="row-sub">Digital &amp; physical products</div></div>
+        <svg class="row-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div class="card-row" id="ql-courses" onclick="showView('coursesView')" style="display:none;">
+        <div class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div>
+        <div class="row-body"><div class="row-title">Courses &amp; Memberships</div><div class="row-sub">Learn &amp; grow with me</div></div>
+        <svg class="row-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div class="card-row" id="ql-books" onclick="showView('booksView')" style="display:none;">
+        <div class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div>
+        <div class="row-body"><div class="row-title">My Books</div><div class="row-sub">Available on Amazon</div></div>
+        <div class="row-badge">Amazon</div>
+      </div>
+      <div class="card-row" id="ql-booking" onclick="showView('bookingView')" style="display:none;">
+        <div class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+        <div class="row-body"><div class="row-title">Book a Session</div><div class="row-sub">Work with me 1:1</div></div>
+        <svg class="row-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div class="card-row" id="ql-contact" onclick="showView('contactView')" style="display:none;">
+        <div class="row-icon n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+        <div class="row-body"><div class="row-title">Contact Me</div><div class="row-sub">Send me a message</div></div>
+        <svg class="row-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shop -->
+
+</div><!-- /homeView -->
+
+<!-- ══ SHOP VIEW ══ -->
+<div class="view" id="shopView">
+  <div class="back-hdr">
+    <button class="back-btn" onclick="showView('homeView')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <div class="back-title">Shop</div>
+  </div>
+  <div style="padding:8px 0 0;">
+    <div style="font-size:9px;font-weight:700;color:var(--l4);text-transform:uppercase;letter-spacing:.6px;padding:8px 18px 6px;">Digital</div>
+    <div class="prod-grid" id="shopDigitalGrid"></div>
+    <div style="font-size:9px;font-weight:700;color:var(--l4);text-transform:uppercase;letter-spacing:.6px;padding:4px 18px 6px;">Physical</div>
+    <div class="prod-grid" id="shopPhysicalGrid"></div>
+  </div>
+</div>
+
+<!-- ══ PRODUCT DETAIL VIEW ══ -->
+<div class="view" id="productView">
+  <div class="back-hdr">
+    <button class="back-btn" id="prodBack" onclick="showView('shopView')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <div class="back-title">Product</div>
+  </div>
+  <div style="padding:16px;" id="productBody"></div>
+</div>
+
+<!-- ══ COURSES VIEW ══ -->
+<div class="view" id="coursesView">
+  <div class="back-hdr">
+    <button class="back-btn" onclick="showView('homeView')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <div class="back-title">Courses &amp; <em>Memberships</em></div>
+  </div>
+  <div style="padding:8px 0 0;" id="coursesViewGrid"></div>
+</div>
+
+<!-- ══ BOOKS VIEW ══ -->
+<div class="view" id="booksView">
+  <div class="back-hdr">
+    <button class="back-btn" onclick="showView('homeView')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <div class="back-title">My <em>Books</em></div>
+  </div>
+  <div style="padding:8px 0 0;"><div class="card" id="booksViewList"></div></div>
+</div>
+
+<!-- ══ BOOKING VIEW ══ -->
+<div class="view" id="bookingView">
+  <div class="back-hdr">
+    <button class="back-btn" onclick="showView('homeView')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <div class="back-title">Book a <em>Session</em></div>
+  </div>
+  <div style="padding:16px 0 0;">
+    <div class="booking-card" style="margin:0 16px 10px;">
+      <div class="booking-ey">Work With Me</div>
+      <div class="booking-title">Book a Session</div>
+      <div class="booking-sub">Ready to work together? Let's find a time that works for you.</div>
+      <button class="booking-btn" onclick="openBooking()">Schedule Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONTACT VIEW ══ -->
+<div class="view" id="contactView">
+  <div class="back-hdr">
+    <button class="back-btn" onclick="showView('homeView')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <div class="back-title">Contact <em>Me</em></div>
+  </div>
+  <div style="padding:16px 0 0;">
+    <div class="contact-form">
+      <input class="form-input" id="cName2" placeholder="Your name">
+      <input class="form-input" id="cEmail2" placeholder="Your email" type="email">
+      <input class="form-input" id="cSubject2" placeholder="Subject">
+      <textarea class="form-ta" id="cMsg2" placeholder="Your message…"></textarea>
+      <button class="submit-btn" onclick="submitContact('cName2','cEmail2','cMsg2')">Send Message</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SETTINGS VIEW (manage mode only) ══ -->
+<div class="view" id="settingsView">
+  <div class="back-hdr">
+    <button class="back-btn" onclick="showView('homeView')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <div class="back-title">Settings</div>
+  </div>
+  <div style="padding:12px 16px 0;">
+
+    <div class="sg">Profile</div>
+    <div class="sc">
+      <div class="sr col">
+        <div style="display:flex;align-items:center;gap:12px;width:100%;">
+          <div class="si n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 012-2h6a2 2 0 012 2v1.662"/></svg></div>
+          <div class="sb"><div class="sl">Profile Photo</div><div class="ss">Shown in the circle at top</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;width:100%;">
+          <div id="photoPreview" style="width:52px;height:52px;border-radius:50%;background:var(--as);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--accent);flex-shrink:0;overflow:hidden;">SC</div>
+          <div style="flex:1;">
+            <input type="file" id="photoFile" accept="image/*" style="display:none" onchange="handlePhoto(this)">
+            <button onclick="document.getElementById('photoFile').click()" style="width:100%;height:34px;background:var(--as);border:1.5px solid var(--ab);border-radius:9px;font-family:'Manrope',sans-serif;font-size:12px;font-weight:800;color:var(--accent);cursor:pointer;margin-bottom:6px;">Upload Photo</button>
+            <button onclick="removePhoto()" style="width:100%;height:28px;background:transparent;border:1px solid var(--sep2);border-radius:9px;font-family:'Manrope',sans-serif;font-size:11px;font-weight:600;color:var(--l3);cursor:pointer;">Remove</button>
+          </div>
+        </div>
+      </div>
+      <div class="sr"><div class="si n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="sb"><div class="sl">Name</div></div><input class="sinp" id="sName" placeholder="Shannon Craft" oninput="saveProfile()"></div>
+      <div class="sr"><div class="si n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><div class="sb"><div class="sl">Tagline</div></div><input class="sinp" id="sTagline" placeholder="Author · Coach" oninput="saveProfile()"></div>
+      <div class="sr col">
+        <div style="display:flex;align-items:center;gap:12px;width:100%;"><div class="si n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg></div><div class="sb"><div class="sl">Bio</div></div></div>
+        <textarea id="sBio" placeholder="Tell visitors who you are…" style="width:100%;background:var(--bg);border:1.5px solid var(--sep2);border-radius:var(--r-sm);padding:10px 12px;font-family:'Manrope',sans-serif;font-size:13px;color:var(--white);outline:none;caret-color:var(--accent);resize:none;min-height:70px;line-height:1.6;" oninput="saveProfile()"></textarea>
+      </div>
+    </div>
+
+    <div class="sg">Social Links</div>
+    <div class="sc" id="socialsSettings"></div>
+
+    <div class="sg">Page Sections</div>
+    <div class="sc">
+      <div class="sr"><div class="si n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div><div class="sb"><div class="sl">Quick Links</div></div><button class="tog" id="sec-tog-quickLinks" onclick="togSec('quickLinks')"></button></div>
+      <div class="sr"><div class="si n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></div><div class="sb"><div class="sl">Shop</div></div><button class="tog" id="sec-tog-shop" onclick="togSec('shop')"></button></div>
+      <div class="sr"><div class="si n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div><div class="sb"><div class="sl">Amazon Books</div></div><button class="tog" id="sec-tog-books" onclick="togSec('books')"></button></div>
+      <div class="sr"><div class="si n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div><div class="sb"><div class="sl">Courses &amp; Memberships</div></div><button class="tog" id="sec-tog-courses" onclick="togSec('courses')"></button></div>
+      <div class="sr"><div class="si n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="sb"><div class="sl">Booking</div></div><button class="tog" id="sec-tog-booking" onclick="togSec('booking')"></button></div>
+      <div class="sr"><div class="si n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div class="sb"><div class="sl">Contact Form</div></div><button class="tog" id="sec-tog-contact" onclick="togSec('contact')"></button></div>
+    </div>
+
+    <div class="sg">Email Sending</div>
+    <div class="sc">
+      <div class="sr"><div class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div class="sb"><div class="sl">Resend API Key</div><div class="ss">Free · 3,000 emails/mo</div></div><input class="sinp" id="sResend" type="password" placeholder="re_xxxx" oninput="saveCfg()"></div>
+      <div class="sr"><div class="si n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="sb"><div class="sl">From Email</div></div><input class="sinp" id="sFromEmail" type="email" placeholder="you@domain.com" oninput="saveCfg()"></div>
+      <div class="sr"><div class="si n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><div class="sb"><div class="sl">From Name</div></div><input class="sinp" id="sFromName" placeholder="Shannon Craft" oninput="saveCfg()"></div>
+    </div>
+
+    <div class="sg">Appearance</div>
+    <div class="sc">
+      <div class="sr"><div class="si n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></div><div class="sb"><div class="sl">Light Mode</div></div><button class="tog" id="lightTog" onclick="togLight()"></button></div>
+      <div class="sr col">
+        <div style="display:flex;align-items:center;gap:12px;width:100%;"><div class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 010 20"/></svg></div><div class="sb"><div class="sl">Accent Color</div></div></div>
+        <div class="swatches" id="colorSwatches"></div>
+        <div style="display:flex;align-items:center;gap:8px;padding:0 14px 10px;">
+          <span style="font-size:10px;font-weight:700;color:var(--l3);">Custom:</span>
+          <input id="hexIn" maxlength="7" placeholder="#E8571A" style="flex:1;background:var(--g2);border:1.5px solid var(--sep2);border-radius:7px;padding:7px 10px;font-family:'Manrope',sans-serif;font-size:12px;font-weight:600;color:var(--white);outline:none;caret-color:var(--accent);" oninput="applyHex(this.value)">
+          <div id="hexPrev" style="width:22px;height:22px;border-radius:50%;background:var(--accent);border:2px solid var(--sep2);flex-shrink:0;"></div>
+        </div>
+      </div>
+    </div>
+
+    <button class="dbtn" onclick="if(confirm('Clear all data? This cannot be undone.'))clearAll()">Clear All Data</button>
+    <div style="text-align:center;font-size:11px;color:var(--l3);padding:6px 0 16px;">Shannon Craft · Manage Mode Only</div>
+  </div>
+</div>
+
+<!-- ══ BOTTOM NAV ══ -->
+<nav class="bnav">
+  <button class="nb on" id="nb-home" onclick="showView('homeView')">
+    <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+    <span class="nlbl">Home</span>
+  </button>
+  <button class="nb" id="nb-shop" onclick="showView('shopView')">
+    <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></span>
+    <span class="nlbl">Shop</span>
+  </button>
+  <button class="nb" id="nb-books" onclick="showView('booksView')">
+    <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span>
+    <span class="nlbl">Books</span>
+  </button>
+  <button class="nb" id="nb-contact" onclick="showView('contactView')">
+    <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+    <span class="nlbl">Contact</span>
+  </button>
+  <button class="nb monly" id="nb-settings" onclick="showView('settingsView')">
+    <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span>
+    <span class="nlbl">Settings</span>
+  </button>
+</nav>
+
+<!-- EDIT SHEET -->
+<div class="overlay" id="editSheet" onclick="if(event.target===this)closeEdit()">
+  <div class="sheet"><div class="si2" id="editSheetInner"></div></div>
+</div>
+
+<script>
+/* ── KEYS ── */
+const K={PROFILE:'sc_profile_v1',SOCIALS:'sc_socials_v1',PRODUCTS:'sc_products_v1',COURSES:'sc_courses_v1',BOOKS:'sc_books_v1',SECTIONS:'sc_sections_v1',CFG:'sc_cfg_v1'};
+const ACCENT_COLORS=['#E8571A','#2563EB','#7C3AED','#16A34A','#DC2626','#0D9488','#DB2777','#D97706'];
+const SOCIAL_KEYS=['instagram','tiktok','youtube','facebook','x','linkedin','booking'];
+const SOCIAL_LABELS={instagram:'Instagram',tiktok:'TikTok',youtube:'YouTube',facebook:'Facebook',x:'X (Twitter)',linkedin:'LinkedIn',booking:'Booking Link'};
+const SOC_ICONS={instagram:'<rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>',tiktok:'<path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/>',youtube:'<path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/>',facebook:'<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>',x:'<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.74l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="currentColor" stroke="none"/>',linkedin:'<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>',booking:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>'};
+const DEFAULT_SECTIONS={quickLinks:true,shop:true,books:true,courses:false,booking:false,contact:true};
+const DEFAULT_PRODUCTS={digital:[{id:'d1',name:'[Digital Product]',price:'$27',type:'Digital Download',desc:'Describe your digital product here.',includes:['Instant download','Lifetime access'],stripeLink:'#',paypalLink:'#'},{id:'d2',name:'[Workbook or PDF]',price:'$17',type:'Digital Download',desc:'Another digital product.',includes:['PDF format','Printable pages'],stripeLink:'#',paypalLink:'#'}],physical:[{id:'p1',name:'[Physical Product]',price:'$35',type:'Ships 3–5 days',desc:'Describe your physical product.',includes:['Free shipping over $50'],stripeLink:'#',paypalLink:'#'}]};
+const DEFAULT_COURSES=[{id:'c1',name:'[Course Name]',price:'$97',desc:'Course description.',meta:'Self-paced · Lifetime access',link:'#'},{id:'c2',name:'[Membership]',price:'$27/mo',desc:'Membership description.',meta:'Monthly · Cancel anytime',link:'#'}];
+const DEFAULT_BOOKS=[{id:'b1',title:'[Your Book Title]',author:'Shannon Craft',desc:'',amazonLink:'#'}];
+
+/* ── UTILS ── */
+function gd(k,def){try{const v=JSON.parse(localStorage.getItem(k));return v!==null?v:def;}catch(e){return def;}}
+function sd(k,v){localStorage.setItem(k,JSON.stringify(v));}
+function uid(){return 'i'+Date.now().toString(36)+Math.random().toString(36).slice(2);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+let _tt;
+function showToast(msg){document.getElementById('tMsg').textContent=msg;const t=document.getElementById('toast');t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),2400);}
+
+/* ── MANAGE MODE ── */
+const MANAGE=new URLSearchParams(window.location.search).get('manage')==='true';
+if(MANAGE){document.body.classList.add('manage');document.getElementById('manageBanner').style.display='flex';}
+
+/* ── VIEW NAV ── */
+function showView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const el=document.getElementById(id);if(el)el.classList.add('active');
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  const map={homeView:'nb-home',shopView:'nb-shop',productView:'nb-shop',booksView:'nb-books',bookingView:'nb-home',coursesView:'nb-home',contactView:'nb-contact',settingsView:'nb-settings'};
+  const nb=document.getElementById(map[id]||'nb-home');if(nb)nb.classList.add('on');
+  window.scrollTo(0,0);
+  if(id==='settingsView')loadSettingsView();
+  if(id==='shopView')renderShopView();
+  if(id==='coursesView')renderCoursesView();
+  if(id==='booksView')renderBooksView();
+}
+
+/* ── PROFILE ── */
+function getProfile(){return gd(K.PROFILE,{name:'Shannon Craft',tagline:'Author · Coach · Creator',bio:'Your bio goes here.',photo:null,accent:'#E8571A',lightMode:false});}
+function saveProfile(){
+  const p=getProfile();
+  const n=document.getElementById('sName');const t=document.getElementById('sTagline');const b=document.getElementById('sBio');
+  if(n)p.name=n.value;if(t)p.tagline=t.value;if(b)p.bio=b.value;
+  sd(K.PROFILE,p);applyProfile(p);
+}
+function applyProfile(p){
+  const av=document.getElementById('heroAvatar');
+  if(av){if(p.photo){av.innerHTML=`<img src="${p.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;}else{const pts=(p.name||'SC').split(' ');av.textContent=(pts[0][0]+(pts[1]?.[0]||'')).toUpperCase();}}
+  const ne=document.getElementById('heroName');
+  if(ne){const pts=(p.name||'Shannon Craft').split(' ');const last=pts.length>1?`<em>${esc(pts[pts.length-1])}</em>`:'';ne.innerHTML=esc(pts.slice(0,-1).join(' '))+' '+last;}
+  const te=document.getElementById('heroTagline');if(te)te.textContent=p.tagline||'';
+  const be=document.getElementById('heroBio');if(be)be.textContent=p.bio||'';
+  const accent=p.accent||'#E8571A';
+  const r=parseInt(accent.slice(1,3),16),g=parseInt(accent.slice(3,5),16),b=parseInt(accent.slice(5,7),16);
+  document.documentElement.style.setProperty('--accent',accent);
+  document.documentElement.style.setProperty('--as',`rgba(${r},${g},${b},.13)`);
+  document.documentElement.style.setProperty('--ab',`rgba(${r},${g},${b},.28)`);
+  if(p.lightMode){[['--bg','#f5f5f5'],['--g1','#fff'],['--g2','#ebebeb'],['--g3','#d0d0d0'],['--sep','rgba(0,0,0,.07)'],['--sep2','rgba(0,0,0,.11)'],['--white','#0a0a0a'],['--l1','rgba(0,0,0,.85)'],['--l2','rgba(0,0,0,.55)'],['--l3','rgba(0,0,0,.35)'],['--l4','rgba(0,0,0,.18)']].forEach(([k,v])=>document.documentElement.style.setProperty(k,v));}
+  else{[['--bg','#000'],['--g1','#161616'],['--g2','#242424'],['--g3','#333'],['--sep','rgba(255,255,255,.07)'],['--sep2','rgba(255,255,255,.11)'],['--white','#fff'],['--l1','rgba(255,255,255,.85)'],['--l2','rgba(255,255,255,.5)'],['--l3','rgba(255,255,255,.28)'],['--l4','rgba(255,255,255,.13)']].forEach(([k,v])=>document.documentElement.style.setProperty(k,v));}
+}
+function handlePhoto(input){const file=input.files[0];if(!file)return;const r=new FileReader();r.onload=e=>{const p=getProfile();p.photo=e.target.result;sd(K.PROFILE,p);applyProfile(p);updatePhotoPrev(p);showToast('Photo updated ✓');};r.readAsDataURL(file);input.value='';}
+function removePhoto(){const p=getProfile();p.photo=null;sd(K.PROFILE,p);applyProfile(p);updatePhotoPrev(p);showToast('Photo removed');}
+function updatePhotoPrev(p){const el=document.getElementById('photoPreview');if(!el)return;if(p.photo){el.innerHTML=`<img src="${p.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;}else{const pts=(p.name||'SC').split(' ');el.textContent=(pts[0][0]+(pts[1]?.[0]||'')).toUpperCase();}}
+function togLight(){const p=getProfile();p.lightMode=!p.lightMode;sd(K.PROFILE,p);applyProfile(p);loadSettingsView();showToast(p.lightMode?'Light mode on':'Dark mode on');}
+function setAccent(hex){const p=getProfile();p.accent=hex;sd(K.PROFILE,p);applyProfile(p);loadSettingsView();}
+function applyHex(val){if(!val)return;const hex=val.startsWith('#')?val:'#'+val;if(!/^#[0-9A-Fa-f]{6}$/.test(hex))return;document.getElementById('hexPrev').style.background=hex;setAccent(hex);}
+
+/* ── SOCIALS ── */
+function getSocials(){return gd(K.SOCIALS,{});}
+function applySocials(){
+  const soc=getSocials();
+  const row=document.getElementById('socialsRow');if(!row)return;
+  const active=SOCIAL_KEYS.filter(k=>soc[k]&&k!=='booking');
+  row.innerHTML=active.map(k=>`<a class="soc-btn" href="${esc(soc[k])}" target="_blank" title="${SOCIAL_LABELS[k]}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${SOC_ICONS[k]}</svg></a>`).join('');
+}
+function openBooking(){const soc=getSocials();const bl=soc.booking;if(bl&&bl!=='#')window.open(bl,'_blank');else showToast('Booking link coming soon');}
+function saveSocials(){const soc={};SOCIAL_KEYS.forEach(k=>{const el=document.getElementById('soc-'+k);if(el)soc[k]=el.value.trim();});sd(K.SOCIALS,soc);applySocials();}
+
+/* ── SECTIONS ── */
+function getSections(){return gd(K.SECTIONS,DEFAULT_SECTIONS);}
+function applySections(){
+  const s=getSections();
+  const ql=document.getElementById('sec-quickLinks');if(ql)ql.style.display=s.quickLinks?'block':'none';
+  const qlMap={shop:'ql-shop',courses:'ql-courses',books:'ql-books',booking:'ql-booking',contact:'ql-contact'};
+  Object.entries(qlMap).forEach(([k,id])=>{const el=document.getElementById(id);if(el)el.style.display=s[k]?'flex':'none';});
+}
+function togSec(key){const s=getSections();s[key]=!s[key];sd(K.SECTIONS,s);applySections();renderSecToggles();showToast((s[key]?'Showing':'Hiding')+' '+key);}
+function renderSecToggles(){const s=getSections();Object.keys(DEFAULT_SECTIONS).forEach(k=>{const t=document.getElementById('sec-tog-'+k);if(t)t.className='tog'+(s[k]?' on':'');});}
+
+/* ── PRODUCTS ── */
+function getProducts(){return gd(K.PRODUCTS,DEFAULT_PRODUCTS);}
+function renderProducts(){
+  const p=getProducts();
+  renderPGrid('digitalGrid',p.digital,'digital',true);
+  renderPGrid('physicalGrid',p.physical,'physical',true);
+}
+function renderShopView(){
+  const p=getProducts();
+  renderPGrid('shopDigitalGrid',p.digital,'digital',false);
+  renderPGrid('shopPhysicalGrid',p.physical,'physical',false);
+}
+function renderPGrid(id,items,type,homeView){
+  const el=document.getElementById(id);if(!el)return;
+  el.innerHTML=items.map(p=>`<div class="prod-card" onclick="openProduct('${p.id}')">
+    <div class="prod-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></div>
+    <div class="prod-info"><div class="prod-name">${esc(p.name)}</div><div class="prod-price">${esc(p.price)}</div><div class="prod-type">${esc(p.type)}</div></div>
+  </div>`).join('')+(MANAGE?`<div class="prod-card" style="border-style:dashed;background:transparent;display:flex;align-items:center;justify-content:center;min-height:140px;cursor:pointer;color:var(--l3);font-size:11px;font-weight:700;flex-direction:column;gap:4px;" onclick="addProduct('${type}')"><span style="font-size:20px;line-height:1;">+</span>Add</div>`:'');
+}
+function addProduct(type){const p=getProducts();const t=p[type][0]||DEFAULT_PRODUCTS[type][0];const c=JSON.parse(JSON.stringify(t));c.id=uid();c.name='[New Product]';p[type].push(c);sd(K.PRODUCTS,p);renderProducts();openProduct(c.id);showToast('Added — edit it now');}
+function openProduct(id){
+  const p=getProducts();const all=[...p.digital,...p.physical];const item=all.find(x=>x.id===id);if(!item)return;
+  const type=p.digital.find(x=>x.id===id)?'digital':'physical';
+  document.getElementById('productBody').innerHTML=`
+    <div class="detail-ey">${esc(item.type)}</div>
+    <div class="detail-name">${esc(item.name)}</div>
+    <div class="detail-price">${esc(item.price)}</div>
+    <div class="detail-desc">${esc(item.desc)}</div>
+    <div class="detail-inc"><div class="detail-inc-hdr">What's Included</div>${(item.includes||[]).map(i=>`<div class="inc-item"><div class="inc-dot"></div><div class="inc-text">${esc(i)}</div></div>`).join('')}</div>
+    <button class="buy-btn stripe" onclick="buyStripe('${id}')">Buy Now · ${esc(item.price)} — Card</button>
+    <button class="buy-btn paypal" onclick="buyPayPal('${id}')">Pay with PayPal</button>
+    ${MANAGE?`<div class="edit-row"><button onclick="editProduct('${id}','${type}')">✏️ Edit</button><button onclick="dupProduct('${id}','${type}')">📋 Duplicate</button><button class="del" onclick="delProduct('${id}','${type}')">Delete</button></div>`:''}`;
+  showView('productView');
+}
+function buyStripe(id){const p=getProducts();const all=[...p.digital,...p.physical];const item=all.find(x=>x.id===id);if(item?.stripeLink&&item.stripeLink!=='#')window.open(item.stripeLink,'_blank');else showToast('Stripe link coming soon');}
+function buyPayPal(id){const p=getProducts();const all=[...p.digital,...p.physical];const item=all.find(x=>x.id===id);if(item?.paypalLink&&item.paypalLink!=='#')window.open(item.paypalLink,'_blank');else showToast('PayPal link coming soon');}
+function editProduct(id,type){const p=getProducts();const item=p[type].find(x=>x.id===id);if(!item)return;openEdit({title:'Edit Product',fields:[{l:'Name',k:'name',v:item.name},{l:'Price',k:'price',v:item.price},{l:'Type',k:'type',v:item.type},{l:'Description',k:'desc',v:item.desc,m:true},{l:'Stripe Link',k:'stripeLink',v:item.stripeLink},{l:'PayPal Link',k:'paypalLink',v:item.paypalLink}],onSave:d=>{Object.assign(item,d);sd(K.PRODUCTS,p);renderProducts();openProduct(id);showToast('Saved ✓');}});}
+function dupProduct(id,type){const p=getProducts();const item=p[type].find(x=>x.id===id);if(!item)return;const c=JSON.parse(JSON.stringify(item));c.id=uid();c.name=item.name+' (Copy)';p[type].push(c);sd(K.PRODUCTS,p);renderProducts();showToast('Duplicated');}
+function delProduct(id,type){if(!confirm('Delete?'))return;const p=getProducts();p[type]=p[type].filter(x=>x.id!==id);sd(K.PRODUCTS,p);renderProducts();showView('shopView');showToast('Deleted');}
+
+/* ── COURSES ── */
+function getCourses(){return gd(K.COURSES,DEFAULT_COURSES);}
+function renderCoursesView(){
+  const courses=getCourses();
+  const el=document.getElementById('coursesViewGrid');if(!el)return;
+  el.innerHTML=courses.map(c=>`<div class="course-card">
+    <div class="course-banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div>
+    <div class="course-body">
+      <div class="course-ey">Course</div>
+      <div class="course-title">${esc(c.name)}</div>
+      <div class="course-desc">${esc(c.desc)}</div>
+      <div class="course-footer"><div><div class="course-price">${esc(c.price)}</div><div class="course-meta">${esc(c.meta)}</div></div>
+      <button class="enroll-btn" onclick="${c.link&&c.link!=='#'?`window.open('${c.link}','_blank')`:"showToast('Link coming soon')"}">Enroll</button></div>
+      ${MANAGE?`<div class="course-edit-row"><button onclick="editCourse('${c.id}')">✏️ Edit</button><button onclick="dupCourse('${c.id}')">📋 Duplicate</button><button class="del" onclick="delCourse('${c.id}')">Delete</button></div>`:''}
+    </div>
+  </div>`).join('')+(MANAGE?`<button class="add-btn" style="margin:0 16px 10px;" onclick="addCourse()">+ Add Course or Membership</button>`:'');
+}
+function addCourse(){const cs=getCourses();const c=JSON.parse(JSON.stringify(DEFAULT_COURSES[0]));c.id=uid();c.name='[New Course]';cs.push(c);sd(K.COURSES,cs);renderCoursesView();showToast('Added — edit it now');}
+function editCourse(id){const cs=getCourses();const c=cs.find(x=>x.id===id);if(!c)return;openEdit({title:'Edit Course',fields:[{l:'Name',k:'name',v:c.name},{l:'Price',k:'price',v:c.price},{l:'Description',k:'desc',v:c.desc,m:true},{l:'Meta',k:'meta',v:c.meta},{l:'Enrollment Link',k:'link',v:c.link}],onSave:d=>{Object.assign(c,d);sd(K.COURSES,cs);renderCoursesView();showToast('Saved ✓');}});}
+function dupCourse(id){const cs=getCourses();const c=cs.find(x=>x.id===id);if(!c)return;const copy=JSON.parse(JSON.stringify(c));copy.id=uid();copy.name=c.name+' (Copy)';cs.push(copy);sd(K.COURSES,cs);renderCoursesView();showToast('Duplicated');}
+function delCourse(id){if(!confirm('Delete?'))return;sd(K.COURSES,getCourses().filter(x=>x.id!==id));renderCoursesView();showToast('Deleted');}
+
+/* ── BOOKS ── */
+function getBooks(){return gd(K.BOOKS,DEFAULT_BOOKS);}
+function renderBooks(){
+  const books=getBooks();
+  const bookHTML=(b,withEdit)=>`<div>
+    <a class="book-card" href="${esc(b.amazonLink||'#')}" target="_blank" ${(!b.amazonLink||b.amazonLink==='#')?`onclick="event.preventDefault();showToast('Amazon link coming soon')"`:''}>
+      <div class="book-cover"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div>
+      <div class="book-info"><div class="book-ey">📖 Available on Amazon</div><div class="book-title">${esc(b.title)}</div><div class="book-author">by ${esc(b.author)}</div><div class="book-cta">View on Amazon →</div></div>
+    </a>
+    ${withEdit&&MANAGE?`<div class="book-edit-row"><button onclick="editBook('${b.id}')">✏️ Edit</button><button onclick="dupBook('${b.id}')">📋 Duplicate</button><button class="del" onclick="delBook('${b.id}')">Delete</button></div>`:''}
+  </div>`;
+  const homeEl=document.getElementById('booksList');if(homeEl)homeEl.innerHTML=books.map(b=>bookHTML(b,false)).join('');
+}
+function renderBooksView(){
+  const books=getBooks();
+  const el=document.getElementById('booksViewList');if(!el)return;
+  const bookHTML=(b)=>`<div>
+    <a class="book-card" href="${esc(b.amazonLink||'#')}" target="_blank" ${(!b.amazonLink||b.amazonLink==='#')?`onclick="event.preventDefault();showToast('Amazon link coming soon')"`:''}>
+      <div class="book-cover"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div>
+      <div class="book-info"><div class="book-ey">📖 Available on Amazon</div><div class="book-title">${esc(b.title)}</div><div class="book-author">by ${esc(b.author)}</div><div class="book-cta">View on Amazon →</div></div>
+    </a>
+    ${MANAGE?`<div class="book-edit-row"><button onclick="editBook('${b.id}')">✏️ Edit</button><button onclick="dupBook('${b.id}')">📋 Duplicate</button><button class="del" onclick="delBook('${b.id}')">Delete</button></div>`:''}
+  </div>`;
+  el.innerHTML=books.map(bookHTML).join('')+(MANAGE?`<button class="add-btn" style="margin:4px 16px 10px;" onclick="addBook()">+ Add Book</button>`:'');
+}
+function addBook(){const bs=getBooks();const b={id:uid(),title:'[Book Title]',author:'Shannon Craft',desc:'',amazonLink:'#'};bs.push(b);sd(K.BOOKS,bs);renderBooks();editBook(b.id);showToast('Added — edit it now');}
+function editBook(id){const bs=getBooks();const b=bs.find(x=>x.id===id);if(!b)return;openEdit({title:'Edit Book',fields:[{l:'Title',k:'title',v:b.title},{l:'Author',k:'author',v:b.author},{l:'Description',k:'desc',v:b.desc||'',m:true},{l:'Amazon Link',k:'amazonLink',v:b.amazonLink}],onSave:d=>{Object.assign(b,d);sd(K.BOOKS,bs);renderBooks();showToast('Saved ✓');}});}
+function dupBook(id){const bs=getBooks();const b=bs.find(x=>x.id===id);if(!b)return;const c=JSON.parse(JSON.stringify(b));c.id=uid();c.title=b.title+' (Copy)';bs.push(c);sd(K.BOOKS,bs);renderBooks();showToast('Duplicated');}
+function delBook(id){if(!confirm('Delete?'))return;sd(K.BOOKS,getBooks().filter(x=>x.id!==id));renderBooks();showToast('Deleted');}
+
+/* ── CONTACT ── */
+function submitContact(n,e,m){const nv=document.getElementById(n)?.value.trim();const ev=document.getElementById(e)?.value.trim();const mv=document.getElementById(m)?.value.trim();if(!nv||!ev||!mv){showToast('Please fill in all fields');return;}showToast('Message sent! I\'ll be in touch ✓');[n,e,m].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
+
+/* ── SETTINGS VIEW ── */
+function loadSettingsView(){
+  const p=getProfile();const soc=getSocials();const cfg=gd(K.CFG,{});
+  const n=document.getElementById('sName');if(n)n.value=p.name||'';
+  const t=document.getElementById('sTagline');if(t)t.value=p.tagline||'';
+  const b=document.getElementById('sBio');if(b)b.value=p.bio||'';
+  updatePhotoPrev(p);
+  const socEl=document.getElementById('socialsSettings');
+  if(socEl)socEl.innerHTML=SOCIAL_KEYS.map(k=>`<div class="sr"><div class="si n"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${SOC_ICONS[k]}</svg></div><div class="sb"><div class="sl">${SOCIAL_LABELS[k]}</div></div><input class="sinp" id="soc-${k}" placeholder="URL" value="${esc(soc[k]||'')}" oninput="saveSocials()"></div>`).join('');
+  renderSecToggles();
+  const sr=document.getElementById('sResend');if(sr)sr.value=cfg.resendKey||'';
+  const sfe=document.getElementById('sFromEmail');if(sfe)sfe.value=cfg.fromEmail||'';
+  const sfn=document.getElementById('sFromName');if(sfn)sfn.value=cfg.fromName||'';
+  const lt=document.getElementById('lightTog');if(lt)lt.className='tog'+(p.lightMode?' on':'');
+  const sw=document.getElementById('colorSwatches');
+  if(sw)sw.innerHTML=ACCENT_COLORS.map(c=>`<div class="sw${(p.accent||'#E8571A')===c?' sel':''}" style="background:${c};" onclick="setAccent('${c}')"></div>`).join('');
+  const hi=document.getElementById('hexIn');if(hi)hi.value=p.accent||'#E8571A';
+  const hp=document.getElementById('hexPrev');if(hp)hp.style.background=p.accent||'#E8571A';
+}
+function saveCfg(){sd(K.CFG,{resendKey:document.getElementById('sResend')?.value||'',fromEmail:document.getElementById('sFromEmail')?.value||'',fromName:document.getElementById('sFromName')?.value||''});}
+function clearAll(){Object.values(K).forEach(k=>localStorage.removeItem(k));location.reload();}
+
+/* ── EDIT SHEET ── */
+let _editCb=null;
+function openEdit({title,fields,onSave}){
+  _editCb=onSave;
+  document.getElementById('editSheetInner').innerHTML=`
+    <div class="drag"></div>
+    <div class="sh-ey">Edit</div>
+    <div class="sh-tit">${title}</div>
+    ${fields.map(f=>`<div class="fl">${f.l}</div>${f.m?`<textarea class="fta" id="ef_${f.k}">${esc(f.v||'')}</textarea>`:`<input class="fi" id="ef_${f.k}" value="${esc(f.v||'')}">`}`).join('')}
+    <button class="okbtn" onclick="saveEdit(${JSON.stringify(fields.map(f=>f.k))})">Save Changes</button>
+    <button class="cancelbtn" onclick="closeEdit()">Cancel</button>`;
+  document.getElementById('editSheet').classList.add('open');
+}
+function saveEdit(keys){const data={};keys.forEach(k=>{const el=document.getElementById('ef_'+k);if(el)data[k]=el.value.trim();});if(_editCb)_editCb(data);closeEdit();}
+function closeEdit(){document.getElementById('editSheet')?.classList.remove('open');_editCb=null;}
+
+/* ── INIT ── */
+function init(){
+  applyProfile(getProfile());
+  applySocials();
+  applySections();
+}
+init();
+</script>
+</body>
+</html>

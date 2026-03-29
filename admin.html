@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#000000">
+<title>Admin · Shannon Craft</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#000;--g1:#161616;--g2:#242424;--g3:#333;--g4:#444;
+  --sep:rgba(255,255,255,0.07);--sep2:rgba(255,255,255,0.11);
+  --accent:#E8571A;--as:rgba(232,87,26,0.13);--ab:rgba(232,87,26,0.28);
+  --white:#fff;--l1:rgba(255,255,255,0.85);--l2:rgba(255,255,255,0.5);
+  --l3:rgba(255,255,255,0.28);--l4:rgba(255,255,255,0.13);
+  --green:#16A34A;--gs:rgba(22,163,74,0.13);--gb:rgba(22,163,74,0.25);
+  --red:#DC2626;--rs:rgba(220,38,38,0.13);
+  --r-lg:16px;--r-md:12px;--r-sm:8px;
+}
+html,body{min-height:100%;overflow-x:hidden;background:var(--bg);color:var(--white);font-family:'Manrope',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+body{max-width:430px;margin:0 auto;padding-bottom:80px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--g2);border:1px solid var(--sep2);color:var(--white);border-radius:12px;padding:10px 16px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;white-space:nowrap;box-shadow:0 8px 40px rgba(0,0,0,.8);transition:transform .3s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:center;gap:8px;}
+.td{width:5px;height:5px;background:var(--accent);border-radius:50%;flex-shrink:0;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.vp{display:none;}
+.hdr{padding:52px 18px 14px;border-bottom:1px solid var(--sep);position:sticky;top:0;z-index:20;background:rgba(0,0,0,.96);backdrop-filter:blur(20px);}
+.htop{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
+.htit{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1.5px;line-height:1;}
+.htit em{color:var(--accent);font-style:normal;}
+.hsub{font-size:11px;font-weight:600;color:var(--l3);margin-top:2px;}
+.hacts{display:flex;gap:6px;flex-shrink:0;}
+.hbtn{display:flex;align-items:center;gap:5px;border:none;border-radius:10px;padding:8px 12px;font-size:11px;font-weight:800;font-family:'Manrope',sans-serif;cursor:pointer;transition:opacity .15s;white-space:nowrap;}
+.hbtn:active{opacity:.8;}
+.hbtn.p{background:var(--accent);color:#fff;}
+.hbtn.s{background:var(--g1);color:var(--l2);border:1px solid var(--sep2);}
+.hbtn svg{width:11px;height:11px;}
+.srow{display:flex;gap:6px;}
+.sp{flex:1;background:var(--g1);border-radius:10px;padding:9px 10px;border:1px solid var(--sep);}
+.sn{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--accent);letter-spacing:1px;line-height:1;}
+.sl{font-size:9px;font-weight:700;color:var(--l3);text-transform:uppercase;letter-spacing:.5px;margin-top:1px;}
+.sh2{font-size:10px;font-weight:700;color:var(--l3);letter-spacing:.8px;text-transform:uppercase;padding:14px 18px 8px;display:flex;align-items:center;justify-content:space-between;}
+.swrap{padding:8px 16px;position:relative;}
+.sinput{width:100%;background:var(--g1);border:1.5px solid var(--sep2);border-radius:var(--r-md);padding:11px 14px 11px 38px;font-family:'Manrope',sans-serif;font-size:14px;font-weight:500;color:var(--white);outline:none;caret-color:var(--accent);transition:border-color .2s;}
+.sinput:focus{border-color:var(--accent);}
+.sinput::placeholder{color:var(--l4);}
+.sico{position:absolute;left:28px;top:50%;transform:translateY(-50%);color:var(--l3);pointer-events:none;}
+.ftabs{display:flex;gap:5px;padding:0 16px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-bottom:4px;}
+.ftabs::-webkit-scrollbar{display:none;}
+.ft{height:25px;padding:0 10px;border-radius:20px;background:var(--g1);border:1px solid var(--sep2);font-size:10px;font-weight:700;color:var(--l3);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;}
+.ft.on{background:var(--as);border-color:var(--ab);color:var(--accent);}
+.card{background:var(--g1);border-radius:var(--r-lg);margin:0 16px 8px;overflow:hidden;border:1px solid var(--sep);}
+.crow{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid var(--sep);cursor:pointer;transition:background .12s;}
+.crow:last-child{border-bottom:none;}
+.crow:active{background:var(--g2);}
+.ri{width:32px;height:32px;border-radius:9px;background:var(--as);border:1px solid var(--ab);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent);}
+.ri svg{width:14px;height:14px;}
+.ri.n{background:var(--g2);border-color:var(--sep2);color:var(--l2);}
+.ri.gr{background:var(--gs);border-color:var(--gb);color:var(--green);}
+.rb{flex:1;min-width:0;}
+.rt{font-size:14px;font-weight:700;color:var(--white);}
+.rs{font-size:11px;font-weight:500;color:var(--l3);margin-top:2px;}
+.tb{height:15px;padding:0 6px;border-radius:4px;font-size:9px;font-weight:800;display:inline-flex;align-items:center;}
+.tbuyer{background:var(--as);color:var(--accent);border:1px solid var(--ab);}
+.tlead{background:var(--gs);color:var(--green);border:1px solid var(--gb);}
+.tvip{background:rgba(124,58,237,.15);color:#a78bfa;border:1px solid rgba(124,58,237,.3);}
+.tyoutube{background:rgba(220,38,38,.13);color:#f87171;border:1px solid rgba(220,38,38,.25);}
+.tnewsletter{background:rgba(13,148,136,.13);color:#2dd4bf;border:1px solid rgba(13,148,136,.25);}
+.cav{width:34px;height:34px;border-radius:50%;background:var(--as);border:1px solid var(--ab);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--accent);}
+.sqcard{background:var(--g1);border-radius:var(--r-lg);margin:0 16px 8px;border:1px solid var(--sep);overflow:hidden;}
+.sqhdr{display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer;transition:background .12s;border-bottom:1px solid var(--sep);}
+.sqhdr:active{background:var(--g2);}
+.sqb{height:18px;padding:0 7px;border-radius:9px;font-size:9px;font-weight:800;display:flex;align-items:center;}
+.sq-on{background:var(--gs);color:var(--green);border:1px solid var(--gb);}
+.sq-off{background:var(--g2);color:var(--l3);border:1px solid var(--sep2);}
+.stpc{background:var(--g2);border-radius:var(--r-md);padding:10px 12px;margin-bottom:6px;cursor:pointer;border:1px solid var(--sep);}
+.sday{height:17px;padding:0 6px;border-radius:4px;background:var(--g3);font-size:9px;font-weight:800;color:var(--l2);display:inline-flex;align-items:center;margin-bottom:4px;}
+.sday.d0{background:var(--as);color:var(--accent);border:1px solid var(--ab);}
+.addstp{width:100%;background:transparent;border:1.5px dashed var(--sep2);border-radius:var(--r-md);padding:9px;display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;color:var(--l3);font-family:'Manrope',sans-serif;font-size:11px;font-weight:700;transition:all .2s;margin-top:4px;}
+.addstp:active{border-color:var(--ab);color:var(--accent);background:var(--as);}
+.scard2{background:var(--g1);border-radius:var(--r-lg);margin-bottom:8px;overflow:hidden;}
+.srow2{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid var(--sep);}
+.srow2:last-child{border-bottom:none;}
+.sico2{width:30px;height:30px;border-radius:8px;background:var(--as);border:1px solid var(--ab);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent);}
+.sico2 svg{width:13px;height:13px;}
+.sico2.n{background:var(--g2);border-color:var(--sep2);color:var(--l2);}
+.sbody{flex:1;}
+.slbl{font-size:13px;font-weight:600;color:var(--white);}
+.sslbl{font-size:10px;font-weight:500;color:var(--l3);margin-top:1px;}
+.sinp2{background:transparent;border:none;outline:none;font-family:'Manrope',sans-serif;font-size:12px;font-weight:600;color:var(--white);caret-color:var(--accent);text-align:right;max-width:140px;}
+.sinp2::placeholder{color:var(--l4);}
+.tog{position:relative;width:42px;height:24px;background:var(--g3);border-radius:12px;cursor:pointer;transition:background .25s;border:none;padding:0;display:block;flex-shrink:0;}
+.tog.on{background:var(--accent);}
+.tog::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .25s cubic-bezier(.34,1.56,.64,1);box-shadow:0 2px 5px rgba(0,0,0,.3);}
+.tog.on::after{transform:translateX(18px);}
+.cswatches{display:flex;gap:7px;flex-wrap:wrap;padding:12px 14px;}
+.sw{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:all .15s;flex-shrink:0;}
+.sw.sel{border-color:#fff;transform:scale(1.15);}
+.bcastbody{background:var(--bg);border:1.5px solid var(--sep2);border-top:none;border-radius:0 0 var(--r-md) var(--r-md);padding:12px;font-family:'Manrope',sans-serif;font-size:13px;color:var(--white);outline:none;min-height:120px;line-height:1.7;caret-color:var(--accent);width:100%;}
+.bcastbody:focus{border-color:var(--accent);}
+.rbar{display:flex;gap:3px;background:var(--g2);border:1.5px solid var(--sep2);border-bottom:none;border-radius:var(--r-sm) var(--r-sm) 0 0;padding:6px 8px;flex-wrap:wrap;}
+.rtb{height:23px;padding:0 7px;border-radius:5px;background:transparent;border:none;cursor:pointer;font-family:'Manrope',sans-serif;font-size:11px;font-weight:700;color:var(--l2);}
+.rtb:active{background:var(--as);color:var(--accent);}
+.mrow{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;}
+.mc{height:20px;padding:0 7px;border-radius:5px;background:var(--g2);border:1px solid var(--sep2);font-size:9px;font-weight:700;color:var(--accent);cursor:pointer;display:flex;align-items:center;}
+.mc:active{background:var(--as);}
+.to{height:26px;padding:0 10px;border-radius:20px;background:var(--g2);border:1.5px solid var(--sep2);font-family:'Manrope',sans-serif;font-size:10px;font-weight:700;color:var(--l3);cursor:pointer;transition:all .15s;}
+.to.sel{background:var(--as);border-color:var(--ab);color:var(--accent);}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.86);z-index:400;align-items:flex-end;backdrop-filter:blur(8px);}
+.overlay.open{display:flex;}
+.sheet{background:var(--g1);border-radius:24px 24px 0 0;width:100%;max-height:93vh;overflow-y:auto;-webkit-overflow-scrolling:touch;animation:slideUp .3s cubic-bezier(.34,1.56,.64,1);}
+.si{padding:20px 20px env(safe-area-inset-bottom,28px);}
+.shdl{width:36px;height:4px;background:var(--g3);border-radius:2px;margin:0 auto 18px;}
+.sey{font-size:10px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;display:flex;align-items:center;gap:6px;}
+.sey::before{content:'';width:4px;height:4px;background:var(--accent);border-radius:50%;}
+.stit{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1px;color:var(--white);line-height:1;margin-bottom:4px;}
+.ssub2{font-size:12px;font-weight:500;color:var(--l3);margin-bottom:14px;line-height:1.5;}
+.fl{font-size:10px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;}
+.fi{width:100%;background:var(--bg);border:1.5px solid var(--sep2);border-radius:var(--r-md);padding:12px 14px;font-family:'Manrope',sans-serif;font-size:14px;font-weight:500;color:var(--white);outline:none;caret-color:var(--accent);transition:border-color .2s;margin-bottom:12px;}
+.fi:focus{border-color:var(--accent);}
+.fi::placeholder{color:var(--l4);}
+.fta{width:100%;background:var(--bg);border:1.5px solid var(--sep2);border-radius:var(--r-md);padding:12px 14px;font-family:'Manrope',sans-serif;font-size:14px;font-weight:500;color:var(--white);outline:none;caret-color:var(--accent);transition:border-color .2s;margin-bottom:12px;resize:none;line-height:1.6;}
+.fta:focus{border-color:var(--accent);}
+.fta::placeholder{color:var(--l4);}
+.fsel{width:100%;background:var(--bg);border:1.5px solid var(--sep2);border-radius:var(--r-md);padding:12px 14px;font-family:'Manrope',sans-serif;font-size:14px;font-weight:500;color:var(--white);outline:none;transition:border-color .2s;margin-bottom:12px;appearance:none;cursor:pointer;}
+.fsel option{background:#1a1a1a;}
+.okbtn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--r-md);padding:14px;font-size:14px;font-weight:800;font-family:'Manrope',sans-serif;cursor:pointer;transition:opacity .15s,transform .12s;margin-top:6px;}
+.okbtn:active{opacity:.85;transform:scale(.98);}
+.cancelbtn{width:100%;background:transparent;color:var(--l3);border:none;font-size:12px;font-weight:600;font-family:'Manrope',sans-serif;cursor:pointer;padding:10px;margin-top:3px;}
+.tpick{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;}
+.dbtn{width:100%;background:transparent;color:#ef4444;border:1px solid rgba(239,68,68,.25);border-radius:var(--r-md);padding:12px;font-size:13px;font-weight:700;font-family:'Manrope',sans-serif;cursor:pointer;}
+.es{text-align:center;padding:32px 20px;}
+.ei{width:42px;height:42px;border-radius:12px;background:var(--g1);border:1px solid var(--sep2);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;}
+.ei svg{width:19px;height:19px;color:var(--l3);}
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(6,6,6,.97);border-top:1px solid rgba(255,255,255,.1);backdrop-filter:blur(24px);display:flex;align-items:flex-end;padding:6px 0 env(safe-area-inset-bottom,12px);z-index:100;}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;background:none;border:none;cursor:pointer;font-family:'Manrope',sans-serif;color:rgba(255,255,255,.3);transition:color .15s;}
+.nb.on{color:var(--accent);}
+.nb:active{opacity:.7;}
+.ni{width:22px;height:22px;display:flex;align-items:center;justify-content:center;position:relative;}
+.nlbl{font-size:8px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+.nbadge{position:absolute;top:-3px;right:-7px;background:var(--accent);color:#fff;border-radius:10px;font-size:8px;padding:1px 4px;font-weight:800;border:2px solid #000;line-height:1.4;}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"><div class="td"></div><span id="tMsg"></span></div>
+
+<!-- CONTACTS -->
+<div id="vC" class="vp">
+  <div class="hdr">
+    <div class="htop">
+      <div><div class="htit">My <em>List</em></div><div class="hsub">Contacts &amp; subscribers</div></div>
+      <div class="hacts">
+        <button class="hbtn s" onclick="oS('impS')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Import</button>
+        <button class="hbtn p" onclick="oS('addCS')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add</button>
+      </div>
+    </div>
+    <div class="srow">
+      <div class="sp"><div class="sn" id="cTot">0</div><div class="sl">Total</div></div>
+      <div class="sp"><div class="sn" id="cBuy">0</div><div class="sl">Buyers</div></div>
+      <div class="sp"><div class="sn" id="cLd">0</div><div class="sl">Leads</div></div>
+      <div class="sp"><div class="sn" id="cUs">0</div><div class="sl">Unsub</div></div>
+    </div>
+  </div>
+  <div class="swrap"><div class="sico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><input class="sinput" id="cSrch" placeholder="Search name or email…" oninput="rC()"></div>
+  <div class="ftabs">
+    <button class="ft on" onclick="sCF('all',this)">All</button>
+    <button class="ft" onclick="sCF('buyer',this)">Buyers</button>
+    <button class="ft" onclick="sCF('lead',this)">Leads</button>
+    <button class="ft" onclick="sCF('vip',this)">VIP</button>
+    <button class="ft" onclick="sCF('youtube',this)">YouTube</button>
+    <button class="ft" onclick="sCF('newsletter',this)">Newsletter</button>
+    <button class="ft" onclick="sCF('unsubscribed',this)">Unsub'd</button>
+  </div>
+  <div id="cList" style="padding:6px 16px 0;"></div>
+</div>
+
+<!-- SEQUENCES -->
+<div id="vSQ" class="vp">
+  <div class="hdr">
+    <div class="htop">
+      <div><div class="htit">Email <em>Sequences</em></div><div class="hsub">Post-purchase automation</div></div>
+      <button class="hbtn p" onclick="oS('newSS')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> New</button>
+    </div>
+    <div class="srow">
+      <div class="sp"><div class="sn" id="sqCnt">0</div><div class="sl">Sequences</div></div>
+      <div class="sp"><div class="sn" id="sqEm">0</div><div class="sl">Emails</div></div>
+      <div class="sp"><div class="sn" id="sqAc">0</div><div class="sl">Active</div></div>
+    </div>
+  </div>
+  <div id="sqList" style="padding:8px 0 0;"></div>
+</div>
+
+<!-- EMAIL TOOLS -->
+<div id="vET" class="vp">
+  <div class="hdr">
+    <div class="htop"><div><div class="htit">Email <em>Tools</em></div><div class="hsub">Builder, Assets &amp; Broadcast</div></div></div>
+  </div>
+  <div style="padding:12px 0 0;">
+    <div style="margin:0 16px 10px;background:var(--as);border:1px solid var(--ab);border-radius:var(--r-lg);padding:14px 16px;">
+      <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:4px;">Tap to open Email Studio</div>
+      <div style="font-size:12px;font-weight:500;color:var(--l2);line-height:1.65;">Email Builder, Brand Assets &amp; Broadcast — all connected.</div>
+    </div>
+    <div class="card">
+      <a class="crow" href="admin-email.html" style="text-decoration:none;color:inherit;">
+        <div class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+        <div class="rb"><div class="rt">Email Builder</div><div class="rs">Build emails with blocks</div></div>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="color:var(--l3)"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+      <a class="crow" href="admin-email.html#assets" style="text-decoration:none;color:inherit;">
+        <div class="ri gr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+        <div class="rb"><div class="rt">Brand Assets</div><div class="rs">Logos &amp; images</div></div>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="color:var(--l3)"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+      <a class="crow" href="admin-email.html#broadcast" style="text-decoration:none;color:inherit;">
+        <div class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+        <div class="rb"><div class="rt">Broadcast</div><div class="rs">Send to your list</div></div>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="color:var(--l3)"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div id="vST" class="vp">
+  <div style="padding:52px 18px 16px;border-bottom:1px solid var(--sep);">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:1.5px;">Settings</div>
+    <div style="font-size:11px;font-weight:600;color:var(--l3);margin-top:2px;">Admin preferences</div>
+  </div>
+  <div style="padding:8px 16px 0;">
+    <div class="sh2" style="padding:10px 2px 8px;">Appearance</div>
+    <div class="scard2">
+      <div class="srow2">
+        <div class="sico2 n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></div>
+        <div class="sbody"><div class="slbl">Light Mode</div></div>
+        <button class="tog" id="lightTog" onclick="togLight()"></button>
+      </div>
+      <div class="srow2" style="flex-direction:column;align-items:flex-start;gap:8px;">
+        <div style="display:flex;align-items:center;gap:12px;width:100%;">
+          <div class="sico2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 010 20"/></svg></div>
+          <div class="sbody"><div class="slbl">Accent Color</div></div>
+        </div>
+        <div class="cswatches" id="accentSw"></div>
+        <div style="display:flex;align-items:center;gap:8px;padding:0 14px 12px;">
+          <span style="font-size:10px;font-weight:700;color:var(--l3);">Custom:</span>
+          <input id="hexIn" maxlength="7" placeholder="#E8571A" style="flex:1;background:var(--g2);border:1.5px solid var(--sep2);border-radius:7px;padding:7px 10px;font-family:'Manrope',sans-serif;font-size:12px;font-weight:600;color:var(--white);outline:none;caret-color:var(--accent);" oninput="applyHex(this.value)">
+          <div id="hexPrev" style="width:22px;height:22px;border-radius:50%;background:var(--accent);flex-shrink:0;border:2px solid var(--sep2);"></div>
+        </div>
+      </div>
+    </div>
+    <div class="sh2" style="padding:10px 2px 8px;">Email Sending</div>
+    <div class="scard2">
+      <div class="srow2">
+        <div class="sico2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+        <div class="sbody"><div class="slbl">Resend API Key</div><div class="sslbl">Free · 3,000 emails/mo</div></div>
+        <input class="sinp2" id="resendKey" type="password" placeholder="re_xxxx" oninput="saveCfg()">
+      </div>
+      <div class="srow2">
+        <div class="sico2 n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div class="sbody"><div class="slbl">From Email</div></div>
+        <input class="sinp2" id="fromEmail" type="email" placeholder="you@domain.com" oninput="saveCfg()">
+      </div>
+      <div class="srow2">
+        <div class="sico2 n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <div class="sbody"><div class="slbl">From Name</div></div>
+        <input class="sinp2" id="fromName" placeholder="Shannon Craft" oninput="saveCfg()">
+      </div>
+    </div>
+    <button class="dbtn" onclick="if(confirm('Clear ALL data?')){Object.values(K).forEach(k=>localStorage.removeItem(k));location.reload();}" style="margin-bottom:8px;">Clear All Data</button>
+    <div style="text-align:center;font-size:11px;font-weight:500;color:var(--l3);padding:16px 0;">Shannon Craft Admin</div>
+  </div>
+</div>
+
+<!-- SHEETS -->
+<div class="overlay" id="addCS" onclick="cS('addCS',event)">
+  <div class="sheet"><div class="si">
+    <div class="shdl"></div><div class="sey">New Contact</div><div class="stit">Add to List</div>
+    <div class="fl">First Name</div><input class="fi" id="acF" placeholder="First name">
+    <div class="fl">Last Name</div><input class="fi" id="acL" placeholder="Last name">
+    <div class="fl">Email</div><input class="fi" id="acE" placeholder="email@example.com" type="email">
+    <div class="fl">Tags</div>
+    <div class="tpick" id="acTags">
+      <button class="to" data-t="buyer" onclick="togT(this)">Buyer</button>
+      <button class="to" data-t="lead" onclick="togT(this)">Lead</button>
+      <button class="to" data-t="vip" onclick="togT(this)">VIP</button>
+      <button class="to" data-t="youtube" onclick="togT(this)">YouTube</button>
+      <button class="to" data-t="newsletter" onclick="togT(this)">Newsletter</button>
+    </div>
+    <div class="fl">Source Note</div><input class="fi" id="acSrc" placeholder="e.g. YouTube lead magnet">
+    <button class="okbtn" onclick="saveC()">Add Contact</button>
+    <button class="cancelbtn" onclick="cS('addCS')">Cancel</button>
+  </div></div>
+</div>
+
+<div class="overlay" id="impS" onclick="cS('impS',event)">
+  <div class="sheet"><div class="si">
+    <div class="shdl"></div><div class="sey">Import</div><div class="stit">Import Contacts</div>
+    <div class="ssub2">Paste from Beacons, Mailchimp, or any source.</div>
+    <div class="fl">Paste emails or CSV</div>
+    <textarea class="fta" id="impPaste" rows="6" placeholder="email@example.com&#10;another@email.com&#10;&#10;CSV: first,last,email"></textarea>
+    <div class="fl">Tag all as</div>
+    <div class="tpick" id="impTags">
+      <button class="to sel" data-t="lead" onclick="togIT(this)">Lead</button>
+      <button class="to" data-t="buyer" onclick="togIT(this)">Buyer</button>
+      <button class="to" data-t="youtube" onclick="togIT(this)">YouTube</button>
+      <button class="to" data-t="newsletter" onclick="togIT(this)">Newsletter</button>
+    </div>
+    <div class="fl">Source Note</div><input class="fi" id="impSrc" placeholder="e.g. Beacons import">
+    <button class="okbtn" onclick="runImport()">Import</button>
+    <button class="cancelbtn" onclick="cS('impS')">Cancel</button>
+  </div></div>
+</div>
+
+<div class="overlay" id="cdS" onclick="cS('cdS',event)">
+  <div class="sheet"><div class="si" id="cdInner"></div></div>
+</div>
+
+<div class="overlay" id="newSS" onclick="cS('newSS',event)">
+  <div class="sheet"><div class="si">
+    <div class="shdl"></div><div class="sey">New Sequence</div><div class="stit">Create Sequence</div>
+    <div class="fl">Name</div><input class="fi" id="nsName" placeholder="e.g. Digital Product Welcome">
+    <div class="fl">Triggered By</div>
+    <select class="fsel" id="nsTrig">
+      <option value="any">Any Purchase</option>
+      <option value="digital">Digital Product</option>
+      <option value="physical">Physical Product</option>
+      <option value="course">Course / Membership</option>
+      <option value="lead">Lead Magnet Signup</option>
+    </select>
+    <button class="okbtn" onclick="createSQ()">Create Sequence</button>
+    <button class="cancelbtn" onclick="cS('newSS')">Cancel</button>
+  </div></div>
+</div>
+
+<div class="overlay" id="stepS" onclick="cS('stepS',event)">
+  <div class="sheet"><div class="si">
+    <div class="shdl"></div><div class="sey" id="stepEy">Add Email</div><div class="stit">Email Step</div>
+    <div class="fl">Type</div>
+    <div class="tpick" id="stepTypes">
+      <button class="to sel" data-st="welcome" onclick="pickST(this)">👋 Welcome</button>
+      <button class="to" data-st="delivery" onclick="pickST(this)">📦 Delivery</button>
+      <button class="to" data-st="followup" onclick="pickST(this)">💬 Follow-Up</button>
+      <button class="to" data-st="upsell" onclick="pickST(this)">🚀 Upsell</button>
+    </div>
+    <div class="fl">Send On</div>
+    <div class="tpick" id="stepDays">
+      <button class="to sel" data-d="0" onclick="pickSD(this)">Now</button>
+      <button class="to" data-d="1" onclick="pickSD(this)">Day 1</button>
+      <button class="to" data-d="2" onclick="pickSD(this)">Day 2</button>
+      <button class="to" data-d="3" onclick="pickSD(this)">Day 3</button>
+      <button class="to" data-d="5" onclick="pickSD(this)">Day 5</button>
+      <button class="to" data-d="7" onclick="pickSD(this)">Day 7</button>
+      <button class="to" data-d="14" onclick="pickSD(this)">Day 14</button>
+      <button class="to" data-d="30" onclick="pickSD(this)">Day 30</button>
+    </div>
+    <div class="fl">Subject</div>
+    <input class="fi" id="stepSub" placeholder="Your download is ready, {{first_name}}!">
+    <div class="fl">Merge Tags</div>
+    <div class="mrow">
+      <div class="mc" onclick="insMerge('{{first_name}}')">{{first_name}}</div>
+      <div class="mc" onclick="insMerge('{{product_name}}')">{{product_name}}</div>
+      <div class="mc" onclick="insMerge('{{download_link}}')">{{download_link}}</div>
+    </div>
+    <div class="fl">Body</div>
+    <div class="rbar">
+      <button class="rtb" onmousedown="event.preventDefault();document.execCommand('bold')"><b>B</b></button>
+      <button class="rtb" onmousedown="event.preventDefault();document.execCommand('italic')"><i>I</i></button>
+      <button class="rtb" onmousedown="event.preventDefault();document.execCommand('underline')"><u>U</u></button>
+    </div>
+    <div class="bcastbody" id="stepBody" contenteditable="true" style="min-height:100px;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--sep2)'"></div>
+    <button class="okbtn" style="margin-top:10px;" onclick="saveStep()">Save Email Step</button>
+    <button class="cancelbtn" onclick="cS('stepS')">Cancel</button>
+  </div></div>
+</div>
+
+<nav class="bnav">
+  <button class="nb on" id="nbC" onclick="sT('vC')">
+    <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg><span class="nbadge" id="cBadge" style="display:none;"></span></span>
+    <span class="nlbl">Contacts</span>
+  </button>
+  <button class="nb" id="nbSQ" onclick="sT('vSQ')">
+    <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+    <span class="nlbl">Sequences</span>
+  </button>
+  <button class="nb" id="nbET" onclick="sT('vET')">
+    <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>
+    <span class="nlbl">Email</span>
+  </button>
+  <button class="nb" id="nbST" onclick="sT('vST')">
+    <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span>
+    <span class="nlbl">Settings</span>
+  </button>
+</nav>
+
+<script>
+const K={CONTACTS:'sc_contacts_v1',SEQS:'sc_seqs_v1',SETTINGS:'sc_settings_v1',CFG:'sc_cfg_v1'};
+const COLORS=['#E8571A','#2563EB','#7C3AED','#16A34A','#DC2626','#0D9488','#DB2777','#D97706'];
+let cFilter='all',importTag='lead',expSeqs={},editSQId=null,editStepIdx=null,sType='welcome',sDay=0;
+
+function ld(k){try{return JSON.parse(localStorage.getItem(k)||'[]');}catch(e){return[];}}
+function sd(k,d){localStorage.setItem(k,JSON.stringify(d));}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function fmtD(iso){if(!iso)return'';return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
+let _tt;
+function showT(m){document.getElementById('tMsg').textContent=m;const t=document.getElementById('toast');t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),2400);}
+function oS(id){document.getElementById(id)?.classList.add('open');}
+function cS(id,e){if(!e||e.target===document.getElementById(id))document.getElementById(id)?.classList.remove('open');}
+
+function sT(id){
+  document.querySelectorAll('.vp').forEach(v=>v.style.display='none');
+  ['nbC','nbSQ','nbET','nbST'].forEach(n=>{const el=document.getElementById(n);if(el)el.classList.remove('on');});
+  document.getElementById(id).style.display='block';
+  const m={vC:'nbC',vSQ:'nbSQ',vET:'nbET',vST:'nbST'};
+  const nb=document.getElementById(m[id]);if(nb)nb.classList.add('on');
+  window.scrollTo(0,0);
+  if(id==='vC')rC();
+  if(id==='vSQ')rSQ();
+  if(id==='vST')renderSP();
+}
+
+function rC(){
+  const contacts=ld(K.CONTACTS);
+  const q=(document.getElementById('cSrch')?.value||'').toLowerCase();
+  let list=contacts;
+  if(cFilter==='unsubscribed')list=list.filter(c=>c.unsubscribed);
+  else if(cFilter!=='all')list=list.filter(c=>!c.unsubscribed&&c.tags?.includes(cFilter));
+  if(q)list=list.filter(c=>(c.firstName+' '+c.lastName+' '+c.email).toLowerCase().includes(q));
+  document.getElementById('cTot').textContent=contacts.length;
+  document.getElementById('cBuy').textContent=contacts.filter(c=>c.tags?.includes('buyer')).length;
+  document.getElementById('cLd').textContent=contacts.filter(c=>c.tags?.includes('lead')).length;
+  document.getElementById('cUs').textContent=contacts.filter(c=>c.unsubscribed).length;
+  const badge=document.getElementById('cBadge');
+  badge.style.display=contacts.length?'block':'none';badge.textContent=contacts.length;
+  const cont=document.getElementById('cList');
+  if(!list.length){cont.innerHTML=`<div class="es"><div class="ei"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div style="font-size:14px;font-weight:800;color:var(--white);margin-bottom:5px;">${cFilter==='all'&&!q?'No contacts yet':'No results'}</div><div style="font-size:12px;font-weight:500;color:var(--l3);">${cFilter==='all'&&!q?'Add or import to get started.':'Try a different filter.'}</div></div>`;return;}
+  const groups={};
+  list.forEach(c=>{const l=((c.firstName||c.email||'?')[0]).toUpperCase();if(!groups[l])groups[l]=[];groups[l].push(c);});
+  cont.innerHTML=Object.keys(groups).sort().map(letter=>`
+    <div style="font-size:9px;font-weight:800;color:var(--l3);text-transform:uppercase;letter-spacing:.8px;padding:10px 2px 4px;">${letter}</div>
+    <div class="card" style="margin:0 0 6px;">${groups[letter].map(c=>{
+      const init=((c.firstName||'')[0]||(c.email||'?')[0]).toUpperCase()+((c.lastName||'')[0]||'').toUpperCase();
+      const tag=c.tags?.[0]||'lead';
+      return`<div class="crow" onclick="openCD('${c.id}')">
+        <div class="cav">${init}</div>
+        <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;color:var(--white);">${esc(c.firstName||'')} ${esc(c.lastName||'')}</div><div style="font-size:11px;font-weight:500;color:var(--l3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(c.email)}</div></div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;"><div class="tb t${tag}">${tag}</div><div style="font-size:9px;font-weight:600;color:var(--l3);">${fmtD(c.addedAt)}</div></div>
+        ${c.unsubscribed?'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>':''}
+      </div>`;
+    }).join('')}</div>`).join('');
+}
+
+function sCF(f,btn){
+  cFilter=f;
+  document.querySelectorAll('.ftabs .ft').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');rC();
+}
+function togT(btn){btn.classList.toggle('sel');}
+function saveC(){
+  const first=document.getElementById('acF').value.trim();
+  const last=document.getElementById('acL').value.trim();
+  const email=document.getElementById('acE').value.trim().toLowerCase();
+  if(!email||!/\S+@\S+\.\S+/.test(email)){showT('Valid email required');return;}
+  const tags=[...document.querySelectorAll('#acTags .to.sel')].map(t=>t.dataset.t);
+  const source=document.getElementById('acSrc').value.trim();
+  const list=ld(K.CONTACTS);
+  if(list.find(c=>c.email===email)){showT('Email already exists');return;}
+  list.unshift({id:uid(),firstName:first,lastName:last,email,tags:tags.length?tags:['lead'],source,addedAt:new Date().toISOString(),unsubscribed:false});
+  sd(K.CONTACTS,list);cS('addCS');
+  ['acF','acL','acE','acSrc'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.querySelectorAll('#acTags .to').forEach(t=>t.classList.remove('sel'));
+  rC();showT('Contact added');
+}
+function openCD(id){
+  const c=ld(K.CONTACTS).find(x=>x.id===id);if(!c)return;
+  const init=((c.firstName||'')[0]||'?').toUpperCase()+((c.lastName||'')[0]||'').toUpperCase();
+  document.getElementById('cdInner').innerHTML=`
+    <div class="shdl"></div>
+    <div style="width:50px;height:50px;border-radius:50%;background:var(--as);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--accent);margin:0 auto 10px;">${init}</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;text-align:center;margin-bottom:2px;">${esc(c.firstName||'')} ${esc(c.lastName||'')}</div>
+    <div style="font-size:12px;font-weight:500;color:var(--l3);text-align:center;margin-bottom:12px;">${esc(c.email)}</div>
+    <div style="display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;">${(c.tags||[]).map(t=>`<div class="tb t${t}">${t}</div>`).join('')}${c.unsubscribed?'<div class="tb" style="background:var(--rs);color:var(--red);border:1px solid rgba(220,38,38,.25);">Unsubscribed</div>':''}</div>
+    <div style="background:var(--bg);border-radius:var(--r-md);padding:12px 14px;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--sep);"><span style="font-size:10px;font-weight:700;color:var(--l3);text-transform:uppercase;">Source</span><span style="font-size:12px;font-weight:600;color:var(--white);">${esc(c.source||'Manual')}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--sep);"><span style="font-size:10px;font-weight:700;color:var(--l3);text-transform:uppercase;">Added</span><span style="font-size:12px;font-weight:600;color:var(--white);">${fmtD(c.addedAt)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:7px 0;"><span style="font-size:10px;font-weight:700;color:var(--l3);text-transform:uppercase;">Status</span><span style="font-size:12px;font-weight:600;color:${c.unsubscribed?'var(--red)':'var(--green)'};">${c.unsubscribed?'Unsubscribed':'Subscribed'}</span></div>
+    </div>
+    ${!c.unsubscribed?`<button class="okbtn" style="background:var(--g2);color:var(--l2);border:1px solid var(--sep2);" onclick="unsubC('${c.id}')">Mark Unsubscribed</button>`:`<button class="okbtn" style="background:var(--green);" onclick="resubC('${c.id}')">Re-subscribe</button>`}
+    <button style="width:100%;background:transparent;color:var(--red);border:1px solid rgba(220,38,38,.25);border-radius:var(--r-md);padding:12px;font-size:13px;font-weight:700;font-family:'Manrope',sans-serif;cursor:pointer;margin-top:8px;" onclick="delC('${c.id}')">Delete</button>
+    <button class="cancelbtn" onclick="cS('cdS')">Close</button>`;
+  oS('cdS');
+}
+function unsubC(id){const l=ld(K.CONTACTS);const c=l.find(x=>x.id===id);if(c)c.unsubscribed=true;sd(K.CONTACTS,l);cS('cdS');rC();showT('Unsubscribed');}
+function resubC(id){const l=ld(K.CONTACTS);const c=l.find(x=>x.id===id);if(c)c.unsubscribed=false;sd(K.CONTACTS,l);cS('cdS');rC();showT('Re-subscribed');}
+function delC(id){sd(K.CONTACTS,ld(K.CONTACTS).filter(x=>x.id!==id));cS('cdS');rC();showT('Deleted');}
+
+function togIT(btn){document.querySelectorAll('#impTags .to').forEach(t=>t.classList.remove('sel'));btn.classList.add('sel');importTag=btn.dataset.t;}
+function runImport(){
+  const raw=document.getElementById('impPaste').value.trim();
+  if(!raw){showT('Paste emails first');return;}
+  const source=document.getElementById('impSrc').value.trim()||'Import';
+  const lines=raw.split('\n').map(l=>l.trim()).filter(Boolean);
+  const existing=ld(K.CONTACTS);const emails=new Set(existing.map(c=>c.email));
+  let added=0,skipped=0;
+  lines.forEach(line=>{
+    let email='',first='',last='';
+    if(line.includes(',')){const p=line.split(',').map(x=>x.trim().replace(/"/g,''));if(p.length>=3){first=p[0];last=p[1];email=p[2];}else if(p.length===2){if(p[0].includes('@')){email=p[0];first=p[1];}else{first=p[0];email=p[1];}}else email=p[0];}
+    else if(line.includes('@'))email=line.toLowerCase();
+    if(!email||!email.includes('@')){skipped++;return;}
+    if(emails.has(email)){skipped++;return;}
+    existing.unshift({id:uid(),firstName:first,lastName:last,email,tags:[importTag],source,addedAt:new Date().toISOString(),unsubscribed:false});
+    emails.add(email);added++;
+  });
+  sd(K.CONTACTS,existing);cS('impS');
+  document.getElementById('impPaste').value='';
+  rC();showT(`${added} imported, ${skipped} skipped`);
+}
+
+function rSQ(){
+  const seqs=ld(K.SEQS);
+  document.getElementById('sqCnt').textContent=seqs.length;
+  document.getElementById('sqEm').textContent=seqs.reduce((a,s)=>a+s.steps.length,0);
+  document.getElementById('sqAc').textContent=seqs.filter(s=>s.active).length;
+  const cont=document.getElementById('sqList');
+  if(!seqs.length){cont.innerHTML=`<div class="es" style="padding:0 16px;"><div class="ei"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div style="font-size:14px;font-weight:800;color:var(--white);margin-bottom:5px;">No sequences yet</div><div style="font-size:12px;font-weight:500;color:var(--l3);">Create one to automate emails.</div></div>`;return;}
+  cont.innerHTML=seqs.map(sq=>{
+    const open=expSeqs[sq.id]!==false;
+    return`<div class="sqcard">
+      <div class="sqhdr" onclick="expSeqs['${sq.id}']=expSeqs['${sq.id}']===false?true:false;rSQ()">
+        <div class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;color:var(--white);">${esc(sq.name)}</div><div style="font-size:11px;font-weight:500;color:var(--l3);margin-top:1px;">${sq.steps.length} email${sq.steps.length!==1?'s':''}</div></div>
+        <div class="sqb ${sq.active?'sq-on':'sq-off'}">${sq.active?'Active':'Draft'}</div>
+        <svg style="color:var(--l3);transform:${open?'rotate(90deg)':'none'}" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      ${open?`<div style="padding:0 14px 14px;">
+        <div style="font-size:9px;font-weight:700;color:var(--l3);text-transform:uppercase;margin:10px 0 8px;">Trigger: ${esc(sq.trigger||'any')}</div>
+        ${sq.steps.map((s,i)=>`<div class="stpc" onclick="openStep('${sq.id}',${i})">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+            <div class="sday${s.day===0?' d0':''}">${s.day===0?'Now':'Day '+s.day}</div>
+            <div style="font-size:9px;font-weight:800;color:var(--l3);flex:1;">${s.type}</div>
+            <button onclick="event.stopPropagation();mvStep('${sq.id}',${i},-1)" style="width:21px;height:21px;border-radius:5px;background:var(--g3);border:none;cursor:pointer;color:var(--l2);font-size:11px;">↑</button>
+            <button onclick="event.stopPropagation();mvStep('${sq.id}',${i},1)" style="width:21px;height:21px;border-radius:5px;background:var(--g3);border:none;cursor:pointer;color:var(--l2);font-size:11px;">↓</button>
+            <button onclick="event.stopPropagation();dlStep('${sq.id}',${i})" style="width:21px;height:21px;border-radius:5px;background:var(--g3);border:none;cursor:pointer;color:var(--l3);">✕</button>
+          </div>
+          <div style="font-size:12px;font-weight:700;color:var(--white);">${esc(s.subject||'No subject')}</div>
+        </div>`).join('')}
+        <button class="addstp" onclick="openStep('${sq.id}',null)">+ Add Email Step</button>
+        <div style="display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--sep);">
+          <button style="flex:1;height:30px;border-radius:var(--r-sm);border:1.5px solid var(--sep2);background:transparent;font-family:'Manrope',sans-serif;font-size:11px;font-weight:800;color:var(--l2);cursor:pointer;" onclick="togSQA('${sq.id}')">${sq.active?'Pause':'Activate'}</button>
+          <button style="flex:1;height:30px;border-radius:var(--r-sm);border:1.5px solid var(--sep2);background:transparent;font-family:'Manrope',sans-serif;font-size:11px;font-weight:800;color:var(--l2);cursor:pointer;" onclick="dupSQ('${sq.id}')">Duplicate</button>
+        </div>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+function createSQ(){const name=document.getElementById('nsName').value.trim();if(!name){showT('Enter a name');return;}const trig=document.getElementById('nsTrig').value;const seqs=ld(K.SEQS);seqs.push({id:uid(),name,trigger:trig,active:false,steps:[]});sd(K.SEQS,seqs);cS('newSS');document.getElementById('nsName').value='';rSQ();showT('Created');}
+function togSQA(id){const seqs=ld(K.SEQS);const s=seqs.find(x=>x.id===id);if(!s)return;if(!s.steps.length&&!s.active){showT('Add at least one email first');return;}s.active=!s.active;sd(K.SEQS,seqs);rSQ();showT(s.active?'Activated':'Paused');}
+function dupSQ(id){const seqs=ld(K.SEQS);const orig=seqs.find(x=>x.id===id);if(!orig)return;const copy=JSON.parse(JSON.stringify(orig));copy.id=uid();copy.name=copy.name+' (Copy)';copy.active=false;seqs.push(copy);sd(K.SEQS,seqs);rSQ();showT('Duplicated');}
+function mvStep(sqId,idx,dir){const seqs=ld(K.SEQS);const s=seqs.find(x=>x.id===sqId);if(!s)return;const ni=idx+dir;if(ni<0||ni>=s.steps.length)return;[s.steps[idx],s.steps[ni]]=[s.steps[ni],s.steps[idx]];sd(K.SEQS,seqs);rSQ();}
+function dlStep(sqId,idx){const seqs=ld(K.SEQS);const s=seqs.find(x=>x.id===sqId);if(!s)return;s.steps.splice(idx,1);sd(K.SEQS,seqs);rSQ();showT('Removed');}
+function openStep(sqId,stepIdx){
+  editSQId=sqId;editStepIdx=stepIdx;
+  document.getElementById('stepEy').textContent=stepIdx!==null?'Edit Email':'Add Email';
+  sType='welcome';sDay=0;
+  if(stepIdx!==null){const sq=ld(K.SEQS).find(x=>x.id===sqId);const step=sq?.steps[stepIdx];if(step){sType=step.type;sDay=step.day;document.getElementById('stepSub').value=step.subject||'';document.getElementById('stepBody').innerHTML=step.body||'';document.querySelectorAll('#stepTypes .to').forEach(b=>b.classList.toggle('sel',b.dataset.st===step.type));document.querySelectorAll('#stepDays .to').forEach(b=>b.classList.toggle('sel',parseInt(b.dataset.d)===step.day));}}
+  else{document.getElementById('stepSub').value='';document.getElementById('stepBody').innerHTML='';document.querySelectorAll('#stepTypes .to').forEach((b,i)=>b.classList.toggle('sel',i===0));document.querySelectorAll('#stepDays .to').forEach((b,i)=>b.classList.toggle('sel',i===0));}
+  oS('stepS');
+}
+function pickST(btn){document.querySelectorAll('#stepTypes .to').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');sType=btn.dataset.st;}
+function pickSD(btn){document.querySelectorAll('#stepDays .to').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');sDay=parseInt(btn.dataset.d);}
+function insMerge(tag){const inp=document.getElementById('stepSub');if(!inp)return;const s=inp.selectionStart,e=inp.selectionEnd;inp.value=inp.value.slice(0,s)+tag+inp.value.slice(e);inp.selectionStart=inp.selectionEnd=s+tag.length;inp.focus();}
+function saveStep(){
+  const subject=document.getElementById('stepSub').value.trim();
+  const body=document.getElementById('stepBody').innerHTML.trim();
+  if(!subject){showT('Subject required');return;}
+  const seqs=ld(K.SEQS);const sq=seqs.find(x=>x.id===editSQId);if(!sq)return;
+  const step={id:uid(),type:sType,day:sDay,subject,body};
+  if(editStepIdx!==null)sq.steps[editStepIdx]=step;
+  else{sq.steps.push(step);sq.steps.sort((a,b)=>a.day-b.day);}
+  sd(K.SEQS,seqs);cS('stepS');rSQ();showT(editStepIdx!==null?'Updated':'Added');
+}
+
+function loadST(){try{return JSON.parse(localStorage.getItem(K.SETTINGS)||'{}');}catch(e){return{};}}
+function applySettings(){
+  const s=loadST();
+  const accent=s.accent||'#E8571A';
+  const r=parseInt(accent.slice(1,3),16),g=parseInt(accent.slice(3,5),16),b=parseInt(accent.slice(5,7),16);
+  document.documentElement.style.setProperty('--accent',accent);
+  document.documentElement.style.setProperty('--as',`rgba(${r},${g},${b},.13)`);
+  document.documentElement.style.setProperty('--ab',`rgba(${r},${g},${b},.28)`);
+  if(s.lightMode){[['--bg','#f5f5f5'],['--g1','#fff'],['--g2','#ebebeb'],['--g3','#d0d0d0'],['--sep','rgba(0,0,0,.07)'],['--sep2','rgba(0,0,0,.11)'],['--white','#0a0a0a'],['--l1','rgba(0,0,0,.85)'],['--l2','rgba(0,0,0,.55)'],['--l3','rgba(0,0,0,.35)'],['--l4','rgba(0,0,0,.18)']].forEach(([k,v])=>document.documentElement.style.setProperty(k,v));}
+  else{[['--bg','#000'],['--g1','#161616'],['--g2','#242424'],['--g3','#333'],['--sep','rgba(255,255,255,.07)'],['--sep2','rgba(255,255,255,.11)'],['--white','#fff'],['--l1','rgba(255,255,255,.85)'],['--l2','rgba(255,255,255,.5)'],['--l3','rgba(255,255,255,.28)'],['--l4','rgba(255,255,255,.13)']].forEach(([k,v])=>document.documentElement.style.setProperty(k,v));}
+}
+function renderSP(){
+  const s=loadST();
+  const tog=document.getElementById('lightTog');if(tog)tog.className='tog'+(s.lightMode?' on':'');
+  const sw=document.getElementById('accentSw');
+  if(sw)sw.innerHTML=COLORS.map(c=>`<div class="sw${(s.accent||'#E8571A')===c?' sel':''}" style="background:${c};" onclick="setAccent('${c}')"></div>`).join('');
+  const hi=document.getElementById('hexIn'),hp=document.getElementById('hexPrev');
+  if(hi)hi.value=s.accent||'#E8571A';if(hp)hp.style.background=s.accent||'#E8571A';
+  const cfg=JSON.parse(localStorage.getItem(K.CFG)||'{}');
+  const rk=document.getElementById('resendKey'),fe=document.getElementById('fromEmail'),fn=document.getElementById('fromName');
+  if(rk)rk.value=cfg.resendKey||'';if(fe)fe.value=cfg.fromEmail||'';if(fn)fn.value=cfg.fromName||'';
+}
+function saveCfg(){const c={resendKey:document.getElementById('resendKey')?.value||'',fromEmail:document.getElementById('fromEmail')?.value||'',fromName:document.getElementById('fromName')?.value||''};localStorage.setItem(K.CFG,JSON.stringify(c));}
+function togLight(){const s=loadST();s.lightMode=!s.lightMode;localStorage.setItem(K.SETTINGS,JSON.stringify(s));applySettings();renderSP();showT(s.lightMode?'Light mode on':'Dark mode on');}
+function setAccent(hex){const s=loadST();s.accent=hex;localStorage.setItem(K.SETTINGS,JSON.stringify(s));applySettings();renderSP();showT('Color updated');}
+function applyHex(val){if(!val)return;const hex=val.startsWith('#')?val:'#'+val;if(!/^#[0-9A-Fa-f]{6}$/.test(hex))return;document.getElementById('hexPrev').style.background=hex;setAccent(hex);}
+
+function init(){
+  applySettings();
+  if(!ld(K.CONTACTS).length){
+    sd(K.CONTACTS,[
+      {id:uid(),firstName:'Example',lastName:'Buyer',email:'buyer@example.com',tags:['buyer'],source:'Digital Product',addedAt:new Date().toISOString(),unsubscribed:false},
+      {id:uid(),firstName:'YouTube',lastName:'Lead',email:'ytlead@example.com',tags:['lead','youtube'],source:'YouTube Lead Magnet',addedAt:new Date().toISOString(),unsubscribed:false},
+    ]);
+  }
+  if(!ld(K.SEQS).length){
+    sd(K.SEQS,[{id:uid(),name:'Digital Product Welcome',trigger:'digital',active:false,steps:[
+      {id:uid(),type:'delivery',day:0,subject:'Your download is ready, {{first_name}}! 🎉',body:'<p>Hey {{first_name}},</p><p>Here\'s your download: <strong>{{download_link}}</strong></p><p>Shannon</p>'},
+      {id:uid(),type:'followup',day:2,subject:'How are you getting on, {{first_name}}?',body:'<p>Hey {{first_name}}! Just checking in. Shannon</p>'},
+    ]}]);
+  }
+  sT('vC');
+}
+init();
+</script>
+</body>
+</html>

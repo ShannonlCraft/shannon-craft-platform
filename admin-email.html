@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#000000">
+<title>Email Studio · Shannon Craft</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#000;--g1:#161616;--g2:#242424;--g3:#333;--g4:#444;
+  --sep:rgba(255,255,255,0.07);--sep2:rgba(255,255,255,0.11);
+  --accent:#E8571A;--as:rgba(232,87,26,0.13);--ab:rgba(232,87,26,0.28);
+  --white:#fff;--l1:rgba(255,255,255,0.85);--l2:rgba(255,255,255,0.5);
+  --l3:rgba(255,255,255,0.28);--l4:rgba(255,255,255,0.13);
+  --green:#16A34A;--gs:rgba(22,163,74,0.13);--gb:rgba(22,163,74,0.25);
+  --r-lg:16px;--r-md:12px;--r-sm:8px;
+}
+html,body{min-height:100%;overflow-x:hidden;background:var(--bg);color:var(--white);font-family:'Manrope',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+body{max-width:430px;margin:0 auto;padding-bottom:80px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes popIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--g2);border:1px solid var(--sep2);color:var(--white);border-radius:12px;padding:10px 16px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;white-space:nowrap;box-shadow:0 8px 40px rgba(0,0,0,.8);transition:transform .3s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:center;gap:8px;}
+.td{width:5px;height:5px;background:var(--accent);border-radius:50%;flex-shrink:0;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+.hdr{padding:52px 18px 14px;border-bottom:1px solid var(--sep);position:sticky;top:0;z-index:20;background:rgba(0,0,0,.96);backdrop-filter:blur(20px);}
+.htop{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
+.htit{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1.5px;line-height:1;}
+.htit em{color:var(--accent);font-style:normal;}
+.hsub{font-size:11px;font-weight:600;color:var(--l3);margin-top:2px;}
+.hacts{display:flex;gap:6px;flex-shrink:0;}
+.hbtn{display:flex;align-items:center;gap:5px;border:none;border-radius:10px;padding:8px 12px;font-size:11px;font-weight:800;font-family:'Manrope',sans-serif;cursor:pointer;transition:opacity .15s;white-space:nowrap;}
+.hbtn:active{opacity:.8;}
+.hbtn.p{background:var(--accent);color:#fff;}
+.hbtn.s{background:var(--g1);color:var(--l2);border:1px solid var(--sep2);}
+.hbtn svg{width:11px;height:11px;}
+.srow{display:flex;gap:6px;}
+.sp{flex:1;background:var(--g1);border-radius:10px;padding:9px 10px;border:1px solid var(--sep);}
+.sn{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--accent);letter-spacing:1px;line-height:1;}
+.sl{font-size:9px;font-weight:700;color:var(--l3);text-transform:uppercase;letter-spacing:.5px;margin-top:1px;}
+.sh2{font-size:10px;font-weight:700;color:var(--l3);letter-spacing:.8px;text-transform:uppercase;padding:14px 18px 8px;display:flex;align-items:center;justify-content:space-between;}
+.sha{font-size:11px;font-weight:700;color:var(--accent);cursor:pointer;text-transform:none;letter-spacing:0;}
+.vp{display:none;}
+
+/* PALETTE */
+.pal-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px 8px;}
+.pi{background:var(--g1);border-radius:var(--r-md);padding:11px 12px;display:flex;align-items:center;gap:9px;cursor:pointer;border:1px solid var(--sep);transition:all .15s;}
+.pi:active{background:var(--as);border-color:var(--ab);}
+.pico{width:30px;height:30px;border-radius:8px;background:var(--as);border:1px solid var(--ab);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent);}
+.pico svg{width:13px;height:13px;}
+.pico.gr{background:var(--gs);border-color:var(--gb);color:var(--green);}
+.pl{font-size:11px;font-weight:700;color:var(--white);}
+.ps{font-size:9px;font-weight:500;color:var(--l3);}
+
+/* CANVAS */
+.ce{background:var(--g1);border-radius:var(--r-lg);border:2px dashed var(--sep2);padding:28px 20px;text-align:center;margin:0 16px 8px;}
+.eb{background:var(--g1);border-radius:var(--r-lg);border:1.5px solid var(--sep);margin:0 16px 8px;overflow:hidden;animation:fadeUp .2s ease both;}
+.eb.dov{border-color:var(--ab);}
+.etb{display:flex;align-items:center;gap:6px;padding:9px 12px;border-bottom:1px solid var(--sep);background:var(--g2);}
+.ety{font-size:10px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;flex:1;}
+.ea{width:24px;height:24px;border-radius:6px;background:transparent;border:1px solid var(--sep2);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--l3);transition:all .15s;}
+.ea:active{background:var(--as);color:var(--accent);border-color:var(--ab);}
+.ea svg{width:10px;height:10px;}
+.ec{padding:12px;}
+.mi{background:var(--bg);border:1.5px solid var(--sep2);border-radius:var(--r-sm);padding:9px 11px;font-family:'Manrope',sans-serif;font-size:13px;font-weight:500;color:var(--white);outline:none;caret-color:var(--accent);transition:border-color .2s;width:100%;margin-bottom:7px;}
+.mi:focus{border-color:var(--accent);}
+.mi::placeholder{color:var(--l4);}
+.rbar{display:flex;gap:3px;background:var(--g2);border-radius:var(--r-sm) var(--r-sm) 0 0;padding:6px 8px;flex-wrap:wrap;border:1.5px solid var(--sep2);border-bottom:none;}
+.rtb{height:23px;padding:0 7px;border-radius:5px;background:transparent;border:none;cursor:pointer;font-family:'Manrope',sans-serif;font-size:11px;font-weight:700;color:var(--l2);transition:all .15s;}
+.rtb:active{background:var(--as);color:var(--accent);}
+.editable{background:var(--bg);border:1.5px solid var(--sep2);border-top:none;border-radius:0 0 var(--r-sm) var(--r-sm);padding:11px;font-family:'Manrope',sans-serif;font-size:13px;color:var(--white);outline:none;min-height:72px;line-height:1.7;caret-color:var(--accent);}
+.editable:focus{border-color:var(--accent);}
+.mrow{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;}
+.mc{height:20px;padding:0 7px;border-radius:5px;background:var(--g2);border:1px solid var(--sep2);font-size:9px;font-weight:700;color:var(--accent);cursor:pointer;display:flex;align-items:center;}
+.mc:active{background:var(--as);}
+.csr{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;align-items:center;}
+.csw{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s;flex-shrink:0;}
+.csw.sel{border-color:#fff;transform:scale(1.2);}
+.bpv{display:flex;justify-content:center;padding:4px 0 8px;}
+.cta{padding:12px 24px;border-radius:9px;font-family:'Manrope',sans-serif;font-size:13px;font-weight:800;cursor:pointer;border:none;display:inline-block;}
+.to{height:26px;padding:0 10px;border-radius:20px;background:var(--g2);border:1.5px solid var(--sep2);font-family:'Manrope',sans-serif;font-size:10px;font-weight:700;color:var(--l3);cursor:pointer;transition:all .15s;}
+.to.sel{background:var(--as);border-color:var(--ab);color:var(--accent);}
+.iph{width:100%;height:90px;background:var(--g2);border-radius:var(--r-sm);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border:2px dashed var(--sep2);margin-bottom:7px;cursor:pointer;}
+.iph svg{width:20px;height:20px;color:var(--l3);}
+
+/* ASSETS */
+.uz{margin:0 16px 8px;background:var(--g1);border:2px dashed var(--sep2);border-radius:var(--r-lg);padding:22px 20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.uz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.uz.dra{border-color:var(--ab);background:var(--as);}
+.ag{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px 8px;}
+.ac{background:var(--g1);border-radius:var(--r-lg);overflow:hidden;border:1.5px solid var(--sep);cursor:pointer;animation:fadeUp .2s ease both;transition:all .15s;}
+.ac:active{transform:scale(.97);}
+.ac.sel{border-color:var(--accent);box-shadow:0 0 0 3px var(--as);}
+.at{width:100%;aspect-ratio:1;background:var(--g2);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.at img{width:100%;height:100%;object-fit:contain;padding:8px;}
+.at.li{background:#fff;}
+.ain{padding:9px 10px 10px;}
+.an{font-size:11px;font-weight:700;color:var(--white);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.am{font-size:9px;font-weight:500;color:var(--l3);}
+.aab{position:fixed;bottom:82px;left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:398px;background:var(--g1);border:1.5px solid var(--ab);border-radius:var(--r-lg);padding:11px 14px;display:flex;align-items:center;gap:8px;z-index:50;box-shadow:0 8px 40px rgba(0,0,0,.8);animation:popIn .2s ease;}
+.aab.hidden{display:none;}
+.aan{flex:1;font-size:12px;font-weight:700;color:var(--white);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.abt{display:flex;align-items:center;gap:4px;height:32px;padding:0 10px;border-radius:var(--r-sm);border:none;font-family:'Manrope',sans-serif;font-size:11px;font-weight:800;cursor:pointer;flex-shrink:0;}
+.abt svg{width:10px;height:10px;}
+.abt.cp{background:var(--g2);color:var(--l2);border:1px solid var(--sep2);}
+.abt.us{background:var(--accent);color:#fff;}
+.abt.dl{background:transparent;color:var(--l3);border:1px solid var(--sep2);}
+.ftabs{display:flex;gap:5px;padding:0 16px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-bottom:4px;}
+.ftabs::-webkit-scrollbar{display:none;}
+.ft{height:25px;padding:0 10px;border-radius:20px;background:var(--g1);border:1px solid var(--sep2);font-size:10px;font-weight:700;color:var(--l3);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;}
+.ft.on{background:var(--as);border-color:var(--ab);color:var(--accent);}
+
+/* BROADCAST */
+.bcastbody{background:var(--bg);border:1.5px solid var(--sep2);border-top:none;border-radius:0 0 var(--r-md) var(--r-md);padding:12px;font-family:'Manrope',sans-serif;font-size:13px;color:var(--white);outline:none;min-height:130px;line-height:1.7;caret-color:var(--accent);}
+.bcastbody:focus{border-color:var(--accent);}
+
+/* SAVED EMAILS */
+.crow{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid var(--sep);cursor:pointer;transition:background .12s;}
+.crow:last-child{border-bottom:none;}
+.crow:active{background:var(--g2);}
+.ri{width:32px;height:32px;border-radius:9px;background:var(--as);border:1px solid var(--ab);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent);}
+.ri svg{width:14px;height:14px;}
+.rb{flex:1;min-width:0;}
+.rt{font-size:13px;font-weight:700;color:var(--white);}
+.rs{font-size:11px;font-weight:500;color:var(--l3);margin-top:2px;}
+
+/* OVERLAY */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.86);z-index:400;align-items:flex-end;backdrop-filter:blur(8px);}
+.overlay.open{display:flex;}
+.sheet{background:var(--g1);border-radius:24px 24px 0 0;width:100%;max-height:93vh;overflow-y:auto;-webkit-overflow-scrolling:touch;animation:slideUp .3s cubic-bezier(.34,1.56,.64,1);}
+.si{padding:20px 20px env(safe-area-inset-bottom,28px);}
+.shdl{width:36px;height:4px;background:var(--g3);border-radius:2px;margin:0 auto 18px;}
+.stit{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;color:var(--white);line-height:1;margin-bottom:4px;}
+.ssub{font-size:12px;font-weight:500;color:var(--l3);margin-bottom:14px;line-height:1.5;}
+.okbtn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--r-md);padding:14px;font-size:14px;font-weight:800;font-family:'Manrope',sans-serif;cursor:pointer;transition:opacity .15s,transform .12s;margin-top:6px;}
+.okbtn:active{opacity:.85;transform:scale(.98);}
+.cancelbtn{width:100%;background:transparent;color:var(--l3);border:none;font-size:12px;font-weight:600;font-family:'Manrope',sans-serif;cursor:pointer;padding:10px;margin-top:3px;}
+
+/* EMPTY */
+.es{text-align:center;padding:32px 20px;}
+.ei{width:42px;height:42px;border-radius:12px;background:var(--g1);border:1px solid var(--sep2);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;}
+.ei svg{width:19px;height:19px;color:var(--l3);}
+
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(6,6,6,.97);border-top:1px solid rgba(255,255,255,.1);backdrop-filter:blur(24px);display:flex;align-items:flex-end;padding:6px 0 env(safe-area-inset-bottom,12px);z-index:100;}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;background:none;border:none;cursor:pointer;font-family:'Manrope',sans-serif;color:rgba(255,255,255,.3);transition:color .15s;}
+.nb.on{color:var(--accent);}
+.nb:active{opacity:.7;}
+.ni{width:22px;height:22px;display:flex;align-items:center;justify-content:center;}
+.nlbl{font-size:8px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"><div class="td"></div><span id="tMsg"></span></div>
+
+<!-- BUILDER VIEW -->
+<div id="vB" class="vp">
+  <div class="hdr">
+    <div class="htop">
+      <div><div class="htit">Email <em>Builder</em></div><div class="hsub" id="bSub">New email</div></div>
+      <div class="hacts">
+        <button class="hbtn s" onclick="oPv()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Preview</button>
+        <button class="hbtn p" onclick="saveEm()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save</button>
+      </div>
+    </div>
+    <div id="subRow" style="background:var(--g1);border-radius:var(--r-md);padding:0 12px;display:flex;align-items:center;gap:8px;height:44px;border:1.5px solid transparent;transition:border-color .2s;">
+      <span style="font-size:9px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;flex-shrink:0;">Subject</span>
+      <input style="flex:1;border:none;outline:none;font-family:'Manrope',sans-serif;font-size:13px;font-weight:600;color:var(--white);background:transparent;caret-color:var(--accent);" id="ebSub" placeholder="Subject line…" onfocus="document.getElementById('subRow').style.borderColor='var(--accent)'" onblur="document.getElementById('subRow').style.borderColor='transparent'">
+    </div>
+  </div>
+  <div class="sh2">Add Blocks <span class="sha" onclick="sT('vSaved')">Saved Emails →</span></div>
+  <div class="pal-grid">
+    <div class="pi" onclick="aBlk('logo')"><div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg></div><div><div class="pl">Logo</div><div class="ps">Brand header</div></div></div>
+    <div class="pi" onclick="aBlk('text')"><div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg></div><div><div class="pl">Text</div><div class="ps">Paragraphs</div></div></div>
+    <div class="pi" onclick="aBlk('image')"><div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div><div class="pl">Image</div><div class="ps">Upload or URL</div></div></div>
+    <div class="pi" onclick="aBlk('button')"><div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="8" width="20" height="8" rx="4"/></svg></div><div><div class="pl">Button</div><div class="ps">Call to action</div></div></div>
+    <div class="pi" onclick="aBlk('divider')"><div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"/></svg></div><div><div class="pl">Divider</div><div class="ps">Line / space</div></div></div>
+    <div class="pi" onclick="aBlk('social')"><div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div><div><div class="pl">Socials</div><div class="ps">Icon footer</div></div></div>
+    <div class="pi" onclick="aBlk('testimonial')"><div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><div><div class="pl">Testimonial</div><div class="ps">Quote block</div></div></div>
+    <div class="pi" onclick="aBlk('banner')"><div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div><div class="pl">Banner</div><div class="ps">Promo block</div></div></div>
+    <div class="pi" onclick="pickAsset()"><div class="pico gr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div><div class="pl" style="color:var(--green);">From Library</div><div class="ps">Use saved asset</div></div></div>
+  </div>
+  <div class="sh2">Canvas <span id="blkCount" style="color:var(--accent);font-size:11px;font-weight:800;text-transform:none;letter-spacing:0;"></span></div>
+  <div id="canvas">
+    <div class="ce" id="canvasEmpty">
+      <div style="font-size:13px;font-weight:700;color:var(--l2);margin-bottom:4px;">Your email is empty</div>
+      <div style="font-size:11px;font-weight:500;color:var(--l3);line-height:1.6;">Tap any block above to add it.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SAVED VIEW -->
+<div id="vSaved" class="vp">
+  <div class="hdr">
+    <div class="htop">
+      <div><div class="htit">Saved <em>Emails</em></div><div class="hsub">Your templates</div></div>
+      <button class="hbtn p" onclick="newEm();sT('vB')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> New</button>
+    </div>
+  </div>
+  <div id="savedList" style="padding:8px 16px 0;"></div>
+</div>
+
+<!-- ASSETS VIEW -->
+<div id="vA" class="vp">
+  <div class="hdr">
+    <div class="htop">
+      <div><div class="htit">Brand <em>Assets</em></div><div class="hsub">Logos &amp; images</div></div>
+      <button class="hbtn p" onclick="document.getElementById('aFileIn').click()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Upload</button>
+    </div>
+    <div class="srow">
+      <div class="sp"><div class="sn" id="aTot">0</div><div class="sl">Total</div></div>
+      <div class="sp"><div class="sn" id="aLogo">0</div><div class="sl">Logos</div></div>
+      <div class="sp"><div class="sn" id="aSize">0KB</div><div class="sl">Storage</div></div>
+    </div>
+  </div>
+  <input type="file" id="aFileIn" multiple accept="image/*" style="display:none" onchange="handleUpload(this)">
+  <div class="uz" id="uploadZone">
+    <input type="file" multiple accept="image/*" onchange="handleUpload(this)">
+    <div style="font-size:28px;margin-bottom:8px;">🖼️</div>
+    <div style="font-size:14px;font-weight:800;color:var(--white);margin-bottom:4px;">Upload or Drag &amp; Drop</div>
+    <div style="font-size:11px;font-weight:500;color:var(--l3);line-height:1.6;">PNG · JPG · SVG · GIF · WEBP<br>Drop files here or tap to browse</div>
+  </div>
+  <div class="ftabs" id="aFT" style="margin-top:6px;">
+    <button class="ft on" data-ac="all" onclick="setAF('all',this)">All</button>
+    <button class="ft" data-ac="logo" onclick="setAF('logo',this)">Logos</button>
+    <button class="ft" data-ac="header" onclick="setAF('header',this)">Headers</button>
+    <button class="ft" data-ac="product" onclick="setAF('product',this)">Products</button>
+    <button class="ft" data-ac="photo" onclick="setAF('photo',this)">Photos</button>
+    <button class="ft" data-ac="other" onclick="setAF('other',this)">Other</button>
+  </div>
+  <div class="ag" id="assetGrid" style="padding-top:8px;"></div>
+  <div class="aab hidden" id="assetBar">
+    <div class="aan" id="aBarName">asset.png</div>
+    <button class="abt cp" onclick="copyAsset()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy</button>
+    <button class="abt us" onclick="useAsset()">Use in Email</button>
+    <button class="abt dl" onclick="delAsset()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg></button>
+  </div>
+</div>
+
+<!-- BROADCAST VIEW -->
+<div id="vBR" class="vp">
+  <div class="hdr">
+    <div class="htop">
+      <div><div class="htit">Broadcast <em>Email</em></div><div class="hsub">Send to your list</div></div>
+    </div>
+    <div class="srow">
+      <div class="sp"><div class="sn" id="bReach">0</div><div class="sl">Will Reach</div></div>
+      <div class="sp"><div class="sn" id="bSentToday">0</div><div class="sl">Sent Today</div></div>
+    </div>
+  </div>
+  <div style="padding:10px 16px 0;">
+    <div style="font-size:10px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">Send To</div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;" id="audPick">
+      <button class="to sel" data-a="everyone" onclick="pickAud(this)">Everyone</button>
+      <button class="to" data-a="buyer" onclick="pickAud(this)">Buyers</button>
+      <button class="to" data-a="lead" onclick="pickAud(this)">Leads</button>
+      <button class="to" data-a="vip" onclick="pickAud(this)">VIP</button>
+      <button class="to" data-a="youtube" onclick="pickAud(this)">YouTube</button>
+      <button class="to" data-a="newsletter" onclick="pickAud(this)">Newsletter</button>
+    </div>
+    <div style="font-size:10px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;">Subject</div>
+    <input class="mi" id="bSubj" placeholder="Subject line…" oninput="updReach()">
+    <div style="font-size:10px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;">Merge Tags</div>
+    <div class="mrow" style="margin-bottom:12px;">
+      <div class="mc" onclick="insBM('{{first_name}}')">{{first_name}}</div>
+      <div class="mc" onclick="insBM('{{full_name}}')">{{full_name}}</div>
+      <div class="mc" onclick="insBM('{{unsubscribe_link}}')">{{unsubscribe_link}}</div>
+    </div>
+    <div style="font-size:10px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:0;">Body</div>
+    <div class="rbar" style="margin-top:6px;">
+      <button class="rtb" onmousedown="event.preventDefault();document.execCommand('bold')"><b>B</b></button>
+      <button class="rtb" onmousedown="event.preventDefault();document.execCommand('italic')"><i>I</i></button>
+      <button class="rtb" onmousedown="event.preventDefault();document.execCommand('underline')"><u>U</u></button>
+      <button class="rtb" onmousedown="event.preventDefault();document.execCommand('insertUnorderedList')">• List</button>
+    </div>
+    <div class="bcastbody" id="bBody" contenteditable="true" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--sep2)'"></div>
+    <div style="margin:10px 0;padding:10px 12px;background:var(--g1);border-radius:var(--r-sm);display:flex;align-items:center;gap:7px;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span style="font-size:11px;font-weight:600;color:var(--l2);">Always include {{unsubscribe_link}} in every broadcast.</span>
+    </div>
+    <button class="okbtn" onclick="sendBcast()" style="margin:0 0 8px;">Send Broadcast</button>
+    <button style="width:100%;background:var(--g1);color:var(--l2);border:1px solid var(--sep2);border-radius:var(--r-md);padding:12px;font-size:13px;font-weight:700;font-family:'Manrope',sans-serif;cursor:pointer;" onclick="pvBcast()">Preview First</button>
+  </div>
+</div>
+
+<!-- PREVIEW SHEET -->
+<div class="overlay" id="pvSheet" onclick="cS('pvSheet',event)">
+  <div class="sheet"><div class="si">
+    <div class="shdl"></div>
+    <div class="stit">Preview</div>
+    <div style="display:flex;gap:6px;margin-bottom:12px;">
+      <button class="to sel" id="pvDk" onclick="setPvm('dark',this)">Dark</button>
+      <button class="to" id="pvLt" onclick="setPvm('light',this)">Light</button>
+    </div>
+    <div id="pvFrame" style="border-radius:var(--r-lg);overflow:hidden;margin-bottom:14px;"></div>
+    <button class="okbtn" onclick="cS('pvSheet')">Done</button>
+  </div></div>
+</div>
+
+<!-- ASSET PICKER SHEET -->
+<div class="overlay" id="apSheet" onclick="cS('apSheet',event)">
+  <div class="sheet"><div class="si">
+    <div class="shdl"></div>
+    <div class="stit">Pick an Asset</div>
+    <div class="ssub">Tap any image to insert it as a block.</div>
+    <div id="apGrid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;"></div>
+    <button class="cancelbtn" onclick="cS('apSheet')">Cancel</button>
+  </div></div>
+</div>
+
+<!-- BROADCAST PREVIEW SHEET -->
+<div class="overlay" id="bpSheet" onclick="cS('bpSheet',event)">
+  <div class="sheet"><div class="si">
+    <div class="shdl"></div>
+    <div class="stit" id="bpSubj">Preview</div>
+    <div style="background:var(--bg);border-radius:var(--r-md);padding:14px;margin-bottom:14px;border:1px solid var(--sep2);">
+      <div style="font-size:10px;font-weight:700;color:var(--l3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;">From: Shannon Craft</div>
+      <div id="bpBody" style="font-size:13px;font-weight:500;color:var(--l2);line-height:1.7;"></div>
+    </div>
+    <div style="font-size:12px;font-weight:500;color:var(--l3);text-align:center;margin-bottom:14px;">Sending to: <strong id="bpAud" style="color:var(--white);">Everyone</strong></div>
+    <button class="okbtn" onclick="cS('bpSheet');sendBcast(true)">Send It</button>
+    <button class="cancelbtn" onclick="cS('bpSheet')">Edit First</button>
+  </div></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bnav">
+  <button class="nb" onclick="window.location.href='admin.html'">
+    <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+    <span class="nlbl">← Back</span>
+  </button>
+  <button class="nb on" id="nbB" onclick="sT('vB')">
+    <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>
+    <span class="nlbl">Builder</span>
+  </button>
+  <button class="nb" id="nbA" onclick="sT('vA')">
+    <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
+    <span class="nlbl">Assets</span>
+  </button>
+  <button class="nb" id="nbBR" onclick="sT('vBR')">
+    <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+    <span class="nlbl">Broadcast</span>
+  </button>
+</nav>
+
+<script>
+const K={EMAILS:'sc_emails_v1',ASSETS:'sc_assets_v1',CONTACTS:'sc_contacts_v1',BCAST:'sc_bcast_v1',SETTINGS:'sc_settings_v1'};
+const EB_COLORS=['#E8571A','#2563EB','#7C3AED','#16A34A','#DC2626','#0D9488','#DB2777','#D97706','#000000','#ffffff'];
+let blocks=[],dragSrc=null,curEmId=null,pvMode='dark',aFilter='all',selAsset=null,bAud='everyone';
+
+function ld(k){try{return JSON.parse(localStorage.getItem(k)||'[]');}catch(e){return[];}}
+function sd(k,d){localStorage.setItem(k,JSON.stringify(d));}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function fmtSz(b){if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB';}
+function fmtD(iso){if(!iso)return'';return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
+let _tt;
+function showT(msg){document.getElementById('tMsg').textContent=msg;const t=document.getElementById('toast');t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),2400);}
+function oS(id){document.getElementById(id)?.classList.add('open');}
+function cS(id,e){if(!e||e.target===document.getElementById(id))document.getElementById(id)?.classList.remove('open');}
+
+function sT(id){
+  document.querySelectorAll('.vp').forEach(v=>v.style.display='none');
+  ['nbB','nbA','nbBR'].forEach(n=>{const el=document.getElementById(n);if(el)el.classList.remove('on');});
+  document.getElementById(id).style.display='block';
+  const map={vB:'nbB',vSaved:'nbB',vA:'nbA',vBR:'nbBR'};
+  const nb=document.getElementById(map[id]);if(nb)nb.classList.add('on');
+  window.scrollTo(0,0);
+  if(id==='vA')rAssets();
+  if(id==='vBR')updReach();
+  if(id==='vSaved')rSaved();
+}
+
+/* Apply stored settings */
+function applySettings(){
+  const s=JSON.parse(localStorage.getItem(K.SETTINGS)||'{}');
+  const accent=s.accent||'#E8571A';
+  const r=parseInt(accent.slice(1,3),16),g=parseInt(accent.slice(3,5),16),b=parseInt(accent.slice(5,7),16);
+  document.documentElement.style.setProperty('--accent',accent);
+  document.documentElement.style.setProperty('--as',`rgba(${r},${g},${b},.13)`);
+  document.documentElement.style.setProperty('--ab',`rgba(${r},${g},${b},.28)`);
+  if(s.lightMode){
+    [['--bg','#f5f5f5'],['--g1','#ffffff'],['--g2','#ebebeb'],['--g3','#d0d0d0'],['--sep','rgba(0,0,0,.07)'],['--sep2','rgba(0,0,0,.11)'],['--white','#0a0a0a'],['--l1','rgba(0,0,0,.85)'],['--l2','rgba(0,0,0,.55)'],['--l3','rgba(0,0,0,.35)'],['--l4','rgba(0,0,0,.18)']].forEach(([k,v])=>document.documentElement.style.setProperty(k,v));
+  } else {
+    [['--bg','#000'],['--g1','#161616'],['--g2','#242424'],['--g3','#333'],['--sep','rgba(255,255,255,.07)'],['--sep2','rgba(255,255,255,.11)'],['--white','#fff'],['--l1','rgba(255,255,255,.85)'],['--l2','rgba(255,255,255,.5)'],['--l3','rgba(255,255,255,.28)'],['--l4','rgba(255,255,255,.13)']].forEach(([k,v])=>document.documentElement.style.setProperty(k,v));
+  }
+}
+
+/* ──────────── EMAIL BUILDER ──────────── */
+const BDefs={
+  logo:{type:'logo',logoUrl:'',brandName:'Shannon Craft',bgColor:'#000000',textColor:'#E8571A'},
+  text:{type:'text',html:'<p>Write your message here.</p>'},
+  image:{type:'image',url:'',alt:'',link:''},
+  button:{type:'button',label:'Shop Now',url:'#',bgColor:'#E8571A',textColor:'#ffffff',style:'filled'},
+  divider:{type:'divider',divStyle:'line',color:'#333333'},
+  social:{type:'social',activeIcons:['instagram','tiktok','youtube'],platforms:{instagram:'',tiktok:'',youtube:'',facebook:'',x:'',linkedin:''}},
+  testimonial:{type:'testimonial',quote:'This changed my life!',author:'— Happy Customer',bgColor:'#161616'},
+  banner:{type:'banner',eyebrow:'Limited Time',headline:'Special Offer',sub:"Don't miss this.",bgColor:'#E8571A',textColor:'#000000'}
+};
+const TLBLS={logo:'Logo',text:'Text',image:'Image',button:'Button',divider:'Divider',social:'Socials',testimonial:'Testimonial',banner:'Banner'};
+
+function newEm(){blocks=[];curEmId=null;const s=document.getElementById('ebSub');if(s)s.value='';document.getElementById('bSub').textContent='New email';rCanvas();}
+function aBlk(t){const b={id:uid(),...JSON.parse(JSON.stringify(BDefs[t]||{type:t}))};blocks.push(b);rCanvas();showT(t+' added');setTimeout(()=>{const el=document.getElementById('eb-'+b.id);if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});},100);}
+function rmBlk(id){blocks=blocks.filter(b=>b.id!==id);rCanvas();}
+function mvBlk(id,dir){const i=blocks.findIndex(b=>b.id===id);const ni=i+dir;if(ni<0||ni>=blocks.length)return;[blocks[i],blocks[ni]]=[blocks[ni],blocks[i]];rCanvas();}
+function updB(id,k,v){const b=blocks.find(x=>x.id===id);if(b)b[k]=v;}
+function updBN(id,obj,k,v){const b=blocks.find(x=>x.id===id);if(b&&b[obj])b[obj][k]=v;}
+
+function rCanvas(){
+  const canvas=document.getElementById('canvas');
+  const empty=document.getElementById('canvasEmpty');
+  const cnt=document.getElementById('blkCount');
+  canvas.querySelectorAll('.eb').forEach(e=>e.remove());
+  if(!blocks.length){empty.style.display='block';cnt.textContent='';return;}
+  empty.style.display='none';cnt.textContent=blocks.length+' block'+(blocks.length!==1?'s':'');
+  blocks.forEach((b,i)=>{const el=mkBlkEl(b,i);canvas.appendChild(el);});
+}
+
+function mkBlkEl(block,idx){
+  const wrap=document.createElement('div');
+  wrap.className='eb';wrap.id='eb-'+block.id;wrap.setAttribute('draggable','true');
+  wrap.addEventListener('dragstart',e=>{dragSrc=idx;wrap.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
+  wrap.addEventListener('dragend',()=>{wrap.classList.remove('dragging');document.querySelectorAll('.eb').forEach(el=>el.classList.remove('dov'));});
+  wrap.addEventListener('dragover',e=>{e.preventDefault();wrap.classList.add('dov');});
+  wrap.addEventListener('dragleave',()=>wrap.classList.remove('dov'));
+  wrap.addEventListener('drop',e=>{e.preventDefault();wrap.classList.remove('dov');if(dragSrc===null||dragSrc===idx)return;const m=blocks.splice(dragSrc,1)[0];blocks.splice(idx,0,m);dragSrc=null;rCanvas();});
+  wrap.innerHTML=`<div class="etb">
+    <div style="color:var(--l3);cursor:grab;padding:2px 4px;display:flex;align-items:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
+    <span class="ety">${TLBLS[block.type]||block.type}</span>
+    <button class="ea" onclick="mvBlk('${block.id}',-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg></button>
+    <button class="ea" onclick="mvBlk('${block.id}',1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+    <button class="ea" onclick="rmBlk('${block.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div><div class="ec">${rBContent(block)}</div>`;
+  return wrap;
+}
+
+const COLORS_SW=(val,key,bid)=>EB_COLORS.map(c=>`<div class="csw${val===c?' sel':''}" style="background:${c};${c==='#ffffff'?'border:1px solid #555':''}" onclick="updB('${bid}','${key}','${c}');rCanvas()"></div>`).join('');
+
+function rBContent(b){
+  switch(b.type){
+    case 'logo':return`
+      <div style="background:${b.bgColor||'#000'};padding:12px;border-radius:var(--r-sm);text-align:center;margin-bottom:8px;">
+        ${b.logoUrl?`<img src="${esc(b.logoUrl)}" style="max-height:44px;max-width:200px;object-fit:contain;" onerror="this.style.display='none'">`:`<div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:${b.textColor||'#E8571A'}">${esc(b.brandName||'Shannon Craft')}</div>`}
+      </div>
+      <input class="mi" placeholder="Logo URL" value="${esc(b.logoUrl||'')}" oninput="updB('${b.id}','logoUrl',this.value);rCanvas()">
+      <input class="mi" placeholder="Brand name text (if no logo)" value="${esc(b.brandName||'')}" oninput="updB('${b.id}','brandName',this.value);rCanvas()">
+      <input type="file" id="lf-${b.id}" accept="image/*" style="display:none" onchange="handleImgUp('${b.id}',this)">
+      <button onclick="document.getElementById('lf-${b.id}').click()" style="height:30px;padding:0 12px;background:var(--g2);border:1px solid var(--sep2);border-radius:7px;font-family:'Manrope',sans-serif;font-size:11px;font-weight:700;color:var(--l2);cursor:pointer;margin-bottom:7px;">Upload Logo File</button>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px;"><span style="font-size:9px;font-weight:700;color:var(--l3);">BG:</span><div class="csr">${COLORS_SW(b.bgColor,'bgColor',b.id)}</div><span style="font-size:9px;font-weight:700;color:var(--l3);">Text:</span><div class="csr">${COLORS_SW(b.textColor,'textColor',b.id)}</div></div>`;
+    case 'text':return`
+      <div class="mrow"><div class="mc" onmousedown="event.preventDefault();document.execCommand('insertText',false,'{{first_name}}')">{{first_name}}</div><div class="mc" onmousedown="event.preventDefault();document.execCommand('insertText',false,'{{product_name}}')">{{product_name}}</div><div class="mc" onmousedown="event.preventDefault();document.execCommand('insertText',false,'{{download_link}}')">{{download_link}}</div></div>
+      <div class="rbar"><button class="rtb" onmousedown="event.preventDefault();document.execCommand('bold')"><b>B</b></button><button class="rtb" onmousedown="event.preventDefault();document.execCommand('italic')"><i>I</i></button><button class="rtb" onmousedown="event.preventDefault();document.execCommand('underline')"><u>U</u></button><button class="rtb" onmousedown="event.preventDefault();document.execCommand('justifyCenter')">Center</button><button class="rtb" onmousedown="event.preventDefault();document.execCommand('insertUnorderedList')">• List</button></div>
+      <div class="editable" contenteditable="true" oninput="updB('${b.id}','html',this.innerHTML)">${b.html||''}</div>`;
+    case 'image':return`
+      ${b.url?`<img src="${esc(b.url)}" style="width:100%;border-radius:var(--r-sm);margin-bottom:7px;max-height:180px;object-fit:cover;" onerror="this.style.display='none'">`:`<div class="iph" onclick="document.getElementById('if-${b.id}').click()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span style="font-size:11px;font-weight:600;color:var(--l3);">Tap to upload</span></div>`}
+      <input type="file" id="if-${b.id}" accept="image/*" style="display:none" onchange="handleImgUp('${b.id}',this)">
+      <input class="mi" placeholder="Or paste image URL" value="${esc(b.url||'')}" oninput="updB('${b.id}','url',this.value);rCanvas()">
+      <input class="mi" placeholder="Click-through URL (optional)" value="${esc(b.link||'')}" oninput="updB('${b.id}','link',this.value)">`;
+    case 'button':return`
+      <div class="bpv"><div class="cta" style="background:${b.style==='filled'?b.bgColor:'transparent'};color:${b.style==='filled'?b.textColor:b.bgColor};${b.style==='outline'?`border:2px solid ${b.bgColor};`:''}">${esc(b.label||'Click Here')}</div></div>
+      <div style="display:flex;gap:5px;margin-bottom:7px;"><button class="to${b.style==='filled'?' sel':''}" onclick="updB('${b.id}','style','filled');rCanvas()">Filled</button><button class="to${b.style==='outline'?' sel':''}" onclick="updB('${b.id}','style','outline');rCanvas()">Outline</button><button class="to${b.style==='ghost'?' sel':''}" onclick="updB('${b.id}','style','ghost');rCanvas()">Text</button></div>
+      <input class="mi" placeholder="Button label" value="${esc(b.label||'')}" oninput="updB('${b.id}','label',this.value);const el=document.querySelector('#eb-${b.id} .cta');if(el)el.textContent=this.value||'Click Here'">
+      <input class="mi" placeholder="Button URL" value="${esc(b.url||'')}" oninput="updB('${b.id}','url',this.value)">
+      <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;"><span style="font-size:9px;font-weight:700;color:var(--l3);">Color:</span><div class="csr">${COLORS_SW(b.bgColor,'bgColor',b.id)}</div></div>`;
+    case 'divider':return`
+      <div style="display:flex;gap:6px;margin-bottom:7px;">
+        <div onclick="updB('${b.id}','divStyle','line');rCanvas()" style="flex:1;height:32px;border-radius:6px;background:${b.divStyle==='line'?'var(--as)':'var(--g2)'};border:1.5px solid ${b.divStyle==='line'?'var(--ab)':'var(--sep2)'};display:flex;align-items:center;justify-content:center;cursor:pointer;"><div style="width:60%;height:2px;background:var(--l3);border-radius:1px;"></div></div>
+        <div onclick="updB('${b.id}','divStyle','dots');rCanvas()" style="flex:1;height:32px;border-radius:6px;background:${b.divStyle==='dots'?'var(--as)':'var(--g2)'};border:1.5px solid ${b.divStyle==='dots'?'var(--ab)':'var(--sep2)'};display:flex;align-items:center;justify-content:center;cursor:pointer;gap:4px;"><span style="width:4px;height:4px;border-radius:50%;background:var(--l3);"></span><span style="width:4px;height:4px;border-radius:50%;background:var(--l3);"></span><span style="width:4px;height:4px;border-radius:50%;background:var(--l3);"></span></div>
+        <div onclick="updB('${b.id}','divStyle','space');rCanvas()" style="flex:1;height:32px;border-radius:6px;background:${b.divStyle==='space'?'var(--as)':'var(--g2)'};border:1.5px solid ${b.divStyle==='space'?'var(--ab)':'var(--sep2)'};display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:10px;font-weight:700;color:var(--l3);">Space</div>
+      </div>
+      <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;"><span style="font-size:9px;font-weight:700;color:var(--l3);">Color:</span><div class="csr">${COLORS_SW(b.color,'color',b.id)}</div></div>`;
+    case 'social':{
+      const SICO={instagram:'<rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/>',tiktok:'<path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/>',youtube:'<path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/>',facebook:'<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>',x:'<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.74l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="currentColor" stroke="none"/>',linkedin:'<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>'};
+      return`<div style="display:flex;gap:6px;justify-content:center;margin-bottom:7px;">${Object.entries(SICO).map(([k,v])=>`<div onclick="togSI('${b.id}','${k}')" style="width:32px;height:32px;border-radius:9px;background:${(b.activeIcons||[]).includes(k)?'var(--as)':'var(--g2)'};border:1px solid ${(b.activeIcons||[]).includes(k)?'var(--ab)':'var(--sep2)'};display:flex;align-items:center;justify-content:center;cursor:pointer;color:${(b.activeIcons||[]).includes(k)?'var(--accent)':'var(--l3)'}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">${v}</svg></div>`).join('')}</div>
+      <div style="font-size:9px;font-weight:600;color:var(--l3);text-align:center;margin-bottom:7px;">Tap to toggle on/off</div>
+      ${Object.keys(SICO).filter(k=>(b.activeIcons||[]).includes(k)).map(k=>`<input class="mi" placeholder="${k} URL" value="${esc((b.platforms||{})[k]||'')}" oninput="updBN('${b.id}','platforms','${k}',this.value)">`).join('')}`;}
+    case 'testimonial':return`
+      <div style="background:${b.bgColor||'var(--g2)'};border-radius:var(--r-sm);padding:12px;border-left:3px solid var(--accent);margin-bottom:8px;"><div style="font-style:italic;color:var(--l2);font-size:12px;line-height:1.6;margin-bottom:5px;">"${esc(b.quote||'')}"</div><div style="color:var(--accent);font-size:11px;font-weight:700;">${esc(b.author||'')}</div></div>
+      <textarea class="mi" style="min-height:55px;resize:none;line-height:1.5;" placeholder="Quote text" oninput="updB('${b.id}','quote',this.value);const q=document.querySelector('#eb-${b.id} [style*=italic]');if(q)q.textContent='\"'+this.value+'\"'">${esc(b.quote||'')}</textarea>
+      <input class="mi" placeholder="— Author Name" value="${esc(b.author||'')}" oninput="updB('${b.id}','author',this.value)">
+      <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;"><span style="font-size:9px;font-weight:700;color:var(--l3);">BG:</span><div class="csr">${COLORS_SW(b.bgColor,'bgColor',b.id)}</div></div>`;
+    case 'banner':return`
+      <div style="background:${b.bgColor||'var(--accent)'};border-radius:var(--r-sm);padding:12px;margin-bottom:8px;"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:${b.textColor||'#000'};opacity:.6;margin-bottom:2px;">${esc(b.eyebrow||'')}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:${b.textColor||'#000'};margin-bottom:2px;">${esc(b.headline||'')}</div><div style="font-size:11px;color:${b.textColor||'#000'};opacity:.65;">${esc(b.sub||'')}</div></div>
+      <input class="mi" placeholder="Eyebrow text" value="${esc(b.eyebrow||'')}" oninput="updB('${b.id}','eyebrow',this.value);rCanvas()">
+      <input class="mi" placeholder="Headline" value="${esc(b.headline||'')}" oninput="updB('${b.id}','headline',this.value);rCanvas()">
+      <input class="mi" placeholder="Sub text" value="${esc(b.sub||'')}" oninput="updB('${b.id}','sub',this.value);rCanvas()">
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;"><span style="font-size:9px;font-weight:700;color:var(--l3);">BG:</span><div class="csr">${COLORS_SW(b.bgColor,'bgColor',b.id)}</div><span style="font-size:9px;font-weight:700;color:var(--l3);">Text:</span><div class="csr">${COLORS_SW(b.textColor,'textColor',b.id)}</div></div>`;
+    default:return`<div style="color:var(--l3);font-size:12px;">Unknown block</div>`;
+  }
+}
+
+function togSI(id,platform){const b=blocks.find(x=>x.id===id);if(!b)return;if(!b.activeIcons)b.activeIcons=[];const i=b.activeIcons.indexOf(platform);if(i>-1)b.activeIcons.splice(i,1);else b.activeIcons.push(platform);rCanvas();}
+function handleImgUp(id,input){const file=input.files[0];if(!file)return;const r=new FileReader();r.onload=e=>{updB(id,'url',e.target.result);rCanvas();};r.readAsDataURL(file);}
+
+function saveEm(){
+  const subj=document.getElementById('ebSub').value.trim();
+  if(!subj&&!blocks.length){showT('Add subject and content');return;}
+  const emails=ld(K.EMAILS);
+  if(curEmId){const i=emails.findIndex(e=>e.id===curEmId);if(i>-1)emails[i]={id:curEmId,subject:subj||'Untitled',blocks:JSON.parse(JSON.stringify(blocks)),savedAt:new Date().toISOString()};}
+  else{curEmId=uid();emails.unshift({id:curEmId,subject:subj||'Untitled',blocks:JSON.parse(JSON.stringify(blocks)),savedAt:new Date().toISOString()});}
+  sd(K.EMAILS,emails);document.getElementById('bSub').textContent=subj||'Untitled';showT('Email saved ✓');
+}
+
+function rSaved(){
+  const emails=ld(K.EMAILS);
+  const c=document.getElementById('savedList');
+  if(!emails.length){c.innerHTML=`<div class="es"><div class="ei"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div style="font-size:14px;font-weight:800;color:var(--white);margin-bottom:5px;">No saved emails yet</div><div style="font-size:12px;font-weight:500;color:var(--l3);">Build one and save it.</div></div>`;return;}
+  c.innerHTML=`<div style="background:var(--g1);border-radius:var(--r-lg);overflow:hidden;">${emails.map(e=>`<div class="crow" onclick="loadEm('${e.id}')"><div class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div class="rb"><div class="rt">${esc(e.subject)}</div><div class="rs">${e.blocks.length} blocks · ${fmtD(e.savedAt)}</div></div><button onclick="event.stopPropagation();delEm('${e.id}')" style="width:26px;height:26px;border-radius:7px;background:transparent;border:1px solid var(--sep2);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--l3);"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>`).join('')}</div>`;
+}
+function loadEm(id){const e=ld(K.EMAILS).find(x=>x.id===id);if(!e)return;curEmId=e.id;blocks=JSON.parse(JSON.stringify(e.blocks));document.getElementById('ebSub').value=e.subject||'';document.getElementById('bSub').textContent=e.subject||'Untitled';rCanvas();sT('vB');showT('Loaded');}
+function delEm(id){sd(K.EMAILS,ld(K.EMAILS).filter(e=>e.id!==id));rSaved();showT('Deleted');}
+
+/* Preview */
+function oPv(){document.getElementById('pvFrame').innerHTML=mkPvHTML(pvMode);oS('pvSheet');}
+function setPvm(m,btn){pvMode=m;document.getElementById('pvDk').classList.toggle('sel',m==='dark');document.getElementById('pvLt').classList.toggle('sel',m==='light');document.getElementById('pvFrame').innerHTML=mkPvHTML(m);}
+function mkPvHTML(mode){
+  const dk=mode==='dark';const bg=dk?'#000':'#fff';const txt=dk?'#fff':'#0a0a0a';const sub=dk?'rgba(255,255,255,.5)':'rgba(0,0,0,.5)';const card=dk?'#161616':'#f5f5f5';
+  let body='';
+  blocks.forEach(b=>{
+    switch(b.type){
+      case 'logo':body+=`<table width="100%"><tr><td style="background:${b.bgColor||'#000'};padding:14px;text-align:center;">${b.logoUrl?`<img src="${esc(b.logoUrl)}" style="max-height:44px;">`:`<span style="font-family:Georgia,serif;font-size:22px;font-weight:bold;color:${b.textColor||'#E8571A'};letter-spacing:3px;">${esc(b.brandName||'SHANNON CRAFT')}</span>`}</td></tr></table>`;break;
+      case 'text':body+=`<div style="padding:14px 18px;color:${txt};font-family:Georgia,Arial,sans-serif;font-size:14px;line-height:1.75;">${b.html||''}</div>`;break;
+      case 'image':if(b.url){const img=`<img src="${esc(b.url)}" style="width:100%;border-radius:6px;display:block;">`;body+=`<div style="padding:6px 18px;">${b.link?`<a href="${esc(b.link)}">${img}</a>`:img}</div>`;}break;
+      case 'button':body+=`<div style="padding:10px 18px;text-align:center;"><a href="${esc(b.url||'#')}" style="display:inline-block;background:${b.style==='filled'?b.bgColor:'transparent'};color:${b.style==='filled'?b.textColor:b.bgColor};${b.style==='outline'?`border:2px solid ${b.bgColor};`:''}padding:12px 28px;border-radius:9px;font-family:Georgia,Arial,sans-serif;font-size:14px;font-weight:bold;text-decoration:none;">${esc(b.label||'Click Here')}</a></div>`;break;
+      case 'divider':body+=b.divStyle==='line'?`<div style="padding:6px 18px;"><hr style="border:none;border-top:2px solid ${b.color||'#333'};"></div>`:b.divStyle==='dots'?`<div style="text-align:center;padding:8px;color:${b.color||'#555'};font-size:18px;letter-spacing:6px;">• • •</div>`:`<div style="height:20px;"></div>`;break;
+      case 'social':{const active=(b.activeIcons||[]).filter(k=>(b.platforms||{})[k]);if(active.length){const em={instagram:'📸',tiktok:'🎵',youtube:'▶️',facebook:'👥',x:'𝕏',linkedin:'💼'};body+=`<div style="padding:10px 18px;text-align:center;">${active.map(k=>`<a href="${esc(b.platforms[k]||'#')}" style="display:inline-block;margin:0 5px;width:34px;height:34px;background:${card};border-radius:8px;text-align:center;line-height:34px;text-decoration:none;font-size:15px;">${em[k]||k}</a>`).join('')}</div>`;}break;}
+      case 'testimonial':body+=`<div style="padding:6px 18px;"><div style="background:${b.bgColor||card};border-radius:8px;padding:14px;border-left:3px solid #E8571A;"><p style="font-style:italic;color:${txt};font-size:13px;line-height:1.7;margin-bottom:6px;">"${esc(b.quote||'')}"</p><p style="color:#E8571A;font-size:11px;font-weight:bold;">${esc(b.author||'')}</p></div></div>`;break;
+      case 'banner':body+=`<div style="padding:6px 18px;"><div style="background:${b.bgColor||'#E8571A'};border-radius:8px;padding:14px 16px;"><div style="font-size:9px;font-weight:bold;text-transform:uppercase;letter-spacing:1px;color:${b.textColor||'#000'};opacity:.6;margin-bottom:3px;">${esc(b.eyebrow||'')}</div><div style="font-family:Georgia,serif;font-size:20px;font-weight:bold;color:${b.textColor||'#000'};margin-bottom:3px;">${esc(b.headline||'')}</div><div style="font-size:11px;color:${b.textColor||'#000'};opacity:.65;">${esc(b.sub||'')}</div></div></div>`;break;
+    }
+  });
+  if(!body)body=`<div style="padding:20px;text-align:center;color:${sub};font-size:13px;">No blocks yet.</div>`;
+  return`<div style="background:${bg};border-radius:12px;overflow:hidden;">${body}<div style="padding:12px 18px;text-align:center;border-top:1px solid ${dk?'rgba(255,255,255,.07)':'rgba(0,0,0,.07)'}"><p style="font-size:10px;color:${sub};margin:0;">© Shannon Craft · <a href="#" style="color:#E8571A;text-decoration:none;">Unsubscribe</a></p></div></div>`;
+}
+
+/* ──────────── ASSETS ──────────── */
+function guessACat(name){const l=name.toLowerCase();if(l.includes('logo'))return'logo';if(l.includes('header')||l.includes('banner'))return'header';if(l.includes('product')||l.includes('book')||l.includes('cover'))return'product';if(l.includes('photo')||l.includes('headshot'))return'photo';return'other';}
+function handleUpload(input){
+  const files=Array.from(input.files).filter(f=>f.type.startsWith('image/'));
+  if(!files.length){showT('Image files only');return;}
+  showT(`Uploading ${files.length} file${files.length>1?'s':''}…`);
+  let done=0;
+  files.forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const list=ld(K.ASSETS);
+      list.unshift({id:uid(),name:file.name.replace(/\.[^/.]+$/,''),fileName:file.name,type:file.type,size:file.size,dataUrl:e.target.result,category:guessACat(file.name),uploadedAt:new Date().toISOString()});
+      sd(K.ASSETS,list);done++;
+      if(done===files.length){rAssets();showT(`${done} uploaded ✓`);}
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value='';
+}
+const uz=document.getElementById('uploadZone');
+if(uz){
+  uz.addEventListener('dragover',e=>{e.preventDefault();uz.classList.add('dra');});
+  uz.addEventListener('dragleave',()=>uz.classList.remove('dra'));
+  uz.addEventListener('drop',e=>{e.preventDefault();uz.classList.remove('dra');const files=Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/'));if(files.length)handleUpload({files:e.dataTransfer.files,value:''});});
+}
+function setAF(cat,btn){aFilter=cat;document.querySelectorAll('#aFT .ft').forEach(t=>t.classList.remove('on'));btn.classList.add('on');selAsset=null;updABar();rAssets();}
+function rAssets(){
+  const assets=ld(K.ASSETS);
+  const filtered=aFilter==='all'?assets:assets.filter(a=>a.category===aFilter);
+  document.getElementById('aTot').textContent=assets.length;
+  document.getElementById('aLogo').textContent=assets.filter(a=>a.category==='logo').length;
+  document.getElementById('aSize').textContent=fmtSz(assets.reduce((s,a)=>s+(a.size||0),0));
+  const grid=document.getElementById('assetGrid');
+  if(!filtered.length){grid.innerHTML=`<div style="grid-column:1/-1;"><div class="es"><div class="ei"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div style="font-size:14px;font-weight:800;color:var(--white);margin-bottom:5px;">No assets yet</div><div style="font-size:12px;font-weight:500;color:var(--l3);line-height:1.6;">Upload logos and images above.</div></div></div>`;return;}
+  grid.innerHTML=filtered.map(a=>`<div class="ac${a.id===selAsset?' sel':''}" onclick="selA('${a.id}')"><div class="at${a.type==='image/png'||a.type==='image/svg+xml'?' li':''}"><img src="${a.dataUrl}" alt="${esc(a.name)}" loading="lazy"></div><div class="ain"><div class="an">${esc(a.name)}</div><div class="am">${fmtSz(a.size||0)} · ${(a.type||'').split('/')[1]?.toUpperCase()||'IMG'}</div></div></div>`).join('');
+}
+function selA(id){if(selAsset===id){selAsset=null;updABar();rAssets();return;}selAsset=id;updABar();rAssets();}
+function updABar(){
+  const bar=document.getElementById('assetBar');
+  if(!selAsset){bar.classList.add('hidden');return;}
+  const a=ld(K.ASSETS).find(x=>x.id===selAsset);if(!a){bar.classList.add('hidden');return;}
+  bar.classList.remove('hidden');document.getElementById('aBarName').textContent=a.name;
+}
+function copyAsset(){const a=ld(K.ASSETS).find(x=>x.id===selAsset);if(!a)return;navigator.clipboard.writeText(a.dataUrl).then(()=>showT('Copied — paste into builder')).catch(()=>showT('Copy failed'));}
+function useAsset(){const a=ld(K.ASSETS).find(x=>x.id===selAsset);if(!a)return;const b={id:uid(),type:'image',url:a.dataUrl,alt:a.name,link:''};blocks.push(b);showT(a.name+' added to email');selAsset=null;updABar();rAssets();sT('vB');}
+function delAsset(){if(!selAsset)return;sd(K.ASSETS,ld(K.ASSETS).filter(a=>a.id!==selAsset));selAsset=null;updABar();rAssets();showT('Deleted');}
+function pickAsset(){
+  const assets=ld(K.ASSETS);
+  const grid=document.getElementById('apGrid');
+  if(!assets.length){showT('Upload assets in the Assets tab first');sT('vA');return;}
+  grid.innerHTML=assets.map(a=>`<div onclick="insertAP('${a.id}')" style="cursor:pointer;border-radius:var(--r-sm);overflow:hidden;border:1.5px solid var(--sep);aspect-ratio:1;background:${a.type==='image/png'?'#fff':'var(--g2)'};display:flex;align-items:center;justify-content:center;"><img src="${a.dataUrl}" style="width:100%;height:100%;object-fit:contain;padding:6px;" loading="lazy"></div>`).join('');
+  oS('apSheet');
+}
+function insertAP(id){const a=ld(K.ASSETS).find(x=>x.id===id);if(!a)return;const b={id:uid(),type:'image',url:a.dataUrl,alt:a.name,link:''};blocks.push(b);rCanvas();cS('apSheet');showT(a.name+' added');}
+
+/* ──────────── BROADCAST ──────────── */
+function pickAud(btn){document.querySelectorAll('#audPick .to').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');bAud=btn.dataset.a;updReach();}
+function updReach(){
+  const c=ld(K.CONTACTS).filter(x=>!x.unsubscribed);
+  document.getElementById('bReach').textContent=bAud==='everyone'?c.length:c.filter(x=>x.tags?.includes(bAud)).length;
+}
+function insBM(tag){const s=document.getElementById('bSubj');const st=s.selectionStart,en=s.selectionEnd;s.value=s.value.slice(0,st)+tag+s.value.slice(en);s.selectionStart=s.selectionEnd=st+tag.length;s.focus();}
+function pvBcast(){
+  const subj=document.getElementById('bSubj').value.trim();
+  const body=document.getElementById('bBody').innerHTML.trim();
+  if(!subj||!body){showT('Add subject and body');return;}
+  document.getElementById('bpSubj').textContent=subj;
+  document.getElementById('bpBody').innerHTML=body;
+  const lbl={everyone:'Everyone',buyer:'Buyers',lead:'Leads',vip:'VIP',youtube:'YouTube',newsletter:'Newsletter'};
+  document.getElementById('bpAud').textContent=lbl[bAud]||bAud;
+  oS('bpSheet');
+}
+async function sendBcast(){
+  const subj=document.getElementById('bSubj').value.trim();
+  const body=document.getElementById('bBody').innerHTML.trim();
+  if(!subj||!body){showT('Subject and body required');return;}
+  const contacts=ld(K.CONTACTS).filter(x=>!x.unsubscribed);
+  const recipients=bAud==='everyone'?contacts:contacts.filter(x=>x.tags?.includes(bAud));
+  if(!recipients.length){showT('No recipients');return;}
+  const cfg=JSON.parse(localStorage.getItem('sc_cfg_v1')||'{}');
+  if(!cfg.resendKey){showT('Add Resend API key in Settings');return;}
+  showT(`Sending to ${recipients.length}…`);
+  let sent=0,failed=0;
+  for(const contact of recipients){
+    const repl=(s)=>s.replace(/\{\{first_name\}\}/gi,contact.firstName||contact.email.split('@')[0]);
+    const html=`<!DOCTYPE html><html><body style="margin:0;padding:0;background:#f5f5f5;font-family:Georgia,Arial,sans-serif;"><table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:20px 0;"><table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#fff;border-radius:12px;overflow:hidden;"><tr><td style="background:#000;padding:20px;text-align:center;"><span style="font-family:Georgia,serif;font-size:22px;font-weight:bold;color:#E8571A;letter-spacing:3px;">${cfg.fromName||'SHANNON CRAFT'}</span></td></tr><tr><td style="padding:32px 36px;color:#333;font-size:15px;line-height:1.75;">${repl(body)}</td></tr><tr><td style="background:#f8f8f8;padding:14px;text-align:center;border-top:1px solid #eee;"><p style="margin:0;font-size:12px;color:#999;">© ${cfg.fromName||'Shannon Craft'} · <a href="#unsubscribe" style="color:#E8571A;">Unsubscribe</a></p></td></tr></table></td></tr></table></body></html>`;
+    try{
+      const res=await fetch('https://sc-send-email.shannonlcraft.workers.dev',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to:contact.email,subject:repl(subj),html,fromName:cfg.fromName||'Shannon Craft',fromEmail:cfg.fromEmail||''})});
+      if(res.ok)sent++;else failed++;
+    }catch(e){failed++;}
+  }
+  const history=ld(K.BCAST);
+  history.push({id:uid(),subject:subj,audience:bAud,count:sent,failed,sentAt:new Date().toISOString()});
+  sd(K.BCAST,history);
+  const today=history.filter(s=>s.sentAt.startsWith(new Date().toISOString().slice(0,10))).length;
+  document.getElementById('bSentToday').textContent=today;
+  document.getElementById('bSubj').value='';
+  document.getElementById('bBody').innerHTML='';
+  showT(failed>0?`Sent ${sent}, ${failed} failed`:`✓ Sent to ${sent} contacts`);
+}
+
+/* ── BOOT ── */
+applySettings();
+// Check if coming from admin.html with a hash
+const hash=window.location.hash;
+if(hash==='#assets')sT('vA');
+else if(hash==='#broadcast')sT('vBR');
+else sT('vB');
+rCanvas();
+</script>
+</body>
+</html>
