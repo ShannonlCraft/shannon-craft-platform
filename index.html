@@ -23,6 +23,97 @@
 }
 html,body{min-height:100%;overflow-x:hidden;background:var(--bg);color:var(--white);font-family:'Manrope',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
 body{max-width:430px;margin:0 auto;padding-bottom:80px;}
+
+/* ── DESKTOP LAYOUT ── */
+@media(min-width:768px){
+  body{max-width:1100px;padding-bottom:40px;}
+
+  /* Hero — two column on desktop */
+  .hero{display:grid;grid-template-columns:220px 1fr;gap:40px;align-items:center;text-align:left;padding:48px 40px 36px;}
+  .hero-avatar{width:160px;height:160px;font-size:48px;margin:0;}
+  .hero-name{font-size:56px;}
+  .hero-tagline{font-size:15px;}
+  .hero-bio{font-size:14px;padding:0;}
+  .socials{justify-content:flex-start;padding:0;}
+  .soc-btn{width:42px;height:42px;}
+
+  /* Sections — wider */
+  .sec-hdr{padding:20px 32px 10px;font-size:11px;}
+  .card{margin:0 32px 12px;border-radius:18px;}
+  .card-row{padding:15px 18px;}
+  .row-title{font-size:15px;}
+
+  /* Quick links — two column grid */
+  #sec-quickLinks .card{display:grid;grid-template-columns:1fr 1fr;margin:0 32px 12px;}
+  #sec-quickLinks .card .card-row{border-bottom:none;border-right:1px solid var(--sep);}
+  #sec-quickLinks .card .card-row:nth-child(even){border-right:none;}
+  #sec-quickLinks .card .card-row:nth-last-child(-n+2){border-bottom:none;}
+
+  /* Products grid — more columns */
+  .prod-grid{grid-template-columns:repeat(4,1fr);padding:4px 32px 12px;gap:14px;}
+  .prod-thumb{height:120px;}
+  .prod-name{font-size:13px;}
+
+  /* Books — two column */
+  #sec-books .card{margin:0 32px 12px;}
+  #booksViewList,#booksList{display:grid;grid-template-columns:1fr 1fr;}
+  .book-card{border-right:1px solid var(--sep);border-bottom:none;}
+  .book-card:nth-child(even){border-right:none;}
+
+  /* Courses — two column */
+  #coursesGrid,#coursesViewGrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:0 32px 12px;}
+  .course-card{margin:0;}
+
+  /* Contact form wider */
+  .contact-form{padding:0 32px;}
+  .form-input,.form-ta,.submit-btn{max-width:600px;}
+
+  /* Back header */
+  .back-hdr{padding:32px 40px 16px;}
+
+  /* Bottom nav — hide on desktop, use sidebar instead */
+  .bnav{display:none;}
+
+  /* Desktop top nav */
+  .desktop-nav{display:flex !important;}
+
+  /* Manage banner */
+  .manage-banner{margin:8px 32px;}
+
+  /* Settings wider */
+  .settings-wrap{padding:0 32px;}
+  .sc{border-radius:16px;}
+  .sg{padding:20px 2px 10px;}
+
+  /* Detail pages */
+  #productBody{max-width:600px;margin:0 auto;}
+
+  /* Shop view grids */
+  #shopDigitalGrid,#shopPhysicalGrid{grid-template-columns:repeat(4,1fr);padding:4px 40px 12px;}
+  .shopView .back-hdr,.coursesView .back-hdr,.booksView .back-hdr,.contactView .back-hdr,.bookingView .back-hdr,.settingsView .back-hdr{padding:32px 40px 16px;}
+
+  /* Booking card */
+  .booking-card{margin:0 32px 12px;display:flex;align-items:center;gap:24px;}
+  .booking-sub{margin-bottom:0;}
+}
+
+/* Desktop top navigation bar */
+.desktop-nav{
+  display:none;
+  position:sticky;top:0;z-index:50;
+  background:rgba(0,0,0,.95);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--sep);
+  padding:0 40px;
+  align-items:center;justify-content:space-between;
+  height:60px;
+}
+.desktop-nav-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--white);}
+.desktop-nav-logo em{color:var(--accent);font-style:normal;}
+.desktop-nav-links{display:flex;gap:4px;align-items:center;}
+.desktop-nav-links button{height:34px;padding:0 14px;border-radius:8px;background:transparent;border:none;font-family:'Manrope',sans-serif;font-size:13px;font-weight:600;color:var(--l2);cursor:pointer;transition:all .15s;}
+.desktop-nav-links button:hover{background:var(--g1);color:var(--white);}
+.desktop-nav-links button.on{background:var(--as);color:var(--accent);}
+.desktop-nav-links button.manage-btn{background:var(--as);border:1px solid var(--ab);color:var(--accent);}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 
 /* VIEWS */
@@ -206,6 +297,19 @@ body.manage .nb.monly{display:flex;}
 </head>
 <body>
 <div class="toast" id="toast"><div class="toast-dot"></div><span id="tMsg"></span></div>
+
+<!-- DESKTOP TOP NAV (hidden on mobile) -->
+<nav class="desktop-nav" id="desktopNav">
+  <div class="desktop-nav-logo">Shannon <em>Craft</em></div>
+  <div class="desktop-nav-links">
+    <button id="dnb-home" class="on" onclick="showView('homeView')">Home</button>
+    <button id="dnb-shop" onclick="showView('shopView')">Shop</button>
+    <button id="dnb-books" onclick="showView('booksView')">Books</button>
+    <button id="dnb-courses" onclick="showView('coursesView')">Courses</button>
+    <button id="dnb-contact" onclick="showView('contactView')">Contact</button>
+    <button id="dnb-settings" class="manage-btn monly" onclick="showView('settingsView')" style="display:none;">⚙ Settings</button>
+  </div>
+</nav>
 
 <!-- ══ HOME VIEW ══ -->
 <div class="view active" id="homeView">
@@ -435,9 +539,23 @@ body.manage .nb.monly{display:flex;}
 /* ── KEYS ── */
 const K={PROFILE:'sc_profile_v1',SOCIALS:'sc_socials_v1',PRODUCTS:'sc_products_v1',COURSES:'sc_courses_v1',BOOKS:'sc_books_v1',SECTIONS:'sc_sections_v1',CFG:'sc_cfg_v1'};
 const ACCENT_COLORS=['#E8571A','#2563EB','#7C3AED','#16A34A','#DC2626','#0D9488','#DB2777','#D97706'];
-const SOCIAL_KEYS=['instagram','tiktok','youtube','facebook','x','linkedin','booking'];
-const SOCIAL_LABELS={instagram:'Instagram',tiktok:'TikTok',youtube:'YouTube',facebook:'Facebook',x:'X (Twitter)',linkedin:'LinkedIn',booking:'Booking Link'};
-const SOC_ICONS={instagram:'<rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>',tiktok:'<path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/>',youtube:'<path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/>',facebook:'<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>',x:'<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.74l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="currentColor" stroke="none"/>',linkedin:'<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>',booking:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>'};
+const SOCIAL_KEYS=['website','instagram','tiktok','youtube','facebook','x','linkedin','threads','pinterest','podcast','amazon','newsletter','booking'];
+const SOCIAL_LABELS={website:'Website',instagram:'Instagram',tiktok:'TikTok',youtube:'YouTube',facebook:'Facebook',x:'X (Twitter)',linkedin:'LinkedIn',threads:'Threads',pinterest:'Pinterest',podcast:'Podcast',amazon:'Amazon Author Page',newsletter:'Newsletter Signup',booking:'Booking Link'};
+const SOC_ICONS={
+  website:'<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
+  instagram:'<rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>',
+  tiktok:'<path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/>',
+  youtube:'<path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/>',
+  facebook:'<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>',
+  x:'<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.74l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="currentColor" stroke="none"/>',
+  linkedin:'<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>',
+  threads:'<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>',
+  pinterest:'<path d="M12 2C6.48 2 2 6.48 2 12c0 4.24 2.65 7.86 6.39 9.29-.09-.78-.17-1.98.04-2.83.18-.77 1.22-5.17 1.22-5.17s-.31-.62-.31-1.55c0-1.45.84-2.54 1.89-2.54.89 0 1.32.67 1.32 1.47 0 .9-.57 2.24-.87 3.48-.25 1.04.52 1.88 1.54 1.88 1.85 0 3.09-2.37 3.09-5.17 0-2.14-1.44-3.63-3.5-3.63-2.38 0-3.78 1.79-3.78 3.63 0 .72.28 1.49.62 1.91.07.08.08.15.06.23l-.23.95c-.04.15-.12.18-.28.11-1.03-.48-1.67-1.99-1.67-3.2 0-2.6 1.89-4.99 5.45-4.99 2.86 0 5.08 2.04 5.08 4.76 0 2.84-1.79 5.12-4.27 5.12-.83 0-1.62-.43-1.89-.94l-.51 1.92c-.19.71-.69 1.6-1.02 2.14.77.24 1.58.37 2.42.37 5.52 0 10-4.48 10-10S17.52 2 12 2z"/>',
+  podcast:'<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>',
+  amazon:'<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>',
+  newsletter:'<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>',
+  booking:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+};
 const DEFAULT_SECTIONS={quickLinks:true,shop:true,books:true,courses:false,booking:false,contact:true};
 const DEFAULT_PRODUCTS={digital:[{id:'d1',name:'[Digital Product]',price:'$27',type:'Digital Download',desc:'Describe your digital product here.',includes:['Instant download','Lifetime access'],stripeLink:'#',paypalLink:'#'},{id:'d2',name:'[Workbook or PDF]',price:'$17',type:'Digital Download',desc:'Another digital product.',includes:['PDF format','Printable pages'],stripeLink:'#',paypalLink:'#'}],physical:[{id:'p1',name:'[Physical Product]',price:'$35',type:'Ships 3–5 days',desc:'Describe your physical product.',includes:['Free shipping over $50'],stripeLink:'#',paypalLink:'#'}]};
 const DEFAULT_COURSES=[{id:'c1',name:'[Course Name]',price:'$97',desc:'Course description.',meta:'Self-paced · Lifetime access',link:'#'},{id:'c2',name:'[Membership]',price:'$27/mo',desc:'Membership description.',meta:'Monthly · Cancel anytime',link:'#'}];
@@ -453,15 +571,26 @@ function showToast(msg){document.getElementById('tMsg').textContent=msg;const t=
 
 /* ── MANAGE MODE ── */
 const MANAGE=new URLSearchParams(window.location.search).get('manage')==='true';
-if(MANAGE){document.body.classList.add('manage');document.getElementById('manageBanner').style.display='flex';}
+if(MANAGE){
+  document.body.classList.add('manage');
+  document.getElementById('manageBanner').style.display='flex';
+  // Show settings button in desktop nav
+  const dSettings=document.getElementById('dnb-settings');
+  if(dSettings)dSettings.style.display='block';
+}
 
 /* ── VIEW NAV ── */
 function showView(id){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   const el=document.getElementById(id);if(el)el.classList.add('active');
+  // Mobile nav
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
   const map={homeView:'nb-home',shopView:'nb-shop',productView:'nb-shop',booksView:'nb-books',bookingView:'nb-home',coursesView:'nb-home',contactView:'nb-contact',settingsView:'nb-settings'};
   const nb=document.getElementById(map[id]||'nb-home');if(nb)nb.classList.add('on');
+  // Desktop nav
+  document.querySelectorAll('.desktop-nav-links button').forEach(b=>b.classList.remove('on'));
+  const dmap={homeView:'dnb-home',shopView:'dnb-shop',productView:'dnb-shop',booksView:'dnb-books',coursesView:'dnb-courses',contactView:'dnb-contact',settingsView:'dnb-settings'};
+  const dnb=document.getElementById(dmap[id]||'dnb-home');if(dnb)dnb.classList.add('on');
   window.scrollTo(0,0);
   if(id==='settingsView')loadSettingsView();
   if(id==='shopView')renderShopView();
@@ -504,8 +633,18 @@ function getSocials(){return gd(K.SOCIALS,{});}
 function applySocials(){
   const soc=getSocials();
   const row=document.getElementById('socialsRow');if(!row)return;
-  const active=SOCIAL_KEYS.filter(k=>soc[k]&&k!=='booking');
-  row.innerHTML=active.map(k=>`<a class="soc-btn" href="${esc(soc[k])}" target="_blank" title="${SOCIAL_LABELS[k]}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${SOC_ICONS[k]}</svg></a>`).join('');
+  // Website gets a special button, not just an icon
+  let websiteBtn='';
+  if(soc.website){
+    websiteBtn=`<a href="${esc(soc.website)}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 14px;background:var(--as);border:1px solid var(--ab);border-radius:9px;font-family:'Manrope',sans-serif;font-size:12px;font-weight:700;color:var(--accent);text-decoration:none;margin-bottom:10px;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">${SOC_ICONS.website}</svg>
+      ${esc(soc.website.replace(/^https?:\/\//,'').replace(/\/$/,''))}
+    </a>`;
+  }
+  // Social icons (everything except website and booking)
+  const iconKeys=SOCIAL_KEYS.filter(k=>soc[k]&&k!=='booking'&&k!=='website');
+  const icons=iconKeys.map(k=>`<a class="soc-btn" href="${esc(soc[k])}" target="_blank" title="${SOCIAL_LABELS[k]}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${SOC_ICONS[k]}</svg></a>`).join('');
+  row.innerHTML=(websiteBtn?`<div style="width:100%;text-align:center;margin-top:4px;">${websiteBtn}</div>`:'')+(icons?`<div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">${icons}</div>`:'');
 }
 function openBooking(){const soc=getSocials();const bl=soc.booking;if(bl&&bl!=='#')window.open(bl,'_blank');else showToast('Booking link coming soon');}
 function saveSocials(){const soc={};SOCIAL_KEYS.forEach(k=>{const el=document.getElementById('soc-'+k);if(el)soc[k]=el.value.trim();});sd(K.SOCIALS,soc);applySocials();}

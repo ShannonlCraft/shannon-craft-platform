@@ -584,7 +584,18 @@ function saveStep(){
   sd(K.SEQS,seqs);cS('stepS');rSQ();showT(editStepIdx!==null?'Updated':'Added');
 }
 
-function loadST(){try{return JSON.parse(localStorage.getItem(K.SETTINGS)||'{}');}catch(e){return{};}}
+const PROFILE_KEY='sc_profile_v1';
+function loadST(){
+  try{
+    const profile=JSON.parse(localStorage.getItem(PROFILE_KEY)||'{}');
+    const settings=JSON.parse(localStorage.getItem(K.SETTINGS)||'{}');
+    return {...settings,...profile};
+  }catch(e){return{};}
+}
+function saveST(s){
+  localStorage.setItem(PROFILE_KEY,JSON.stringify(s));
+  localStorage.setItem(K.SETTINGS,JSON.stringify(s));
+}
 function applySettings(){
   const s=loadST();
   const accent=s.accent||'#E8571A';
@@ -607,8 +618,8 @@ function renderSP(){
   if(rk)rk.value=cfg.resendKey||'';if(fe)fe.value=cfg.fromEmail||'';if(fn)fn.value=cfg.fromName||'';
 }
 function saveCfg(){const c={resendKey:document.getElementById('resendKey')?.value||'',fromEmail:document.getElementById('fromEmail')?.value||'',fromName:document.getElementById('fromName')?.value||''};localStorage.setItem(K.CFG,JSON.stringify(c));}
-function togLight(){const s=loadST();s.lightMode=!s.lightMode;localStorage.setItem(K.SETTINGS,JSON.stringify(s));applySettings();renderSP();showT(s.lightMode?'Light mode on':'Dark mode on');}
-function setAccent(hex){const s=loadST();s.accent=hex;localStorage.setItem(K.SETTINGS,JSON.stringify(s));applySettings();renderSP();showT('Color updated');}
+function togLight(){const s=loadST();s.lightMode=!s.lightMode;saveST(s);applySettings();renderSP();showT(s.lightMode?'Light mode on':'Dark mode on');}
+function setAccent(hex){const s=loadST();s.accent=hex;saveST(s);applySettings();renderSP();showT('Color updated');}
 function applyHex(val){if(!val)return;const hex=val.startsWith('#')?val:'#'+val;if(!/^#[0-9A-Fa-f]{6}$/.test(hex))return;document.getElementById('hexPrev').style.background=hex;setAccent(hex);}
 
 function init(){

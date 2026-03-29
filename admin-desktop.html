@@ -572,11 +572,30 @@ html,body{height:100%;background:var(--bg);color:var(--white);font-family:'Manro
           </div>
           <!-- Profile -->
           <div class="settings-sec">
-            <div class="settings-sec-hdr">👤 Profile</div>
+            <div class="settings-sec-hdr">👤 Profile — syncs to your public page</div>
+            <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:10px;">
+              <div style="display:flex;align-items:center;gap:12px;width:100%;">
+                <div class="settings-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 012-2h6a2 2 0 012 2v1.662"/></svg></div>
+                <div class="settings-row-body"><div class="settings-row-label">Profile Photo</div><div class="settings-row-sub">Updates your public page instantly</div></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;padding:0 2px;">
+                <div id="adminPhotoPreview" style="width:52px;height:52px;border-radius:50%;background:var(--as);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--accent);flex-shrink:0;overflow:hidden;">SC</div>
+                <div>
+                  <input type="file" id="adminPhotoFile" accept="image/*" style="display:none" onchange="handleAdminPhoto(this)">
+                  <button onclick="document.getElementById('adminPhotoFile').click()" style="height:32px;padding:0 14px;background:var(--as);border:1.5px solid var(--ab);border-radius:9px;font-family:'Manrope',sans-serif;font-size:12px;font-weight:800;color:var(--accent);cursor:pointer;margin-right:8px;">Upload Photo</button>
+                  <button onclick="removeAdminPhoto()" style="height:32px;padding:0 12px;background:transparent;border:1px solid var(--sep2);border-radius:9px;font-family:'Manrope',sans-serif;font-size:11px;font-weight:600;color:var(--l3);cursor:pointer;">Remove</button>
+                </div>
+              </div>
+            </div>
             <div class="settings-row">
               <div class="settings-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-              <div class="settings-row-body"><div class="settings-row-label">Your Name</div><div class="settings-row-sub">Shown in sidebar</div></div>
+              <div class="settings-row-body"><div class="settings-row-label">Your Name</div><div class="settings-row-sub">Updates public page name</div></div>
               <input class="settings-input" id="settingsName" placeholder="Shannon Craft" oninput="saveSettings()">
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-icon n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+              <div class="settings-row-body"><div class="settings-row-label">Tagline</div><div class="settings-row-sub">e.g. Author · Coach · Creator</div></div>
+              <input class="settings-input" id="settingsTagline" placeholder="Author · Coach · Creator" oninput="saveSettings()">
             </div>
           </div>
           <!-- Email Config -->
@@ -1144,7 +1163,21 @@ function rBcastHistory(){
 }
 
 /* ══════ SETTINGS ══════ */
-function loadST(){try{return JSON.parse(localStorage.getItem(K.SETTINGS)||'{}');}catch(e){return{};}}
+// Uses sc_profile_v1 — same key as public page so changes sync automatically
+const PROFILE_KEY = 'sc_profile_v1';
+function loadST(){
+  // Merge profile + settings so admin keeps working while syncing to public page
+  try{
+    const profile = JSON.parse(localStorage.getItem(PROFILE_KEY)||'{}');
+    const settings = JSON.parse(localStorage.getItem(K.SETTINGS)||'{}');
+    return {...settings, ...profile};
+  }catch(e){return{};}
+}
+function saveST(s){
+  // Save to BOTH keys so public page and admin both stay in sync
+  localStorage.setItem(PROFILE_KEY, JSON.stringify(s));
+  localStorage.setItem(K.SETTINGS, JSON.stringify(s));
+}
 function applySettings(){
   const s=loadST();
   const accent=s.accent||'#E8571A';
@@ -1161,8 +1194,27 @@ function applySettings(){
 function saveSettings(){
   const s=loadST();
   s.name=document.getElementById('settingsName')?.value||s.name;
-  localStorage.setItem(K.SETTINGS,JSON.stringify(s));
+  s.tagline=document.getElementById('settingsTagline')?.value||s.tagline;
+  saveST(s);
   updateGreeting();
+}
+function handleAdminPhoto(input){
+  const file=input.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    const s=loadST();s.photo=e.target.result;saveST(s);
+    updateAdminPhotoPreview(s);showT('Photo updated — public page will reflect this ✓');
+  };
+  r.readAsDataURL(file);input.value='';
+}
+function removeAdminPhoto(){
+  const s=loadST();s.photo=null;saveST(s);
+  updateAdminPhotoPreview(s);showT('Photo removed');
+}
+function updateAdminPhotoPreview(s){
+  const el=document.getElementById('adminPhotoPreview');if(!el)return;
+  if(s.photo){el.innerHTML=`<img src="${s.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;}
+  else{const pts=(s.name||'SC').split(' ');el.textContent=(pts[0][0]+(pts[1]?.[0]||'')).toUpperCase();}
 }
 function saveCfg(){
   const c={resendKey:document.getElementById('sResendKey')?.value||'',fromEmail:document.getElementById('sFromEmail')?.value||'',fromName:document.getElementById('sFromName')?.value||''};
@@ -1176,14 +1228,16 @@ function loadSettingsPanel(){
   const hi=document.getElementById('hexInput'),hp=document.getElementById('hexPreview');
   if(hi)hi.value=s.accent||'#E8571A';if(hp)hp.style.background=s.accent||'#E8571A';
   if(document.getElementById('settingsName'))document.getElementById('settingsName').value=s.name||'';
+  if(document.getElementById('settingsTagline'))document.getElementById('settingsTagline').value=s.tagline||'';
+  updateAdminPhotoPreview(s);
   const cfg=JSON.parse(localStorage.getItem(K.CFG)||'{}');
   const rk=document.getElementById('sResendKey'),fe=document.getElementById('sFromEmail'),fn=document.getElementById('sFromName');
   if(rk)rk.value=cfg.resendKey||'';if(fe)fe.value=cfg.fromEmail||'';if(fn)fn.value=cfg.fromName||'';
 }
-function togLight(){const s=loadST();s.lightMode=!s.lightMode;localStorage.setItem(K.SETTINGS,JSON.stringify(s));applySettings();loadSettingsPanel();showT(s.lightMode?'Light mode on':'Dark mode on');}
-function setAccent(hex){const s=loadST();s.accent=hex;localStorage.setItem(K.SETTINGS,JSON.stringify(s));applySettings();loadSettingsPanel();showT('Color updated');}
+function togLight(){const s=loadST();s.lightMode=!s.lightMode;saveST(s);applySettings();loadSettingsPanel();showT(s.lightMode?'Light mode on':'Dark mode on');}
+function setAccent(hex){const s=loadST();s.accent=hex;saveST(s);applySettings();loadSettingsPanel();showT('Color updated');}
 function applyHex(val){if(!val)return;const hex=val.startsWith('#')?val:'#'+val;if(!/^#[0-9A-Fa-f]{6}$/.test(hex))return;document.getElementById('hexPreview').style.background=hex;setAccent(hex);}
-function clearAll(){Object.values(K).forEach(k=>localStorage.removeItem(k));location.reload();showT('All data cleared');}
+function clearAll(){Object.values(K).forEach(k=>localStorage.removeItem(k));localStorage.removeItem(PROFILE_KEY);location.reload();showT('All data cleared');}
 
 /* BOOT */
 applySettings();
