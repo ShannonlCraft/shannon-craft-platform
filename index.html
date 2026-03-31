@@ -382,7 +382,7 @@ body.manage .nb.monly{display:flex;}
       <input class="form-input" id="cEmail2" placeholder="Your email" type="email">
       <input class="form-input" id="cSubject2" placeholder="Subject">
       <textarea class="form-ta" id="cMsg2" placeholder="Your message…"></textarea>
-      <button class="submit-btn" onclick="submitContact('cName2','cEmail2','cSubject2','cMsg2')">Send Message</button>
+      <button class="submit-btn" id="contactSendBtn" onclick="submitContact('cName2','cEmail2','cSubject2','cMsg2')">Send Message</button>
     </div>
   </div>
 </div>
@@ -709,16 +709,31 @@ function dupBook(id){const bs=getBooks();const b=bs.find(x=>x.id===id);if(!b)ret
 function delBook(id){if(!confirm('Delete?'))return;sd(K.BOOKS,getBooks().filter(x=>x.id!==id));renderBooks();showToast('Deleted');}
 
 /* ── CONTACT ── */
-function submitContact(n,e,s,m){
+async function submitContact(n,e,s,m){
   const nv=document.getElementById(n)?.value.trim();
   const ev=document.getElementById(e)?.value.trim();
-  const sv=document.getElementById(s)?.value.trim()||'Message from your hub';
+  const sv=document.getElementById(s)?.value.trim()||'Message via Shannon Craft Hub';
   const mv=document.getElementById(m)?.value.trim();
   if(!nv||!ev||!mv){showToast('Please fill in all fields');return;}
-  const toEmail=localStorage.getItem('sc_contact_email')||'';
-  if(toEmail){window.open('mailto:'+toEmail+'?subject='+encodeURIComponent(sv)+'&body='+encodeURIComponent('From: '+nv+' ('+ev+')\n\n'+mv));}
-  showToast('Message sent! I\'ll be in touch ✓');
-  [n,e,s,m].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const btn=document.getElementById('contactSendBtn');
+  if(btn){btn.disabled=true;btn.textContent='Sending…';}
+  try{
+    const res=await fetch('https://api.web3forms.com/submit',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify({access_key:'49e1efa4-cbf4-40da-8380-8d16d403d78c',name:nv,email:ev,subject:sv,message:mv})
+    });
+    const data=await res.json();
+    if(data.success){
+      if(btn){btn.textContent='✓ Sent!';}
+      showToast('Message sent! I\'ll be in touch ✓');
+      [n,e,s,m].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+      setTimeout(()=>{if(btn){btn.disabled=false;btn.textContent='Send Message';}},3000);
+    }else{throw new Error(data.message||'Send failed');}
+  }catch(err){
+    showToast('Could not send — please try again');
+    if(btn){btn.disabled=false;btn.textContent='Send Message';}
+  }
 }
 
 /* ── SETTINGS VIEW ── */
