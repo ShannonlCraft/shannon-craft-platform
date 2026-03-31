@@ -63,7 +63,9 @@
     "books": true,
     "courses": false,
     "booking": true,
-    "contact": true
+    "contact": true,
+    "website": true
   },
-  "contactEmail": ""
+  "contactEmail": "",
+  "websiteUrl": "www.shannoncraft.com"
 }
