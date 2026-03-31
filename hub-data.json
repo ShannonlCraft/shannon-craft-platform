@@ -32,7 +32,8 @@
     "shop": true,
     "books": true,
     "courses": true,
-    "booking": true,
+    "booking": false,
     "contact": true
-  }
+  },
+  "contactEmail": ""
 }
