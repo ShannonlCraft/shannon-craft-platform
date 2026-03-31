@@ -13,6 +13,7 @@
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{
+  color-scheme: dark;
   --bg:#000;--g1:#161616;--g2:#242424;--g3:#333;
   --sep:rgba(255,255,255,.07);--sep2:rgba(255,255,255,.11);
   --accent:#E8571A;--as:rgba(232,87,26,.13);--ab:rgba(232,87,26,.28);
@@ -22,7 +23,7 @@
   --r-lg:16px;--r-md:12px;--r-sm:8px;
 }
 html,body{min-height:100%;overflow-x:hidden;background:var(--bg);color:var(--white);font-family:'Manrope',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
-body{max-width:430px;margin:0 auto;padding-bottom:80px;}
+body{max-width:430px;margin:0 auto;padding-bottom:80px;opacity:0;transition:opacity 0.35s ease;}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 
 /* VIEWS */
@@ -149,7 +150,7 @@ body{max-width:430px;margin:0 auto;padding-bottom:80px;}
 .back-btn{width:32px;height:32px;border-radius:9px;background:var(--g1);border:1px solid var(--sep2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--l2);flex-shrink:0;}
 .back-btn:active{background:var(--as);color:var(--accent);}
 .back-btn svg{width:14px;height:14px;}
-.back-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1.5px;}
+.back-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1.5px;color:var(--white);}
 .back-title em{color:var(--accent);font-style:normal;}
 
 /* BOTTOM NAV */
@@ -381,7 +382,7 @@ body.manage .nb.monly{display:flex;}
       <input class="form-input" id="cEmail2" placeholder="Your email" type="email">
       <input class="form-input" id="cSubject2" placeholder="Subject">
       <textarea class="form-ta" id="cMsg2" placeholder="Your message…"></textarea>
-      <button class="submit-btn" onclick="submitContact('cName2','cEmail2','cMsg2')">Send Message</button>
+      <button class="submit-btn" onclick="submitContact('cName2','cEmail2','cSubject2','cMsg2')">Send Message</button>
     </div>
   </div>
 </div>
@@ -578,7 +579,7 @@ function openBooking(){const soc=getSocials();const bl=soc.booking;if(bl&&bl!=='
 function saveSocials(){const soc={};SOCIAL_KEYS.forEach(k=>{const el=document.getElementById('soc-'+k);if(el)soc[k]=el.value.trim();});sd(K.SOCIALS,soc);applySocials();}
 
 /* ── SECTIONS ── */
-function getSections(){return gd(K.SECTIONS,DEFAULT_SECTIONS);}
+function getSections(){return {...DEFAULT_SECTIONS,...gd(K.SECTIONS,DEFAULT_SECTIONS)};}
 function applySections(){
   const s=getSections();
   const ql=document.getElementById('sec-quickLinks');if(ql)ql.style.display=s.quickLinks?'block':'none';
@@ -708,7 +709,17 @@ function dupBook(id){const bs=getBooks();const b=bs.find(x=>x.id===id);if(!b)ret
 function delBook(id){if(!confirm('Delete?'))return;sd(K.BOOKS,getBooks().filter(x=>x.id!==id));renderBooks();showToast('Deleted');}
 
 /* ── CONTACT ── */
-function submitContact(n,e,m){const nv=document.getElementById(n)?.value.trim();const ev=document.getElementById(e)?.value.trim();const mv=document.getElementById(m)?.value.trim();if(!nv||!ev||!mv){showToast('Please fill in all fields');return;}showToast('Message sent! I\'ll be in touch ✓');[n,e,m].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
+function submitContact(n,e,s,m){
+  const nv=document.getElementById(n)?.value.trim();
+  const ev=document.getElementById(e)?.value.trim();
+  const sv=document.getElementById(s)?.value.trim()||'Message from your hub';
+  const mv=document.getElementById(m)?.value.trim();
+  if(!nv||!ev||!mv){showToast('Please fill in all fields');return;}
+  const toEmail=localStorage.getItem('sc_contact_email')||'';
+  if(toEmail){window.open('mailto:'+toEmail+'?subject='+encodeURIComponent(sv)+'&body='+encodeURIComponent('From: '+nv+' ('+ev+')\n\n'+mv));}
+  showToast('Message sent! I\'ll be in touch ✓');
+  [n,e,s,m].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+}
 
 /* ── SETTINGS VIEW ── */
 function loadSettingsView(){
@@ -771,9 +782,12 @@ async function loadLiveData(){
     Object.entries(keyMap).forEach(([field,lsKey])=>{
       if(data[field]!==undefined)localStorage.setItem(lsKey,JSON.stringify(data[field]));
     });
+    if(data.contactEmail)localStorage.setItem('sc_contact_email',data.contactEmail);
     init(); // Re-run init with fresh data
   }catch(e){
     init(); // Fall back to whatever is in localStorage
+  }finally{
+    document.body.style.opacity='1'; // Reveal page after data loads
   }
 }
 loadLiveData();
