@@ -28,7 +28,7 @@
     }
   ],
   "sections": {
-    "quickLinks": false,
+    "quickLinks": true,
     "shop": false,
     "books": false,
     "courses": false,
