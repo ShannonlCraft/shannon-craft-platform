@@ -62,7 +62,7 @@
     "shop": false,
     "books": true,
     "courses": false,
-    "booking": true,
+    "booking": false,
     "contact": true,
     "website": true
   },
