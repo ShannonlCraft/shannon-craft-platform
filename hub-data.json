@@ -30,10 +30,10 @@
   "sections": {
     "quickLinks": true,
     "shop": false,
-    "books": false,
+    "books": true,
     "courses": false,
     "booking": false,
-    "contact": false
+    "contact": true
   },
   "contactEmail": ""
 }
