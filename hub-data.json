@@ -18,7 +18,15 @@
   },
   "products": {},
   "courses": [],
-  "books": [],
+  "books": [
+    {
+      "id": "imneqcn6tpqx4it66wkr",
+      "title": "UNRAPTURED",
+      "author": "Shannon Craft",
+      "desc": "",
+      "amazonLink": "https://a.co/d/0aFqQaU4"
+    }
+  ],
   "sections": {
     "quickLinks": true,
     "shop": true,
