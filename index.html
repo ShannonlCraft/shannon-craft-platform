@@ -309,7 +309,25 @@ body.manage .nb.monly{display:flex;}
     </div>
   </div>
 
-  <!-- Shop -->
+  <!-- Shop Section -->
+  <div id="sec-shop">
+    <div class="sec-hdr">Digital Products</div>
+    <div class="prod-grid" id="digitalGrid"></div>
+    <div class="sec-hdr">Physical Products</div>
+    <div class="prod-grid" id="physicalGrid"></div>
+  </div>
+
+  <!-- Courses Section -->
+  <div id="sec-courses">
+    <div class="sec-hdr">Courses &amp; Memberships</div>
+    <div style="padding:4px 0;display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:4px 0;" id="coursesHomeGrid"></div>
+  </div>
+
+  <!-- Books Section -->
+  <div id="sec-books">
+    <div class="sec-hdr">My Books</div>
+    <div class="card" id="booksList"></div>
+  </div>
 
 </div><!-- /homeView -->
 
@@ -530,6 +548,7 @@ function showView(id){
   const tnlMap={homeView:'tnl-home',shopView:'tnl-shop',productView:'tnl-shop',booksView:'tnl-books',bookingView:'tnl-booking',coursesView:'tnl-courses',contactView:'tnl-contact',settingsView:'tnl-settings'};
   const tnl=document.getElementById(tnlMap[id]);if(tnl)tnl.classList.add('on');
   window.scrollTo(0,0);
+  if(id==='homeView'){renderProductsHome();renderCoursesHome();renderBooksHome();}
   if(id==='settingsView')loadSettingsView();
   if(id==='shopView')renderShopView();
   if(id==='coursesView')renderCoursesView();
@@ -588,6 +607,9 @@ function applySections(){
   // Top nav links — keep in sync with section toggles
   const navMap={shop:'tnl-shop',courses:'tnl-courses',books:'tnl-books',booking:'tnl-booking',contact:'tnl-contact'};
   Object.entries(navMap).forEach(([k,id])=>{const el=document.getElementById(id);if(el)el.style.display=s[k]?'':'none';});
+  // Home view sections
+  const homeSecMap={shop:'sec-shop',courses:'sec-courses',books:'sec-books'};
+  Object.entries(homeSecMap).forEach(([k,id])=>{const el=document.getElementById(id);if(el)el.style.display=s[k]?'block':'none';});
 }
 function togSec(key){const s=getSections();s[key]=!s[key];sd(K.SECTIONS,s);applySections();renderSecToggles();showToast((s[key]?'Showing':'Hiding')+' '+key);}
 function renderSecToggles(){const s=getSections();Object.keys(DEFAULT_SECTIONS).forEach(k=>{const t=document.getElementById('sec-tog-'+k);if(t)t.className='tog'+(s[k]?' on':'');});}
@@ -598,6 +620,9 @@ function renderProducts(){
   const p=getProducts();
   renderPGrid('digitalGrid',p.digital,'digital',true);
   renderPGrid('physicalGrid',p.physical,'physical',true);
+}
+function renderProductsHome(){
+  renderProducts();
 }
 function renderShopView(){
   const p=getProducts();
@@ -634,6 +659,20 @@ function delProduct(id,type){if(!confirm('Delete?'))return;const p=getProducts()
 
 /* ── COURSES ── */
 function getCourses(){return gd(K.COURSES,DEFAULT_COURSES);}
+function renderCoursesHome(){
+  const courses=getCourses();
+  const el=document.getElementById('coursesHomeGrid');if(!el)return;
+  el.innerHTML=courses.map(c=>`<div class="course-card">
+    <div class="course-banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div>
+    <div class="course-body">
+      <div class="course-ey">Course</div>
+      <div class="course-title">${esc(c.name)}</div>
+      <div class="course-desc">${esc(c.desc)}</div>
+      <div class="course-footer"><div><div class="course-price">${esc(c.price)}</div><div class="course-meta">${esc(c.meta)}</div></div>
+      <button class="enroll-btn" onclick="${c.link&&c.link!=='#'?`window.open('${c.link}','_blank')`:"showToast('Link coming soon')"}">Enroll</button></div>
+    </div>
+  </div>`).join('');
+}
 function renderCoursesView(){
   const courses=getCourses();
   const el=document.getElementById('coursesViewGrid');if(!el)return;
@@ -666,6 +705,9 @@ function renderBooks(){
     ${withEdit&&MANAGE?`<div class="book-edit-row"><button onclick="editBook('${b.id}')">✏️ Edit</button><button onclick="dupBook('${b.id}')">📋 Duplicate</button><button class="del" onclick="delBook('${b.id}')">Delete</button></div>`:''}
   </div>`;
   const homeEl=document.getElementById('booksList');if(homeEl)homeEl.innerHTML=books.map(b=>bookHTML(b,false)).join('');
+}
+function renderBooksHome(){
+  renderBooks();
 }
 function renderBooksView(){
   const books=getBooks();
@@ -711,18 +753,20 @@ function clearAll(){Object.values(K).forEach(k=>localStorage.removeItem(k));loca
 
 /* ── EDIT SHEET ── */
 let _editCb=null;
+let _editKeys=[];
 function openEdit({title,fields,onSave}){
   _editCb=onSave;
+  _editKeys=fields.map(f=>f.k);
   document.getElementById('editSheetInner').innerHTML=`
     <div class="drag"></div>
     <div class="sh-ey">Edit</div>
     <div class="sh-tit">${title}</div>
     ${fields.map(f=>`<div class="fl">${f.l}</div>${f.m?`<textarea class="fta" id="ef_${f.k}">${esc(f.v||'')}</textarea>`:`<input class="fi" id="ef_${f.k}" value="${esc(f.v||'')}">`}`).join('')}
-    <button class="okbtn" onclick="saveEdit(${JSON.stringify(fields.map(f=>f.k))})">Save Changes</button>
+    <button class="okbtn" onclick="saveEdit()">Save Changes</button>
     <button class="cancelbtn" onclick="closeEdit()">Cancel</button>`;
   document.getElementById('editSheet').classList.add('open');
 }
-function saveEdit(keys){const data={};keys.forEach(k=>{const el=document.getElementById('ef_'+k);if(el)data[k]=el.value.trim();});if(_editCb)_editCb(data);closeEdit();}
+function saveEdit(){const data={};_editKeys.forEach(k=>{const el=document.getElementById('ef_'+k);if(el)data[k]=el.value.trim();});if(_editCb)_editCb(data);closeEdit();}
 function closeEdit(){document.getElementById('editSheet')?.classList.remove('open');_editCb=null;}
 
 /* ── INIT ── */
@@ -730,6 +774,9 @@ function init(){
   applyProfile(getProfile());
   applySocials();
   applySections();
+  renderProductsHome();
+  renderCoursesHome();
+  renderBooksHome();
 }
 
 /* ── FETCH PUBLISHED DATA FROM GITHUB ── */
