@@ -19,5 +19,12 @@
   "products": {},
   "courses": [],
   "books": [],
-  "sections": {}
+  "sections": {
+    "quickLinks": false,
+    "shop": false,
+    "books": false,
+    "courses": false,
+    "booking": false,
+    "contact": false
+  }
 }
