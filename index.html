@@ -794,7 +794,7 @@ function init(){
 
 /* ── FETCH PUBLISHED DATA FROM GITHUB ── */
 const HUB_DATA_URL='https://raw.githubusercontent.com/shannonlcraft/shannon-craft-platform/main/hub-data.json';
-function openWebsite(){const url=localStorage.getItem('sc_website_url')||'';if(url)window.open(url,'_blank');else showToast('Website link not set yet');}
+function openWebsite(){let url=localStorage.getItem('sc_website_url')||'';if(!url){showToast('Website link not set yet');return;}if(!/^https?:\/\//i.test(url))url='https://'+url;window.open(url,'_blank');}
 function applyWebsiteCard(){const url=localStorage.getItem('sc_website_url')||'';const sub=document.getElementById('ql-website-sub');if(sub&&url){try{sub.textContent=new URL(url).hostname;}catch(e){sub.textContent='Visit my site';}};}
 async function loadLiveData(){
   try{
