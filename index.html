@@ -307,6 +307,11 @@ body.manage .nb.monly{display:flex;}
         <div class="row-body"><div class="row-title">Contact Me</div><div class="row-sub">Send me a message</div></div>
         <svg class="row-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
+      <div class="card-row" id="ql-website" onclick="openWebsite()" style="display:none;">
+        <div class="row-icon n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+        <div class="row-body"><div class="row-title">My Website</div><div class="row-sub" id="ql-website-sub">Visit my site</div></div>
+        <svg class="row-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
     </div>
   </div>
 
@@ -494,7 +499,7 @@ const ACCENT_COLORS=['#E8571A','#2563EB','#7C3AED','#16A34A','#DC2626','#0D9488'
 const SOCIAL_KEYS=['instagram','tiktok','youtube','facebook','x','linkedin','booking'];
 const SOCIAL_LABELS={instagram:'Instagram',tiktok:'TikTok',youtube:'YouTube',facebook:'Facebook',x:'X (Twitter)',linkedin:'LinkedIn',booking:'Booking Link'};
 const SOC_ICONS={instagram:'<rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>',tiktok:'<path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/>',youtube:'<path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/>',facebook:'<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>',x:'<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.74l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="currentColor" stroke="none"/>',linkedin:'<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>',booking:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>'};
-const DEFAULT_SECTIONS={quickLinks:true,shop:true,books:true,courses:false,booking:false,contact:true};
+const DEFAULT_SECTIONS={quickLinks:true,shop:true,books:true,courses:false,booking:false,contact:true,website:false};
 const DEFAULT_PRODUCTS={digital:[{id:'d1',name:'[Digital Product]',price:'$27',type:'Digital Download',desc:'Describe your digital product here.',includes:['Instant download','Lifetime access'],stripeLink:'#',paypalLink:'#'},{id:'d2',name:'[Workbook or PDF]',price:'$17',type:'Digital Download',desc:'Another digital product.',includes:['PDF format','Printable pages'],stripeLink:'#',paypalLink:'#'}],physical:[{id:'p1',name:'[Physical Product]',price:'$35',type:'Ships 3–5 days',desc:'Describe your physical product.',includes:['Free shipping over $50'],stripeLink:'#',paypalLink:'#'}]};
 const DEFAULT_COURSES=[{id:'c1',name:'[Course Name]',price:'$97',desc:'Course description.',meta:'Self-paced · Lifetime access',link:'#'},{id:'c2',name:'[Membership]',price:'$27/mo',desc:'Membership description.',meta:'Monthly · Cancel anytime',link:'#'}];
 const DEFAULT_BOOKS=[{id:'b1',title:'[Your Book Title]',author:'Shannon Craft',desc:'',amazonLink:'#'}];
@@ -584,7 +589,7 @@ function applySections(){
   const s=getSections();
   const ql=document.getElementById('sec-quickLinks');if(ql)ql.style.display=s.quickLinks?'block':'none';
   // Quick link cards
-  const qlMap={shop:'ql-shop',courses:'ql-courses',books:'ql-books',booking:'ql-booking',contact:'ql-contact'};
+  const qlMap={shop:'ql-shop',courses:'ql-courses',books:'ql-books',booking:'ql-booking',contact:'ql-contact',website:'ql-website'};
   Object.entries(qlMap).forEach(([k,id])=>{const el=document.getElementById(id);if(el)el.style.display=s[k]?'flex':'none';});
   // Top nav links — keep in sync with section toggles
   const navMap={shop:'tnl-shop',courses:'tnl-courses',books:'tnl-books',booking:'tnl-booking',contact:'tnl-contact'};
@@ -781,6 +786,7 @@ function init(){
   applyProfile(getProfile());
   applySocials();
   applySections();
+  applyWebsiteCard();
   renderProductsHome();
   renderCoursesHome();
   renderBooksHome();
@@ -788,6 +794,8 @@ function init(){
 
 /* ── FETCH PUBLISHED DATA FROM GITHUB ── */
 const HUB_DATA_URL='https://raw.githubusercontent.com/shannonlcraft/shannon-craft-platform/main/hub-data.json';
+function openWebsite(){const url=localStorage.getItem('sc_website_url')||'';if(url)window.open(url,'_blank');else showToast('Website link not set yet');}
+function applyWebsiteCard(){const url=localStorage.getItem('sc_website_url')||'';const sub=document.getElementById('ql-website-sub');if(sub&&url){try{sub.textContent=new URL(url).hostname;}catch(e){sub.textContent='Visit my site';}};}
 async function loadLiveData(){
   try{
     const res=await fetch(HUB_DATA_URL+'?t='+Date.now());
@@ -798,6 +806,7 @@ async function loadLiveData(){
       if(data[field]!==undefined)localStorage.setItem(lsKey,JSON.stringify(data[field]));
     });
     if(data.contactEmail)localStorage.setItem('sc_contact_email',data.contactEmail);
+    if(data.websiteUrl)localStorage.setItem('sc_website_url',data.websiteUrl);
     init(); // Re-run init with fresh data
   }catch(e){
     init(); // Fall back to whatever is in localStorage
