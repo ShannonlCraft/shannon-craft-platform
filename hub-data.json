@@ -20,11 +20,11 @@
   "courses": [],
   "books": [],
   "sections": {
-    "quickLinks": false,
-    "shop": false,
-    "books": false,
-    "courses": false,
-    "booking": false,
-    "contact": false
+    "quickLinks": true,
+    "shop": true,
+    "books": true,
+    "courses": true,
+    "booking": true,
+    "contact": true
   }
 }
